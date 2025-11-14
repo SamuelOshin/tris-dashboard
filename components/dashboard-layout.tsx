@@ -4,7 +4,18 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { TrendingUp, Shield, Users, FileCheck, Activity, LogOut, ChevronDown } from 'lucide-react'
+import {
+  TrendingUp,
+  Shield,
+  Users,
+  FileCheck,
+  Activity,
+  LogOut,
+  BarChart3,
+  FileBarChart,
+  Settings as SettingsIcon,
+} from 'lucide-react'
+
 import {
   SidebarProvider,
   Sidebar,
@@ -19,7 +30,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar'
-import { UserMenu } from './user-menu'
+
 import { ThemeToggle } from './theme-toggle'
 import { NotificationsPopover } from './notifications-popover'
 import { HeaderSearch } from './header-search'
@@ -30,7 +41,8 @@ interface DashboardLayoutProps {
   description: string
 }
 
-const navigationItems = [
+// Sectioned navigation
+const coreNavigation = [
   {
     name: 'Dashboard',
     href: '/',
@@ -55,11 +67,26 @@ const navigationItems = [
     icon: Activity,
     description: 'Access Monitoring',
   },
+]
+
+const intelligenceNavigation = [
   {
     name: 'Compliance',
     href: '/compliance',
     icon: FileCheck,
     description: 'Audit & Reports',
+  },
+  {
+    name: 'Correlation Intelligence',
+    href: '/dashboard/correlation',
+    icon: BarChart3,
+    description: 'Correlation & Pattern Insights',
+  },
+  {
+    name: 'Reports & Compliance',
+    href: '/dashboard/reports',
+    icon: FileBarChart,
+    description: 'Automated Reports & Compliance Files',
   },
 ]
 
@@ -67,12 +94,9 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
   const { user, loading, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const [isCollapsed, setIsCollapsed] = useState(false)
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login')
-    }
+    if (!loading && !user) router.push('/login')
   }, [user, loading, router])
 
   const handleLogout = () => {
@@ -91,13 +115,12 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
     )
   }
 
-  if (!user) {
-    return null
-  }
+  if (!user) return null
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon" variant="sidebar">
+      <Sidebar collapsible="icon" variant="sidebar" className="overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+
         {/* Sidebar Header */}
         <SidebarHeader className="border-b border-sidebar-border pb-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg text-primary px-2">
@@ -106,41 +129,63 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           </Link>
         </SidebarHeader>
 
-        {/* Sidebar Content */}
-        <SidebarContent>
+        {/* Sidebar Content with scroll */}
+        <SidebarContent className="pr-1">
           <SidebarGroup>
-            <SidebarGroupLabel className="px-2">NAVIGATION</SidebarGroupLabel>
-            <SidebarMenu className="gap-2">
-              {navigationItems.map((item) => {
+            <SidebarGroupLabel className="px-2 text-[11px] tracking-wider opacity-70">CORE MODULES</SidebarGroupLabel>
+            <SidebarMenu className="gap-1">
+              {coreNavigation.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
 
                 return (
-                  <SidebarMenuItem key={item.href} className="mb-1">
+                  <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`py-3 px-3 rounded-lg transition-all ${
-                        isActive
-                          ? 'bg-primary/15 text-primary font-semibold shadow-sm py-3 px-2'
-                          : 'hover:bg-sidebar-accent/50'
-                      }`}
-                      tooltip={{
-                        children: (
-                          <div>
-                            <div className="font-medium">{item.name}</div>
-                            <div className="text-xs text-muted-foreground">{item.description}</div>
-                          </div>
-                        ),
-                      }}
+                      className={`py-3 rounded-lg transition-all flex items-center gap-3 min-w-0
+                        ${isActive ? 'bg-primary/15 text-primary border-l-3 border-primary pl-4 pr-4 ml-1' : 'hover:bg-sidebar-accent/40 px-3'}
+                      `}
                     >
-                      <Link href={item.href} className="flex items-center gap-3">
+                      <Link href={item.href} className="flex items-center gap-3 min-w-0 w-full">
                         <Icon className="w-4 h-4 shrink-0" />
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-xs text-muted-foreground hidden md:inline">
-                            {item.description}
-                          </span>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="font-medium text-sm truncate">{item.name}</span>
+                          <span className="text-[11px] text-muted-foreground truncate group-data-[collapsible=icon]:hidden">{item.description}</span>
+                        </div>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroup>
+
+          {/* Divider */}
+          <div className="border-t border-sidebar-border my-2 opacity-40"></div>
+
+          {/* Intelligence Section */}
+          <SidebarGroup>
+            <SidebarGroupLabel className="px-2 text-[11px] tracking-wider opacity-70">GOVERNANCE & INTELLIGENCE</SidebarGroupLabel>
+            <SidebarMenu className="gap-1">
+              {intelligenceNavigation.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href
+
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      className={`py-3 rounded-lg transition-all flex items-center gap-3 min-w-0
+                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary pl-[10px] pr-3' : 'hover:bg-sidebar-accent/40 px-3'}
+                      `}
+                    >
+                      <Link href={item.href} className="flex items-center gap-3 min-w-0 w-full">
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="font-medium text-sm truncate">{item.name}</span>
+                          <span className="text-[11px] text-muted-foreground truncate group-data-[collapsible=icon]:hidden">{item.description}</span>
                         </div>
                       </Link>
                     </SidebarMenuButton>
@@ -151,44 +196,47 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           </SidebarGroup>
         </SidebarContent>
 
-        {/* Sidebar Footer */}
-        <SidebarFooter className="border-t border-sidebar-border pt-4">
-          <div className="flex items-center justify-between gap-2 px-2 mb-4">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-bold text-sidebar-accent-foreground shrink-0">
-                {user?.name?.[0]?.toUpperCase() || 'U'}
-              </div>
-              <div className="min-w-0 hidden group-data-[collapsible=icon]:hidden">
-                <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name || 'User'}</p>
-                <p className="text-xs text-sidebar-muted-foreground truncate">{user?.role || 'Guest'}</p>
+        {/* SIDEBAR FOOTER */}
+        <SidebarFooter className="border-t border-sidebar-border pt-4 mt-2">
+
+          {/* SETTINGS */}
+          <Link
+            href="/dashboard/settings"
+            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors mb-3"
+          >
+            <SettingsIcon className="w-4 h-4" />
+            <span className="group-data-[collapsible=icon]:hidden">Settings</span>
+          </Link>
+
+          {/* USER + LOGOUT ROW */}
+          <div className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-sidebar-accent transition-all">
+            {/* User icon */}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-bold uppercase">
+                {user?.name?.[0] || 'U'}
               </div>
             </div>
+
+            {/* Logout */}
+            <button onClick={handleLogout} className="text-sm flex items-center gap-1 hover:text-primary">
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-2 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="group-data-[collapsible=icon]:hidden">Logout</span>
-          </button>
         </SidebarFooter>
       </Sidebar>
 
-      {/* Main Content Area */}
+      {/* MAIN CONTENT */}
       <SidebarInset>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-border bg-card sticky top-0 z-40 gap-4">
+        <div className="flex items-center justify-between h-16 px-6 border-b bg-card sticky top-0 z-40">
           <div className="flex items-center gap-4 flex-1 min-w-0">
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
-              <h1 className="text-lg font-semibold text-foreground">{title}</h1>
-              {description && (
-                <p className="text-xs text-muted-foreground">{description}</p>
-              )}
+              <h1 className="text-lg font-semibold">{title}</h1>
+              {description && <p className="text-xs text-muted-foreground">{description}</p>}
             </div>
           </div>
 
-          {/* Header Actions */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2">
             <HeaderSearch />
             <NotificationsPopover />
             <div className="w-px h-6 bg-border" />
@@ -196,9 +244,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           </div>
         </div>
 
-        <main className="flex-1">
-          {children}
-        </main>
+        <main>{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )
