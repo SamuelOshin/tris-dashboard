@@ -4,7 +4,18 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { TrendingUp, Shield, Users, FileCheck, Activity, LogOut, ChevronDown } from 'lucide-react'
+import {
+  TrendingUp,
+  Shield,
+  Users,
+  FileCheck,
+  Activity,
+  LogOut,
+  BarChart3,
+  FileBarChart,
+  Settings as SettingsIcon,
+} from 'lucide-react'
+
 import {
   SidebarProvider,
   Sidebar,
@@ -19,6 +30,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar'
+
 import { UserMenu } from './user-menu'
 import { ThemeToggle } from './theme-toggle'
 import { NotificationsPopover } from './notifications-popover'
@@ -61,6 +73,18 @@ const navigationItems = [
     icon: FileCheck,
     description: 'Audit & Reports',
   },
+  {
+    name: 'Correlation Intelligence',
+    href: '/dashboard/correlation',
+    icon: BarChart3,
+    description: 'Correlation & Pattern Insights',
+  },
+  {
+    name: 'Reports & Compliance',
+    href: '/dashboard/reports',
+    icon: FileBarChart,
+    description: 'Automated Reports & Compliance Files',
+  },
 ]
 
 export function DashboardLayout({ children, title, description }: DashboardLayoutProps) {
@@ -91,9 +115,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
     )
   }
 
-  if (!user) {
-    return null
-  }
+  if (!user) return null
 
   return (
     <SidebarProvider>
@@ -110,6 +132,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel className="px-2">NAVIGATION</SidebarGroupLabel>
+
             <SidebarMenu className="gap-2">
               {navigationItems.map((item) => {
                 const Icon = item.icon
@@ -129,7 +152,9 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                         children: (
                           <div>
                             <div className="font-medium">{item.name}</div>
-                            <div className="text-xs text-muted-foreground">{item.description}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {item.description}
+                            </div>
                           </div>
                         ),
                       }}
@@ -159,11 +184,26 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                 {user?.name?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="min-w-0 hidden group-data-[collapsible=icon]:hidden">
-                <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name || 'User'}</p>
-                <p className="text-xs text-sidebar-muted-foreground truncate">{user?.role || 'Guest'}</p>
+                <p className="text-sm font-medium text-sidebar-foreground truncate">
+                  {user?.name || 'User'}
+                </p>
+                <p className="text-xs text-sidebar-muted-foreground truncate">
+                  {user?.role || 'Guest'}
+                </p>
               </div>
             </div>
           </div>
+
+          {/* Settings */}
+          <Link
+            href="/dashboard/settings"
+            className="w-full flex items-center gap-2 px-2 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-colors mb-2"
+          >
+            <SettingsIcon className="w-4 h-4" />
+            <span className="group-data-[collapsible=icon]:hidden">Settings</span>
+          </Link>
+
+          {/* Logout */}
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-2 px-2 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-colors"
@@ -187,7 +227,6 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
             </div>
           </div>
 
-          {/* Header Actions */}
           <div className="flex items-center gap-2 shrink-0">
             <HeaderSearch />
             <NotificationsPopover />
@@ -196,9 +235,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           </div>
         </div>
 
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )
