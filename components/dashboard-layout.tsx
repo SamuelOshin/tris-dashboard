@@ -143,15 +143,15 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`py-3 px-3 rounded-lg transition-all flex items-center gap-3
-                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary' : 'hover:bg-sidebar-accent/40'}
+                      className={`py-3 rounded-lg transition-all flex items-center gap-3 min-w-0
+                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary pl-[10px] pr-3' : 'hover:bg-sidebar-accent/40 px-3'}
                       `}
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} className="flex items-center gap-3 min-w-0 w-full">
                         <Icon className="w-4 h-4 shrink-0" />
-                        <div className="flex flex-col">
-                          <span className="font-medium text-sm">{item.name}</span>
-                          <span className="text-[11px] text-muted-foreground hidden md:inline">{item.description}</span>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="font-medium text-sm truncate">{item.name}</span>
+                          <span className="text-[11px] text-muted-foreground truncate group-data-[collapsible=icon]:hidden">{item.description}</span>
                         </div>
                       </Link>
                     </SidebarMenuButton>
@@ -177,15 +177,15 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`py-3 px-3 rounded-lg transition-all flex items-center gap-3
-                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary' : 'hover:bg-sidebar-accent/40'}
+                      className={`py-3 rounded-lg transition-all flex items-center gap-3 min-w-0
+                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary pl-[10px] pr-3' : 'hover:bg-sidebar-accent/40 px-3'}
                       `}
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} className="flex items-center gap-3 min-w-0 w-full">
                         <Icon className="w-4 h-4 shrink-0" />
-                        <div className="flex flex-col">
-                          <span className="font-medium text-sm">{item.name}</span>
-                          <span className="text-[11px] text-muted-foreground hidden md:inline">{item.description}</span>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="font-medium text-sm truncate">{item.name}</span>
+                          <span className="text-[11px] text-muted-foreground truncate group-data-[collapsible=icon]:hidden">{item.description}</span>
                         </div>
                       </Link>
                     </SidebarMenuButton>
