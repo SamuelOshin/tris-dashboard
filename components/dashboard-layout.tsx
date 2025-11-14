@@ -230,6 +230,15 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
 
         {/* SIDEBAR FOOTER */}
         <SidebarFooter className="border-t border-sidebar-border pt-4">
+        
+          {/* SETTINGS */}
+          <Link
+            href="/dashboard/settings"
+            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors"
+          >
+            <SettingsIcon className="w-4 h-4" />
+            <span className="group-data-[collapsible=icon]:hidden">Settings</span>
+          </Link>
 
           {/* USER + LOGOUT ROW */}
           <div className="flex items-center justify-between px-2 py-2 w-full">
@@ -257,14 +266,6 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
 
           </div>
 
-          {/* SETTINGS */}
-          <Link
-            href="/dashboard/settings"
-            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors"
-          >
-            <SettingsIcon className="w-4 h-4" />
-            <span className="group-data-[collapsible=icon]:hidden">Settings</span>
-          </Link>
 
         </SidebarFooter>
 
