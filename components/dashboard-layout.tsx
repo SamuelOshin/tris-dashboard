@@ -133,7 +133,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
         <SidebarContent className="pr-1">
           <SidebarGroup>
             <SidebarGroupLabel className="px-2 text-[11px] tracking-wider opacity-70">CORE MODULES</SidebarGroupLabel>
-            <SidebarMenu className="gap-1">
+            <SidebarMenu className="gap-3">
               {coreNavigation.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
@@ -167,7 +167,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           {/* Intelligence Section */}
           <SidebarGroup>
             <SidebarGroupLabel className="px-2 text-[11px] tracking-wider opacity-70">GOVERNANCE & INTELLIGENCE</SidebarGroupLabel>
-            <SidebarMenu className="gap-1">
+            <SidebarMenu className="gap-3">
               {intelligenceNavigation.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
