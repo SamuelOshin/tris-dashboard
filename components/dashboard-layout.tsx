@@ -73,6 +73,8 @@ const navigationItems = [
     icon: FileCheck,
     description: 'Audit & Reports',
   },
+
+  // ✅ New items you requested
   {
     name: 'Correlation Intelligence',
     href: '/dashboard/correlation',
@@ -194,7 +196,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
             </div>
           </div>
 
-          {/* Settings */}
+          {/* Settings (correct UX position) */}
           <Link
             href="/dashboard/settings"
             className="w-full flex items-center gap-2 px-2 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-colors mb-2"
