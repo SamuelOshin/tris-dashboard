@@ -41,7 +41,6 @@ interface DashboardLayoutProps {
   description: string
 }
 
-// Sectioned navigation for clean grouping
 const coreNavigation = [
   {
     name: 'Dashboard',
@@ -123,7 +122,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
     <SidebarProvider>
       <Sidebar collapsible="icon" variant="sidebar">
         
-        {/* Sidebar Header */}
+        {/* SIDEBAR HEADER */}
         <SidebarHeader className="border-b border-sidebar-border pb-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg text-primary px-2">
             <Shield className="w-5 h-5" />
@@ -131,12 +130,12 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           </Link>
         </SidebarHeader>
 
-        {/* Sidebar Content */}
         <SidebarContent>
 
           {/* CORE MODULES */}
           <SidebarGroup>
             <SidebarGroupLabel className="px-2">CORE MODULES</SidebarGroupLabel>
+
             <SidebarMenu className="gap-2">
               {coreNavigation.map((item) => {
                 const Icon = item.icon
@@ -148,13 +147,17 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                       asChild
                       isActive={isActive}
                       className={`py-3 px-3 rounded-lg transition-all ${
-                        isActive ? 'bg-primary/15 text-primary font-semibold shadow-sm' : 'hover:bg-sidebar-accent/50'
+                        isActive
+                          ? 'bg-primary/15 text-primary font-semibold shadow-sm'
+                          : 'hover:bg-sidebar-accent/50'
                       }`}
                       tooltip={{
                         children: (
                           <div>
                             <div className="font-medium">{item.name}</div>
-                            <div className="text-xs text-muted-foreground">{item.description}</div>
+                            <div className="text-xs text-muted-foreground whitespace-normal leading-tight">
+                              {item.description}
+                            </div>
                           </div>
                         ),
                       }}
@@ -163,7 +166,9 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                         <Icon className="w-4 h-4 shrink-0" />
                         <div className="flex flex-col gap-0.5">
                           <span className="font-medium">{item.name}</span>
-                          <span className="text-xs text-muted-foreground hidden md:inline">{item.description}</span>
+                          <span className="text-xs text-muted-foreground whitespace-normal leading-tight hidden md:inline">
+                            {item.description}
+                          </span>
                         </div>
                       </Link>
                     </SidebarMenuButton>
@@ -173,7 +178,6 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
             </SidebarMenu>
           </SidebarGroup>
 
-          {/* SECTION DIVIDER */}
           <div className="border-t border-sidebar-border opacity-60 my-px" />
 
           {/* GOVERNANCE & INTELLIGENCE */}
@@ -191,13 +195,17 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                       asChild
                       isActive={isActive}
                       className={`py-3 px-3 rounded-lg transition-all ${
-                        isActive ? 'bg-primary/15 text-primary font-semibold shadow-sm' : 'hover:bg-sidebar-accent/50'
+                        isActive
+                          ? 'bg-primary/15 text-primary font-semibold shadow-sm'
+                          : 'hover:bg-sidebar-accent/50'
                       }`}
                       tooltip={{
                         children: (
                           <div>
                             <div className="font-medium">{item.name}</div>
-                            <div className="text-xs text-muted-foreground">{item.description}</div>
+                            <div className="text-xs text-muted-foreground whitespace-normal leading-tight">
+                              {item.description}
+                            </div>
                           </div>
                         ),
                       }}
@@ -206,7 +214,9 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                         <Icon className="w-4 h-4 shrink-0" />
                         <div className="flex flex-col gap-0.5">
                           <span className="font-medium">{item.name}</span>
-                          <span className="text-xs text-muted-foreground hidden md:inline">{item.description}</span>
+                          <span className="text-xs text-muted-foreground whitespace-normal leading-tight hidden md:inline">
+                            {item.description}
+                          </span>
                         </div>
                       </Link>
                     </SidebarMenuButton>
@@ -221,41 +231,46 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
         {/* SIDEBAR FOOTER */}
         <SidebarFooter className="border-t border-sidebar-border pt-4">
 
-          {/* User */}
-          <div className="flex items-center justify-between gap-2 px-2 mb-4">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
+          {/* USER + LOGOUT ROW */}
+          <div className="flex items-center justify-between px-2 py-2 w-full">
+
+            {/* USER INFO */}
+            <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-bold text-sidebar-accent-foreground">
                 {user?.name?.[0]?.toUpperCase() || 'U'}
               </div>
-              <div className="min-w-0 hidden group-data-[collapsible=icon]:hidden">
+
+              <div className="hidden group-data-[collapsible=icon]:hidden">
                 <p className="text-sm font-medium truncate">{user?.name || 'User'}</p>
                 <p className="text-xs text-sidebar-muted-foreground truncate">{user?.role || 'Guest'}</p>
               </div>
             </div>
+
+            {/* LOGOUT */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1 text-sm hover:bg-sidebar-accent px-2 py-1 rounded-md transition-colors"
+            >
+              <span className="hidden group-data-[collapsible=icon]:hidden">Logout</span>
+              <LogOut className="w-4 h-4" />
+            </button>
+
           </div>
 
-          {/* Settings */}
+          {/* SETTINGS */}
           <Link
             href="/dashboard/settings"
-            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors mb-2"
+            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors"
           >
             <SettingsIcon className="w-4 h-4" />
             <span className="group-data-[collapsible=icon]:hidden">Settings</span>
           </Link>
 
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="group-data-[collapsible=icon]:hidden">Logout</span>
-          </button>
-
         </SidebarFooter>
+
       </Sidebar>
 
-      {/* Main Content */}
+      {/* MAIN CONTENT */}
       <SidebarInset>
         <div className="flex items-center justify-between h-16 px-6 border-b bg-card sticky top-0 z-40">
           <div className="flex items-center gap-4 flex-1 min-w-0">
