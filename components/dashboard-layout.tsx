@@ -41,6 +41,7 @@ interface DashboardLayoutProps {
   description: string
 }
 
+// Sectioned navigation
 const coreNavigation = [
   {
     name: 'Dashboard',
@@ -95,9 +96,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
   const pathname = usePathname()
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login')
-    }
+    if (!loading && !user) router.push('/login')
   }, [user, loading, router])
 
   const handleLogout = () => {
@@ -120,9 +119,9 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon" variant="sidebar">
-        
-        {/* SIDEBAR HEADER */}
+      <Sidebar collapsible="icon" variant="sidebar" className="overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+
+        {/* Sidebar Header */}
         <SidebarHeader className="border-b border-sidebar-border pb-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg text-primary px-2">
             <Shield className="w-5 h-5" />
@@ -130,45 +129,29 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           </Link>
         </SidebarHeader>
 
-        <SidebarContent>
-
-          {/* CORE MODULES */}
+        {/* Sidebar Content with scroll */}
+        <SidebarContent className="pr-1">
           <SidebarGroup>
-            <SidebarGroupLabel className="px-2">CORE MODULES</SidebarGroupLabel>
-
-            <SidebarMenu className="gap-2">
+            <SidebarGroupLabel className="px-2 text-[11px] tracking-wider opacity-70">CORE MODULES</SidebarGroupLabel>
+            <SidebarMenu className="gap-1">
               {coreNavigation.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
 
                 return (
-                  <SidebarMenuItem key={item.href} className="mb-1">
+                  <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`py-3 px-3 rounded-lg transition-all ${
-                        isActive
-                          ? 'bg-primary/15 text-primary font-semibold shadow-sm'
-                          : 'hover:bg-sidebar-accent/50'
-                      }`}
-                      tooltip={{
-                        children: (
-                          <div>
-                            <div className="font-medium">{item.name}</div>
-                            <div className="text-xs text-muted-foreground whitespace-normal leading-tight">
-                              {item.description}
-                            </div>
-                          </div>
-                        ),
-                      }}
+                      className={`py-3 px-3 rounded-lg transition-all flex items-center gap-3
+                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary' : 'hover:bg-sidebar-accent/40'}
+                      `}
                     >
-                      <Link href={item.href} className="flex items-center gap-3">
+                      <Link href={item.href}>
                         <Icon className="w-4 h-4 shrink-0" />
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-xs text-muted-foreground whitespace-normal leading-tight hidden md:inline">
-                            {item.description}
-                          </span>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm">{item.name}</span>
+                          <span className="text-[11px] text-muted-foreground hidden md:inline">{item.description}</span>
                         </div>
                       </Link>
                     </SidebarMenuButton>
@@ -178,45 +161,31 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
             </SidebarMenu>
           </SidebarGroup>
 
-          <div className="border-t border-sidebar-border opacity-60 my-px" />
+          {/* Divider */}
+          <div className="border-t border-sidebar-border my-2 opacity-40"></div>
 
-          {/* GOVERNANCE & INTELLIGENCE */}
+          {/* Intelligence Section */}
           <SidebarGroup>
-            <SidebarGroupLabel className="px-2">GOVERNANCE & INTELLIGENCE</SidebarGroupLabel>
-
-            <SidebarMenu className="gap-2">
+            <SidebarGroupLabel className="px-2 text-[11px] tracking-wider opacity-70">GOVERNANCE & INTELLIGENCE</SidebarGroupLabel>
+            <SidebarMenu className="gap-1">
               {intelligenceNavigation.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
 
                 return (
-                  <SidebarMenuItem key={item.href} className="mb-1">
+                  <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`py-3 px-3 rounded-lg transition-all ${
-                        isActive
-                          ? 'bg-primary/15 text-primary font-semibold shadow-sm'
-                          : 'hover:bg-sidebar-accent/50'
-                      }`}
-                      tooltip={{
-                        children: (
-                          <div>
-                            <div className="font-medium">{item.name}</div>
-                            <div className="text-xs text-muted-foreground whitespace-normal leading-tight">
-                              {item.description}
-                            </div>
-                          </div>
-                        ),
-                      }}
+                      className={`py-3 px-3 rounded-lg transition-all flex items-center gap-3
+                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary' : 'hover:bg-sidebar-accent/40'}
+                      `}
                     >
-                      <Link href={item.href} className="flex items-center gap-3">
+                      <Link href={item.href}>
                         <Icon className="w-4 h-4 shrink-0" />
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-xs text-muted-foreground whitespace-normal leading-tight hidden md:inline">
-                            {item.description}
-                          </span>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm">{item.name}</span>
+                          <span className="text-[11px] text-muted-foreground hidden md:inline">{item.description}</span>
                         </div>
                       </Link>
                     </SidebarMenuButton>
@@ -225,50 +194,35 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
               })}
             </SidebarMenu>
           </SidebarGroup>
-
         </SidebarContent>
 
         {/* SIDEBAR FOOTER */}
-        <SidebarFooter className="border-t border-sidebar-border pt-4">
-        
+        <SidebarFooter className="border-t border-sidebar-border pt-4 mt-2">
+
           {/* SETTINGS */}
           <Link
             href="/dashboard/settings"
-            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors"
+            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors mb-3"
           >
             <SettingsIcon className="w-4 h-4" />
             <span className="group-data-[collapsible=icon]:hidden">Settings</span>
           </Link>
 
           {/* USER + LOGOUT ROW */}
-          <div className="flex items-center justify-between px-2 py-2 w-full">
-
-            {/* USER INFO */}
+          <div className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-sidebar-accent transition-all">
+            {/* User icon */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-bold text-sidebar-accent-foreground">
-                {user?.name?.[0]?.toUpperCase() || 'U'}
-              </div>
-
-              <div className="hidden group-data-[collapsible=icon]:hidden">
-                <p className="text-sm font-medium truncate">{user?.name || 'User'}</p>
-                <p className="text-xs text-sidebar-muted-foreground truncate">{user?.role || 'Guest'}</p>
+              <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-bold uppercase">
+                {user?.name?.[0] || 'U'}
               </div>
             </div>
 
-            {/* LOGOUT */}
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1 text-sm hover:bg-sidebar-accent px-2 py-1 rounded-md transition-colors"
-            >
-              <span className="hidden group-data-[collapsible=icon]:hidden">Logout</span>
+            {/* Logout */}
+            <button onClick={handleLogout} className="text-sm flex items-center gap-1 hover:text-primary">
               <LogOut className="w-4 h-4" />
             </button>
-
           </div>
-
-
         </SidebarFooter>
-
       </Sidebar>
 
       {/* MAIN CONTENT */}
