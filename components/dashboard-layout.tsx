@@ -174,7 +174,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           </SidebarGroup>
 
           {/* SECTION DIVIDER */}
-          <div className="my-3 border-t border-sidebar-border opacity-60" />
+          <div className="border-t border-sidebar-border opacity-60 my-px" />
 
           {/* GOVERNANCE & INTELLIGENCE */}
           <SidebarGroup>
