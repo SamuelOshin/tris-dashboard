@@ -178,7 +178,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                       asChild
                       isActive={isActive}
                       className={`py-3 rounded-lg transition-all flex items-center gap-3 min-w-0
-                        ${isActive ? 'bg-primary/15 text-primary border-l-3 border-primary pl-4 pr-4 ml-1' : 'hover:bg-sidebar-accent/40 px-3'}
+                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary pl-[10px] pr-3' : 'hover:bg-sidebar-accent/40 px-3'}
                       `}
                     >
                       <Link href={item.href} className="flex items-center gap-3 min-w-0 w-full">
