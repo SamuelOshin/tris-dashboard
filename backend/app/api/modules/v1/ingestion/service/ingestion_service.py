@@ -106,9 +106,7 @@ class IngestionService:
                 "Must include 'transaction_id', 'supplier_id', and 'amount_usd' (or 'amount'). "
                 f"Found: {list(df_tx.columns)}"
             )
-        report["transactions_loaded"] = await IngestionService._ingest_transactions(
-            df_tx, session
-        )
+        report["transactions_loaded"] = await IngestionService._ingest_transactions(df_tx, session)
 
         # 3. Check for at least 1 record in core sheets
         if report["suppliers_loaded"] == 0 and report["transactions_loaded"] == 0:

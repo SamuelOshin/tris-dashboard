@@ -14,6 +14,9 @@ from app.api.modules.v1.rules.routes.rule_routes import router as rules_router
 from app.api.modules.v1.suppliers.routes.supplier_routes import (
     router as suppliers_router,
 )
+from app.api.modules.v1.transactions.routes.transaction_routes import (
+    router as transactions_router,
+)
 
 api_v1_router = APIRouter(prefix="/api/v1")
 
@@ -21,6 +24,7 @@ api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.include_router(auth_router)
 api_v1_router.include_router(ingestion_router)
 api_v1_router.include_router(suppliers_router)
+api_v1_router.include_router(transactions_router)
 api_v1_router.include_router(rules_router)
 api_v1_router.include_router(cases_router)
 

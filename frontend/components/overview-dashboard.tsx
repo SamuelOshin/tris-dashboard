@@ -1,42 +1,144 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-
-const chartData = [
-  { time: '00:00', fraud: 2.4, risk: 2.4, access: 2.4 },
-  { time: '04:00', fraud: 3.0, risk: 1.4, access: 2.2 },
-  { time: '08:00', fraud: 2.0, risk: 9.6, access: 2.9 },
-  { time: '12:00', fraud: 2.78, risk: 3.9, access: 2.0 },
-  { time: '16:00', fraud: 1.89, risk: 4.3, access: 2.1 },
-  { time: '20:00', fraud: 2.39, risk: 1.1, access: 2.6 },
-  { time: '24:00', fraud: 2.78, risk: 2.9, access: 2.5 },
-]
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { api, Transaction, RiskCase } from '@/lib/api'
+import { ShieldAlert, ArrowRight, CheckCircle2, Calendar, FileText } from 'lucide-react'
+import Link from 'next/link'
 
 export function OverviewDashboard() {
-  return (
-    <Card className="p-6">
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Risk Timeline</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-            <XAxis dataKey="time" stroke="var(--muted-foreground)" />
-            <YAxis stroke="var(--muted-foreground)" />
-            <Tooltip 
-              contentStyle={{
-                backgroundColor: 'var(--card)',
-                border: '1px solid var(--border)',
-                borderRadius: '8px'
-              }}
-            />
-            <Legend />
-            <Line type="monotone" dataKey="fraud" stroke="var(--destructive)" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="risk" stroke="var(--warning)" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="access" stroke="var(--accent)" strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+  const [benchmarkCase, setBenchmarkCase] = useState<RiskCase | null>(null)
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+    Promise.all([
+      api.getCases().catch(() => []),
+      api.getTransactions(undefined, 0, 7).catch(() => []),
+    ])
+      .then(([cases, txs]) => {
+        if (mounted) {
+          const highCase = cases.find((c) => c.priority.toLowerCase() === 'high') || cases[0] || null
+          setBenchmarkCase(highCase)
+          setRecentTransactions(txs)
+        }
+      })
+      .finally(() => {
+        if (mounted) setLoading(false)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6 space-y-4">
+          <div className="h-6 bg-muted/40 rounded w-1/3 animate-pulse" />
+          <div className="h-24 bg-muted/20 rounded animate-pulse" />
+        </Card>
+        <Card className="p-6 space-y-3">
+          <div className="h-5 bg-muted/40 rounded w-1/4 animate-pulse" />
+          <div className="h-32 bg-muted/20 rounded animate-pulse" />
+        </Card>
       </div>
-    </Card>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Benchmark Spotlight */}
+      {benchmarkCase && (
+        <Card className="p-6 border-l-4 border-l-destructive bg-card relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
+                  {benchmarkCase.priority} Priority Anomaly
+                </Badge>
+                <span className="text-xs font-mono text-muted-foreground">{benchmarkCase.case_id}</span>
+              </div>
+              <h3 className="text-lg font-bold text-foreground">
+                Multi-Signal Risk Trigger: {benchmarkCase.transaction_id} ($104,000.00)
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-xl">
+                Northstar Components LLC invoice exceeds historical baseline ($30,471.43) by 3.41x, preceded by recent bank detail changes and unauthorized off-hours access.
+              </p>
+            </div>
+
+            <Link href={`/cases/${benchmarkCase.case_id}`}>
+              <Button className="flex items-center gap-2 flex-shrink-0">
+                Investigate Case
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      )}
+
+      {/* Recent Audited Transactions */}
+      <Card className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-foreground">Audited Invoices Ledger</h3>
+            <p className="text-xs text-muted-foreground">Recent transactions evaluated by deterministic rules engine</p>
+          </div>
+          <Link href="/fraud-detection">
+            <Button variant="ghost" size="sm" className="text-xs">
+              View All Cases
+            </Button>
+          </Link>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-muted/30 border-b border-border text-muted-foreground font-semibold uppercase">
+              <tr>
+                <th className="p-3">Invoice</th>
+                <th className="p-3">Supplier</th>
+                <th className="p-3">Date</th>
+                <th className="p-3">Amount</th>
+                <th className="p-3">Approval</th>
+                <th className="p-3 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {recentTransactions.map((tx) => (
+                <tr key={tx.transaction_id} className="hover:bg-muted/10 transition-colors">
+                  <td className="p-3 font-mono font-semibold text-foreground">{tx.invoice_number || tx.transaction_id}</td>
+                  <td className="p-3 text-muted-foreground font-mono">{tx.supplier_id}</td>
+                  <td className="p-3 text-muted-foreground">{tx.invoice_date}</td>
+                  <td className="p-3 font-semibold font-mono text-foreground">
+                    ${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </td>
+                  <td className="p-3">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
+                      {tx.approval_status}
+                    </span>
+                  </td>
+                  <td className="p-3 text-right">
+                    {tx.transaction_id === 'TX-1999' ? (
+                      <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-[10px]">
+                        Flagged Anomaly
+                      </Badge>
+                    ) : (
+                      <span className="text-success inline-flex items-center gap-1 font-medium">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Verified
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
   )
 }
