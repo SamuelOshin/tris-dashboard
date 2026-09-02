@@ -299,6 +299,7 @@ class IngestionService:
                     },
                 )
                 session.add(case)
+                await session.flush()
 
                 # Initial Case History entry
                 history = CaseHistory(
@@ -313,6 +314,6 @@ class IngestionService:
                     ),
                 )
                 session.add(history)
+                await session.flush()
                 count += 1
-        await session.flush()
         return count

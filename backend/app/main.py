@@ -3,7 +3,9 @@ TRIS FastAPI Application Entrypoint.
 Initializes FastAPI, configures CORS, registers global exception handlers, and mounts API routers.
 """
 
+import asyncio
 import logging
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -13,6 +15,9 @@ from app.api.core.config import settings
 from app.api.core.custom_exceptions.register import register_exception_handlers
 from app.api.db.database import create_db_and_tables
 from app.api.modules.v1.router import api_v1_router
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger("tris.main")
