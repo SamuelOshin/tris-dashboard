@@ -82,19 +82,19 @@ const intelligenceNavigation = [
     name: 'Compliance',
     href: '/compliance',
     icon: FileCheck,
-    description: 'Audit & Reports',
+    description: 'Framework Audits (SOX/GDPR)',
   },
   {
     name: 'Correlation Intelligence',
     href: '/dashboard/correlation',
     icon: BarChart3,
-    description: 'Correlation & Pattern Insights',
+    description: 'Cross-Signal Pattern Graphs',
   },
   {
-    name: 'Reports & Compliance',
+    name: 'Reports & Export',
     href: '/dashboard/reports',
     icon: FileBarChart,
-    description: 'Automated Reports & Compliance Files',
+    description: 'Scheduled PDF & Audit Packs',
   },
 ]
 
@@ -177,7 +177,14 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
 
           {/* Intelligence Section */}
           <SidebarGroup>
-            <SidebarGroupLabel className="px-2 text-[11px] tracking-wider opacity-70">GOVERNANCE & INTELLIGENCE</SidebarGroupLabel>
+            <div className="flex items-center justify-between px-2 pr-3 py-1">
+              <SidebarGroupLabel className="text-[11px] tracking-wider opacity-70 p-0">
+                GOVERNANCE & INTELLIGENCE
+              </SidebarGroupLabel>
+              <span className="text-[9px] uppercase tracking-wider font-mono px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 group-data-[collapsible=icon]:hidden">
+                Roadmap
+              </span>
+            </div>
             <SidebarMenu className="gap-1">
               {intelligenceNavigation.map((item) => {
                 const Icon = item.icon
@@ -193,9 +200,14 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                       `}
                     >
                       <Link href={item.href} className="flex items-center gap-3 min-w-0 w-full">
-                        <Icon className="w-4 h-4 shrink-0" />
+                        <Icon className="w-4 h-4 shrink-0 text-muted-foreground" />
                         <div className="flex flex-col min-w-0 flex-1">
-                          <span className="font-medium text-sm truncate">{item.name}</span>
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-medium text-sm truncate">{item.name}</span>
+                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-muted/60 text-muted-foreground group-data-[collapsible=icon]:hidden">
+                              Preview
+                            </span>
+                          </div>
                           <span className="text-[11px] text-muted-foreground truncate group-data-[collapsible=icon]:hidden">{item.description}</span>
                         </div>
                       </Link>
