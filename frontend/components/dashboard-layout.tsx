@@ -14,6 +14,8 @@ import {
   BarChart3,
   FileBarChart,
   Settings as SettingsIcon,
+  Database,
+  CheckSquare,
 } from 'lucide-react'
 
 import {
@@ -50,22 +52,28 @@ const coreNavigation = [
     description: 'Overview & Risk Scores',
   },
   {
-    name: 'Financial Fraud',
+    name: 'Cases & Fraud',
     href: '/fraud-detection',
     icon: Shield,
-    description: 'Anomaly Detection',
+    description: 'Anomaly Detection & Cases',
   },
   {
     name: 'Suppliers',
     href: '/suppliers',
     icon: Users,
-    description: 'Risk Management',
+    description: 'Risk Management & Baselines',
   },
   {
-    name: 'Zero-Trust',
-    href: '/zero-trust',
-    icon: Activity,
-    description: 'Access Monitoring',
+    name: 'Data Ingestion',
+    href: '/ingestion',
+    icon: Database,
+    description: 'Excel Relational Pipeline',
+  },
+  {
+    name: 'Acceptance Matrix',
+    href: '/developer-tests',
+    icon: CheckSquare,
+    description: 'T01 - T10 Compliance Matrix',
   },
 ]
 
@@ -126,6 +134,9 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           <Link href="/" className="flex items-center gap-2 font-bold text-lg text-primary px-2">
             <Shield className="w-5 h-5" />
             <span className="group-data-[collapsible=icon]:hidden">TRIS</span>
+            <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 group-data-[collapsible=icon]:hidden">
+              v1.3
+            </span>
           </Link>
         </SidebarHeader>
 
