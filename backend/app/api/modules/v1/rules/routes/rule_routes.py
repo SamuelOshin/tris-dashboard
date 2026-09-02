@@ -8,7 +8,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.core.dependencies import get_current_user, require_roles
 from app.api.db.database import get_db
+from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.rules.schemas.rule_schemas import (
     EvaluationResult,
     RuleConfigResponse,
@@ -48,9 +50,13 @@ async def get_rule(rule_code: str, db: Annotated[AsyncSession, Depends(get_db)] 
 async def update_rule(
     rule_code: str,
     payload: RuleConfigUpdate,
+    current_user: Annotated[User, Depends(require_roles(["admin", "compliance"]))],
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
-    """Update rule thresholds or weights (increments rule_version)."""
+    """
+    Update rule thresholds or weights (increments rule_version).
+    Requires admin or compliance role.
+    """
     updated = await RuleEngineService.update_rule(
         rule_code=rule_code,
         update_data=payload,
@@ -67,6 +73,7 @@ async def update_rule(
 @router.post("/evaluate/{transaction_id}", response_model=None)
 async def evaluate_transaction(
     transaction_id: str,
+    current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
     """Execute active detection rules against a transaction and consolidate signals."""

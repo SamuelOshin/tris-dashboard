@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (emailOrUsername: string, password: string) => {
     try {
       // 1. Attempt live FastAPI backend login
-      const { user: beUser } = await api.login(emailOrUsername, password)
+      const { user: beUser, access_token } = await api.login(emailOrUsername, password)
       const mappedUser: User = {
         id: beUser.user_id,
         name: beUser.name,
@@ -85,6 +85,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setUser(mappedUser)
       localStorage.setItem('tris_user', JSON.stringify(mappedUser))
+      document.cookie = `access_token=${access_token}; path=/; SameSite=Lax`
+      document.cookie = 'tris_auth_active=true; path=/; SameSite=Lax'
     } catch {
       // 2. Fallback to mock demo credentials if backend is offline
       const userKey = Object.keys(MOCK_USERS).find(key => 
@@ -96,6 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const foundUser = MOCK_USERS[userKey]
         setUser(foundUser)
         localStorage.setItem('tris_user', JSON.stringify(foundUser))
+        document.cookie = 'tris_auth_active=true; path=/; SameSite=Lax'
       } else {
         throw new Error('Invalid username or password')
       }
@@ -107,6 +110,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
     localStorage.removeItem('tris_user')
     localStorage.removeItem('tris_token')
+    document.cookie = 'access_token=; path=/; max-age=0'
+    document.cookie = 'tris_auth_active=; path=/; max-age=0'
   }
 
   const hasPermission = (roles: UserRole[]) => {

@@ -8,7 +8,9 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.core.dependencies import get_current_user
 from app.api.db.database import get_db
+from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.cases.schemas.case_schemas import (
     CaseResponse,
     CaseTransitionRequest,
@@ -61,9 +63,12 @@ async def get_case(case_id: str, db: Annotated[AsyncSession, Depends(get_db)] = 
 async def transition_case(
     case_id: str,
     payload: CaseTransitionRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
     """Execute governed case state transition with verified closure validation."""
+    payload.actor = current_user.name or current_user.username
+
     updated = await CaseService.transition_case(
         case_id=case_id,
         transition=payload,

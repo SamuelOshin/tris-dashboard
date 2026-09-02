@@ -35,5 +35,16 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
+    def validate_production_security(self) -> None:
+        """Enforces security boundaries outside development."""
+        if self.ENVIRONMENT.lower() not in ("development", "test"):
+            if "change_in_production" in self.SECRET_KEY or len(self.SECRET_KEY) < 32:
+                raise ValueError(
+                    "CRITICAL SECURITY CONFIGURATION ERROR: "
+                    "Default or weak SECRET_KEY detected in non-development environment! "
+                    "You must configure a strong 32+ character SECRET_KEY in production."
+                )
+
 
 settings = Settings()
+settings.validate_production_security()

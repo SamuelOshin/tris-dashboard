@@ -9,20 +9,35 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.core.custom_exceptions.exceptions import IngestionError
+from app.api.core.dependencies import get_current_user
 from app.api.db.database import get_db
+from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.ingestion.service.ingestion_service import IngestionService
 from app.api.utils.response_payloads import success_response
 
 router = APIRouter(prefix="/ingest", tags=["Ingestion"])
 
+MAX_INGEST_FILE_SIZE = 25 * 1024 * 1024  # 25 MB limit to protect from OOM/DoS
+
 
 @router.post("/upload", response_model=None)
 async def upload_workbook(
     file: Annotated[UploadFile, File(...)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """Upload and ingest an Excel workbook into the TRIS relational database."""
-    content = await file.read()
+    """
+    Upload and ingest an Excel workbook into the TRIS relational database.
+    Requires authenticated user.
+    """
+    # Enforce file size limit
+    content = await file.read(MAX_INGEST_FILE_SIZE + 1)
+    if len(content) > MAX_INGEST_FILE_SIZE:
+        raise IngestionError(
+            f"Uploaded file '{file.filename}' exceeds maximum permitted limit of 25 MB."
+        )
+
     report = await IngestionService.ingest_excel_workbook(
         file_path_or_bytes=BytesIO(content),
         session=db,

@@ -70,3 +70,7 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# FastAPI Cloud
+.fastapicloud/
+*/.fastapicloud/

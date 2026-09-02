@@ -150,6 +150,9 @@ return auth_response(
 - ❌ **NEVER** hardcode fake metrics, artificial AI percentages, or unverified probability scores.
 - ❌ **NEVER** edit `alembic/versions/` migration files manually.
 - ❌ **NEVER** commit `.env` files or API secrets to version control.
+- ❌ **NEVER** expose backend implementation details, database names, or internal packages in user-facing UI or toasts (e.g. "PostgreSQL", "Live Postgres", "/api/v1/rules", "RFC Gateway", "Local Enclave", "SQLModel", `uv run...`).
+- ❌ **NEVER** invent pseudo-technical jargon for standard UX patterns (e.g. use "Sign in", not "Authenticate Session"; use "Signing in...", not "Verifying Cryptographic Tokens"; use "Remember me", not "Trust this browser for 30 days"). Always follow Jakob's Law.
+- ❌ **NEVER** add developer disclosure banners (e.g. "Live Postgres vs Sandbox Enclave") into end-user pages. Use simple `Coming Soon` badges for roadmap features.
 
 ---
 
@@ -164,3 +167,28 @@ return auth_response(
   uv run ruff format .
   uv run pytest tests/ -v
   ```
+
+---
+
+## 8. Frontend UX & Human-Centric Copy Guidelines
+
+### Jakob's Law of Internet User Experience
+Users spend almost all their time on other applications and websites. They expect standard, universally understood conventions:
+- **Authentication**: Use standard labels: `Sign in`, `Signing in...`, `Remember me`, `Email`, `Password`, `Forgot password?`. Never invent alienating jargon like `Authenticate Session`, `Session Gateway`, or `Verifying Cryptographic Tokens`.
+- **User Profile**: Use `Account Profile`, `Full Name`, `Email`, `Role`, `Active Sessions`. Avoid internal security terms like `Authenticated Principal` or `Actor`.
+
+### Zero Internal Architecture Leaks
+Never expose database names, API endpoints, terminal commands, or library names in the UI, modals, or toasts:
+- ❌ **Never write:** `"Workbook ingested successfully into PostgreSQL relational schema!"`
+  * ✅ **Instead write:** `"Workbook uploaded and processed successfully!"`
+- ❌ **Never write:** `"Live PostgreSQL: Detection rules connect directly to active database"`
+  * ✅ **Instead write:** Simple status indicator: `"Active"`
+- ❌ **Never write:** Exposing developer CLI commands like `uv run python -m app.scripts.seed...` to end users.
+  * ✅ **Instead write:** `"Automated data imports can also be configured via scheduled ERP connections and secure file delivery."`
+- ❌ **Never write:** Toast messages like `"Rule updated in PostgreSQL (Incremented to v2)"`
+  * ✅ **Instead write:** `"Rule updated"` / `"Weight adjusted to 35 points"`
+
+### Unimplemented Features & Roadmap Badging
+- Mark non-implemented capabilities cleanly with a user-facing badge: `<ComingSoonBadge label="Coming Soon" />`.
+- Never guess or hardcode speculative future version numbers like `v1.4` or `v1.3.1` in badges or UI copy.
+- Never add meta-developer disclosure banners explaining what is "simulated in sandbox" vs "live in database". The interface must always present a polished, cohesive, professional enterprise experience.

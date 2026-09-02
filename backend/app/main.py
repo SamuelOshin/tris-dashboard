@@ -8,13 +8,14 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.core.config import settings
 from app.api.core.custom_exceptions.register import register_exception_handlers
 from app.api.db.database import create_db_and_tables
 from app.api.modules.v1.router import api_v1_router
+from app.api.utils.response_payloads import success_response
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -59,6 +60,19 @@ register_exception_handlers(app)
 
 # Mount API Routers
 app.include_router(api_v1_router)
+
+
+@app.get("/", tags=["System"])
+async def root():
+    """Root system entrypoint."""
+    return success_response(
+        status_code=status.HTTP_200_OK,
+        message="Welcome to Tris API v1.3 ...",
+        data={
+            "system": "TRIS Risk Intelligence Engine",
+            "version": "1.3.0",
+        },
+    )
 
 
 @app.get("/health", tags=["Health"])

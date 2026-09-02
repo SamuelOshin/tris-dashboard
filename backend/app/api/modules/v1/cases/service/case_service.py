@@ -26,7 +26,7 @@ VALID_TRANSITIONS: Dict[str, List[str]] = {
     "Corrective Action": ["Pending Verification"],
     "Pending Verification": ["Closed", "Under Investigation"],  # Approval or rejection
     "Closed": ["Reopened"],
-    "Reopened": ["Under Investigation"],
+    "Reopened": ["Under Investigation", "Pending Verification"],
 }
 
 # The 8 Mandatory Closure Fields Required by Enterprise Compliance

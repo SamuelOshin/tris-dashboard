@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
@@ -9,14 +9,18 @@ import {
   Shield,
   Users,
   FileCheck,
-  Activity,
   LogOut,
   BarChart3,
   FileBarChart,
   Settings as SettingsIcon,
   Database,
   CheckSquare,
+  ShieldAlert,
+  ChevronRight,
+  Search,
 } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
 
 import {
   SidebarProvider,
@@ -31,74 +35,131 @@ import {
   SidebarInset,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarRail,
 } from '@/components/ui/sidebar'
 
 import { ThemeToggle } from './theme-toggle'
 import { NotificationsPopover } from './notifications-popover'
 import { HeaderSearch } from './header-search'
+import { UserNav } from './user-nav'
+
+interface BreadcrumbItem {
+  label: string
+  href?: string
+}
 
 interface DashboardLayoutProps {
   children: React.ReactNode
-  title: string
-  description: string
+  title?: string
+  description?: string
+  breadcrumbs?: BreadcrumbItem[]
+  actions?: React.ReactNode
+  showActions?: boolean
 }
 
-// Sectioned navigation
 const coreNavigation = [
   {
-    name: 'Dashboard',
+    name: 'Executive Dashboard',
     href: '/',
     icon: TrendingUp,
-    description: 'Overview & Risk Scores',
   },
   {
     name: 'Cases & Fraud',
     href: '/fraud-detection',
-    icon: Shield,
-    description: 'Anomaly Detection & Cases',
+    icon: ShieldAlert,
   },
   {
     name: 'Suppliers',
     href: '/suppliers',
     icon: Users,
-    description: 'Risk Management & Baselines',
   },
   {
     name: 'Data Ingestion',
     href: '/ingestion',
     icon: Database,
-    description: 'Excel Relational Pipeline',
   },
   {
     name: 'Acceptance Matrix',
     href: '/developer-tests',
     icon: CheckSquare,
-    description: 'T01 - T10 Compliance Matrix',
   },
 ]
 
 const intelligenceNavigation = [
   {
-    name: 'Compliance',
+    name: 'Compliance Audits',
     href: '/compliance',
     icon: FileCheck,
-    description: 'Framework Audits (SOX/GDPR)',
+    tag: 'Preview',
   },
   {
-    name: 'Correlation Intelligence',
+    name: 'Cross-Signal Correlation',
     href: '/dashboard/correlation',
     icon: BarChart3,
-    description: 'Cross-Signal Pattern Graphs',
+    tag: 'Preview',
   },
   {
     name: 'Reports & Export',
     href: '/dashboard/reports',
     icon: FileBarChart,
-    description: 'Scheduled PDF & Audit Packs',
+    tag: 'Preview',
   },
 ]
 
-export function DashboardLayout({ children, title, description }: DashboardLayoutProps) {
+function DefaultQuickActions() {
+  return (
+    <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 shrink-0">
+      <Link href="/cases/TEST-CASE-001">
+        <Button
+          size="sm"
+          className="h-8.5 px-3.5 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-medium text-xs flex items-center gap-1.5 shadow-sm transition-transform active:scale-95"
+        >
+          <ShieldAlert className="w-3.5 h-3.5 text-destructive" />
+          Investigate
+        </Button>
+      </Link>
+      <Link href="/fraud-detection">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8.5 px-3.5 rounded-xl border-0 bg-card shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:bg-muted/60 text-xs font-medium flex items-center gap-1.5 transition-all"
+        >
+          <Search className="w-3.5 h-3.5 text-muted-foreground" />
+          Evaluate Rules
+        </Button>
+      </Link>
+      <Link href="/ingestion">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8.5 px-3.5 rounded-xl border-0 bg-card shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:bg-muted/60 text-xs font-medium flex items-center gap-1.5 transition-all"
+        >
+          <Database className="w-3.5 h-3.5 text-muted-foreground" />
+          Upload Data
+        </Button>
+      </Link>
+      <Link href="/developer-tests">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8.5 px-3.5 rounded-xl border-0 bg-card shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:bg-muted/60 text-xs font-medium flex items-center gap-1.5 transition-all"
+        >
+          <CheckSquare className="w-3.5 h-3.5 text-muted-foreground" />
+          Acceptance Gates
+        </Button>
+      </Link>
+    </div>
+  )
+}
+
+export function DashboardLayout({
+  children,
+  title,
+  description,
+  breadcrumbs,
+  actions,
+  showActions = true,
+}: DashboardLayoutProps) {
   const { user, loading, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -115,9 +176,9 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading TRIS...</p>
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs text-muted-foreground">Loading your workspace...</p>
         </div>
       </div>
     )
@@ -125,25 +186,47 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
 
   if (!user) return null
 
+  // Compute breadcrumbs if not provided
+  const activeNav = [...coreNavigation, ...intelligenceNavigation].find((n) => n.href === pathname)
+  const defaultBreadcrumbs: BreadcrumbItem[] = [
+    { label: 'TRIS Studio', href: '/' },
+    ...(activeNav && activeNav.href !== '/' ? [{ label: activeNav.name, href: activeNav.href }] : []),
+    ...(pathname.startsWith('/cases/') ? [{ label: 'Cases', href: '/fraud-detection' }, { label: pathname.split('/')[2] || 'Case Detail' }] : []),
+  ]
+  const renderedBreadcrumbs = breadcrumbs || defaultBreadcrumbs
+
+  const todayFormatted = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon" variant="sidebar" className="overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
-
-        {/* Sidebar Header */}
-        <SidebarHeader className="border-b border-sidebar-border pb-4">
-          <Link href="/" className="flex items-center gap-2 font-bold text-lg text-primary px-2">
-            <Shield className="w-5 h-5" />
-            <span className="group-data-[collapsible=icon]:hidden">TRIS</span>
-            <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 group-data-[collapsible=icon]:hidden">
-              v1.3
-            </span>
+      <Sidebar collapsible="icon" variant="sidebar" className="border-r border-sidebar-border bg-sidebar">
+        {/* Brand Header */}
+        <SidebarHeader className="h-14 border-b border-sidebar-border flex items-center px-3">
+          <Link href="/" className="flex items-center gap-2.5 font-bold text-foreground hover:opacity-90 transition-opacity min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+              <Shield className="w-4 h-4" />
+            </div>
+            <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden min-w-0">
+              <span className="text-sm font-bold tracking-tight font-mono truncate">TRIS</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold shrink-0">
+                v1.3
+              </span>
+            </div>
           </Link>
         </SidebarHeader>
 
-        {/* Sidebar Content with scroll */}
-        <SidebarContent className="pr-1">
+        {/* Navigation Content */}
+        <SidebarContent className="px-2 py-3 space-y-4">
+          {/* Core Modules */}
           <SidebarGroup>
-            <SidebarGroupLabel className="px-2 text-[11px] tracking-wider opacity-70">CORE MODULES</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1">
+              Core Modules
+            </SidebarGroupLabel>
             <SidebarMenu className="gap-1">
               {coreNavigation.map((item) => {
                 const Icon = item.icon
@@ -154,16 +237,16 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`py-3 rounded-lg transition-all flex items-center gap-3 min-w-0
-                        ${isActive ? 'bg-primary/15 text-primary border-l-3 border-primary pl-4 pr-4 ml-1' : 'hover:bg-sidebar-accent/40 px-3'}
-                      `}
+                      tooltip={item.name}
+                      className={`h-9 px-2.5 rounded-lg text-xs font-medium transition-all ${
+                        isActive
+                          ? 'bg-primary/15 text-primary font-semibold shadow-xs'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                      }`}
                     >
-                      <Link href={item.href} className="flex items-center gap-3 min-w-0 w-full">
-                        <Icon className="w-4 h-4 shrink-0" />
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <span className="font-medium text-sm truncate">{item.name}</span>
-                          <span className="text-[11px] text-muted-foreground truncate group-data-[collapsible=icon]:hidden">{item.description}</span>
-                        </div>
+                      <Link href={item.href} className="flex items-center gap-2.5 w-full">
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <span className="truncate group-data-[collapsible=icon]:hidden">{item.name}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -172,19 +255,11 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
             </SidebarMenu>
           </SidebarGroup>
 
-          {/* Divider */}
-          <div className="border-t border-sidebar-border my-2 opacity-40"></div>
-
-          {/* Intelligence Section */}
+          {/* Intelligence Modules */}
           <SidebarGroup>
-            <div className="flex items-center justify-between px-2 pr-3 py-1">
-              <SidebarGroupLabel className="text-[11px] tracking-wider opacity-70 p-0">
-                GOVERNANCE & INTELLIGENCE
-              </SidebarGroupLabel>
-              <span className="text-[9px] uppercase tracking-wider font-mono px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 group-data-[collapsible=icon]:hidden">
-                Roadmap
-              </span>
-            </div>
+            <SidebarGroupLabel className="px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1">
+              Intelligence
+            </SidebarGroupLabel>
             <SidebarMenu className="gap-1">
               {intelligenceNavigation.map((item) => {
                 const Icon = item.icon
@@ -195,21 +270,23 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`py-3 rounded-lg transition-all flex items-center gap-3 min-w-0
-                        ${isActive ? 'bg-primary/15 text-primary border-l-2 border-primary pl-[10px] pr-3' : 'hover:bg-sidebar-accent/40 px-3'}
-                      `}
+                      tooltip={item.name}
+                      className={`h-9 px-2.5 rounded-lg text-xs font-medium transition-all ${
+                        isActive
+                          ? 'bg-primary/15 text-primary font-semibold shadow-xs'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                      }`}
                     >
-                      <Link href={item.href} className="flex items-center gap-3 min-w-0 w-full">
-                        <Icon className="w-4 h-4 shrink-0 text-muted-foreground" />
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-1">
-                            <span className="font-medium text-sm truncate">{item.name}</span>
-                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-muted/60 text-muted-foreground group-data-[collapsible=icon]:hidden">
-                              Preview
-                            </span>
-                          </div>
-                          <span className="text-[11px] text-muted-foreground truncate group-data-[collapsible=icon]:hidden">{item.description}</span>
+                      <Link href={item.href} className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                          <span className="truncate group-data-[collapsible=icon]:hidden">{item.name}</span>
                         </div>
+                        {item.tag && (
+                          <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-muted/40 text-muted-foreground border border-border/50 group-data-[collapsible=icon]:hidden">
+                            {item.tag}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -219,55 +296,109 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
           </SidebarGroup>
         </SidebarContent>
 
-        {/* SIDEBAR FOOTER */}
-        <SidebarFooter className="border-t border-sidebar-border pt-4 mt-2">
-
-          {/* SETTINGS */}
+        {/* Sidebar Footer */}
+        <SidebarFooter className="border-t border-sidebar-border p-2 space-y-1">
           <Link
             href="/dashboard/settings"
-            className="w-full flex items-center gap-2 px-2 py-2 text-sm hover:bg-sidebar-accent rounded-md transition-colors mb-3"
+            title="Settings & Governance"
+            className="flex items-center gap-2.5 h-8 px-2.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50 transition-colors group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
           >
-            <SettingsIcon className="w-4 h-4" />
-            <span className="group-data-[collapsible=icon]:hidden">Settings</span>
+            <SettingsIcon className="w-3.5 h-3.5 shrink-0" />
+            <span className="group-data-[collapsible=icon]:hidden">Settings & Governance</span>
           </Link>
 
-          {/* USER + LOGOUT ROW */}
-          <div className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-sidebar-accent transition-all">
-            {/* User icon */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-bold uppercase">
-                {user?.name?.[0] || 'U'}
+          {/* User Session Bar */}
+          <div className="flex items-center justify-between p-2 rounded-lg bg-sidebar-accent/30 border border-sidebar-border/50 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-1.5">
+            <div className="flex items-center gap-2 min-w-0 group-data-[collapsible=icon]:hidden">
+              <div className="w-7 h-7 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                {user?.name?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-foreground truncate leading-tight">{user?.name}</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-mono truncate leading-tight">
+                  {user?.role || 'Auditor'}
+                </p>
               </div>
             </div>
 
-            {/* Logout */}
-            <button onClick={handleLogout} className="text-sm flex items-center gap-1 hover:text-primary">
-              <LogOut className="w-4 h-4" />
+            <button
+              onClick={handleLogout}
+              title="Sign Out"
+              className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         </SidebarFooter>
+
+        {/* Interactive Resize & Collapse Rail */}
+        <SidebarRail />
       </Sidebar>
 
-      {/* MAIN CONTENT */}
-      <SidebarInset>
-        <div className="flex items-center justify-between h-16 px-6 border-b bg-card sticky top-0 z-40">
-          <div className="flex items-center gap-4 flex-1 min-w-0">
-            <SidebarTrigger className="md:hidden" />
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold">{title}</h1>
-              {description && <p className="text-xs text-muted-foreground">{description}</p>}
-            </div>
+      {/* Main App Inset */}
+      <SidebarInset className="bg-background flex flex-col min-h-screen">
+        {/* Sticky Command Header with Global Collapse Trigger */}
+        <header className="h-14 px-4 sm:px-6 border-b border-border bg-card/60 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Sidebar Collapse/Expand Toggle (Always accessible) */}
+            <SidebarTrigger
+              title="Toggle Sidebar (Ctrl+B)"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted/40 p-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
+            />
+
+            {/* Breadcrumb Navigation */}
+            <nav className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
+              {renderedBreadcrumbs.map((crumb, idx) => (
+                <div key={idx} className="flex items-center gap-1.5 min-w-0">
+                  {idx > 0 && <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />}
+                  {crumb.href && idx < renderedBreadcrumbs.length - 1 ? (
+                    <Link href={crumb.href} className="hover:text-foreground truncate transition-colors">
+                      {crumb.label}
+                    </Link>
+                  ) : (
+                    <span className="font-semibold text-foreground truncate">{crumb.label}</span>
+                  )}
+                </div>
+              ))}
+            </nav>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Right Header Actions */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Live System Status */}
+            <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-success/10 border border-success/20 text-[11px] font-mono text-success">
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+              <span>All Systems Operational</span>
+            </div>
+
             <HeaderSearch />
             <NotificationsPopover />
-            <div className="w-px h-6 bg-border" />
+            <div className="w-px h-4 bg-border" />
             <ThemeToggle />
+            <div className="w-px h-4 bg-border" />
+            <UserNav />
           </div>
-        </div>
+        </header>
 
-        <main>{children}</main>
+        {/* Page Content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+          {title && (
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-1">
+              <div>
+                <p className="text-xs font-mono text-muted-foreground">{todayFormatted}</p>
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mt-0.5">
+                  {title}
+                </h1>
+                {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
+              </div>
+
+              {showActions !== false && (
+                <div>{actions !== undefined ? actions : <DefaultQuickActions />}</div>
+              )}
+            </div>
+          )}
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )

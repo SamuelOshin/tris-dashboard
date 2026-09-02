@@ -22,12 +22,14 @@ export function middleware(request: NextRequest) {
   }
 
   // Check for protected routes
-  const isProtected = PROTECTED_PREFIXES.some(prefix => pathname.startsWith(prefix))
+  const isProtected = pathname === '/' || PROTECTED_PREFIXES.some(prefix => pathname.startsWith(prefix))
 
   if (isProtected) {
-    const token = request.cookies.get('access_token')?.value
-    // If not authenticated via cookie and navigating to a protected page, check client auth in layout
-    // We allow pass-through to protected layout which checks client-side localStorage fallback
+    const token = request.cookies.get('access_token')?.value || request.cookies.get('tris_auth_active')?.value
+    if (!token) {
+      const loginUrl = new URL('/login', request.url)
+      return NextResponse.redirect(loginUrl)
+    }
     return NextResponse.next()
   }
 
