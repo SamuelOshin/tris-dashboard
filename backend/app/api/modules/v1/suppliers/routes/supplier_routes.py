@@ -8,7 +8,9 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.core.dependencies import get_current_user
 from app.api.db.database import get_db
+from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.suppliers.schemas.supplier_schemas import (
     BaselineStatsResponse,
     SupplierResponse,
@@ -23,9 +25,10 @@ router = APIRouter(prefix="/suppliers", tags=["Suppliers"])
 async def list_suppliers(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
+    current_user: Annotated[User, Depends(get_current_user)] = None,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
-    """Retrieve list of suppliers."""
+    """Retrieve list of suppliers. Requires authenticated session."""
     suppliers = await BaselineService.get_all_suppliers(session=db, skip=skip, limit=limit)
     data = [SupplierResponse.model_validate(s).model_dump() for s in suppliers]
     return success_response(
@@ -38,9 +41,10 @@ async def list_suppliers(
 @router.get("/{supplier_id}", response_model=None)
 async def get_supplier(
     supplier_id: str,
+    current_user: Annotated[User, Depends(get_current_user)] = None,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
-    """Retrieve a single supplier by unique ID."""
+    """Retrieve a single supplier by unique ID. Requires authenticated session."""
     supplier = await BaselineService.get_supplier_by_id(supplier_id=supplier_id, session=db)
     data = SupplierResponse.model_validate(supplier).model_dump()
     return success_response(
@@ -54,9 +58,13 @@ async def get_supplier(
 async def get_supplier_baseline(
     supplier_id: str,
     exclude_tx: Optional[str] = Query(None, description="Transaction ID to exclude from baseline"),
+    current_user: Annotated[User, Depends(get_current_user)] = None,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
-    """Compute mathematical descriptive baseline with strict transaction exclusion."""
+    """
+    Compute mathematical descriptive baseline with strict transaction exclusion.
+    Requires authenticated session.
+    """
     baseline = await BaselineService.calculate_baseline(
         supplier_id=supplier_id,
         session=db,

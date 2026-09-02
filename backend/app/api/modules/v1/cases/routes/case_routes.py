@@ -8,7 +8,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.core.dependencies import get_current_user
+from app.api.core.dependencies import require_roles
 from app.api.db.database import get_db
 from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.cases.schemas.case_schemas import (
@@ -20,6 +20,11 @@ from app.api.utils.response_payloads import success_response
 
 router = APIRouter(prefix="/cases", tags=["Cases"])
 
+# Roles permitted to read case data
+_READ_ROLES = ["reviewer", "verifier", "admin", "compliance", "cfo", "security"]
+# Roles permitted to transition case status
+_TRANSITION_ROLES = ["reviewer", "verifier", "admin", "compliance"]
+
 
 @router.get("", response_model=None)
 async def list_cases(
@@ -28,9 +33,10 @@ async def list_cases(
     supplier_id: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
+    current_user: Annotated[User, Depends(require_roles(_READ_ROLES))] = None,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
-    """Retrieve filtered list of risk cases."""
+    """Retrieve filtered list of risk cases. Requires authenticated session."""
     cases = await CaseService.get_all_cases(
         session=db,
         status=status_filter,
@@ -48,8 +54,12 @@ async def list_cases(
 
 
 @router.get("/{case_id}", response_model=None)
-async def get_case(case_id: str, db: Annotated[AsyncSession, Depends(get_db)] = None):
-    """Retrieve case with chronological immutable audit history."""
+async def get_case(
+    case_id: str,
+    current_user: Annotated[User, Depends(require_roles(_READ_ROLES))] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,
+):
+    """Retrieve case with chronological immutable audit history. Requires authenticated session."""
     case_data = await CaseService.get_case_by_id(case_id=case_id, session=db)
     data = CaseResponse.model_validate(case_data).model_dump()
     return success_response(
@@ -63,7 +73,7 @@ async def get_case(case_id: str, db: Annotated[AsyncSession, Depends(get_db)] = 
 async def transition_case(
     case_id: str,
     payload: CaseTransitionRequest,
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(require_roles(_TRANSITION_ROLES))],
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
     """Execute governed case state transition with verified closure validation."""

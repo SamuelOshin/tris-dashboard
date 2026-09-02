@@ -4,7 +4,7 @@ Pure request/response serialization — no business logic.
 """
 
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -66,7 +66,14 @@ class CaseTransitionRequest(BaseModel):
     # 8 Verified Closure Fields (Mandatory when to_status == 'Closed')
     root_cause: Optional[str] = None
     corrective_action: Optional[str] = None
-    closure_type: Optional[str] = None
+    closure_type: Optional[
+        Literal[
+            "Confirmed Fraud / Blocked",
+            "Process Error / Remedied",
+            "Legitimate Exception Approved",
+            "False Positive / Threshold Adjusted",
+        ]
+    ] = None
     closure_evidence: Optional[str] = None
     verified_by: Optional[str] = None
     closure_date: Optional[date] = None

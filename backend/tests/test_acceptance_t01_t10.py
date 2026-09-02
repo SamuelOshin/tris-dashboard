@@ -229,24 +229,77 @@ async def test_t09_verified_closure_gatekeeper_validation(async_client: AsyncCli
 
 
 @pytest.mark.asyncio
-async def test_t10_immutable_audit_trail_integrity(db_session: AsyncSession):
+async def test_t10_immutable_audit_trail_integrity(
+    async_client: AsyncClient, db_session: AsyncSession
+):
     """
-    T10 Acceptance Test: Immutable Audit Trail Creation and Integrity.
-    Verifies every transition creates an unmodifiable CaseHistory audit log.
+    T10 Acceptance Test: Immutable Audit Trail — Append-Only Behavioral Verification.
+
+    This test verifies two independent properties:
+    1. Application-layer append-only behavior: history rows are never modified or deleted
+       across multiple state transitions. The count only grows and existing rows are unchanged.
+    2. PostgreSQL trigger presence: the CASE_HISTORY_IMMUTABILITY_SQL trigger is defined
+       and targets the correct table (verified by inspecting the trigger SQL source).
+
+    Note: The PostgreSQL-level BEFORE UPDATE/DELETE trigger (trg_case_history_immutable)
+    is enforced at runtime against a live Postgres instance. Integration verification
+    should run uv run pytest tests/ against a real Docker PostgreSQL container.
     """
-    history_entries = (
-        (
-            await db_session.execute(
-                select(CaseHistory)
-                .where(CaseHistory.case_id == "TEST-CASE-001")
-                .order_by(CaseHistory.timestamp.asc())
-            )
+    case_id = "TEST-CASE-001"
+
+    # Capture baseline history (after seeding, case has 1 history entry)
+    def get_history():
+        return db_session.execute(
+            select(CaseHistory)
+            .where(CaseHistory.case_id == case_id)
+            .order_by(CaseHistory.timestamp.asc())
         )
-        .scalars()
-        .all()
+
+    initial_result = await get_history()
+    initial_entries = list(initial_result.scalars().all())
+    assert len(initial_entries) >= 1, "Seeding must create at least one history entry"
+
+    # Snapshot content of existing rows BEFORE any additional transitions
+    initial_row_ids = {e.history_id for e in initial_entries}
+    initial_row_actions = {e.history_id: e.action for e in initial_entries}
+
+    # Drive two more transitions
+    await async_client.post(
+        f"/api/v1/cases/{case_id}/transition",
+        json={"to_status": "Assigned", "actor": "auditor"},
+    )
+    await async_client.post(
+        f"/api/v1/cases/{case_id}/transition",
+        json={"to_status": "Under Investigation", "actor": "auditor"},
     )
 
-    assert len(history_entries) >= 1
-    assert history_entries[0].action is not None
-    assert history_entries[0].actor is not None
-    assert history_entries[0].timestamp is not None
+    # Fetch updated history
+    updated_result = await get_history()
+    updated_entries = list(updated_result.scalars().all())
+
+    # 1. Row count grew — only INSERTs, no DELETEs
+    assert len(updated_entries) == len(initial_entries) + 2, (
+        f"Expected {len(initial_entries) + 2} rows, got {len(updated_entries)}. "
+        "Rows were deleted rather than appended."
+    )
+
+    # 2. Original rows are unmodified — no UPDATEs mutated existing history
+    for entry in updated_entries:
+        if entry.history_id in initial_row_ids:
+            assert entry.action == initial_row_actions[entry.history_id], (
+                f"History row {entry.history_id} was mutated after insertion. "
+                "Audit trail is not immutable."
+            )
+
+    # 3. All entries have required audit fields populated
+    for entry in updated_entries:
+        assert entry.action is not None and entry.action.strip() != ""
+        assert entry.actor is not None and entry.actor.strip() != ""
+        assert entry.timestamp is not None
+
+    # 4. Verify PostgreSQL trigger SQL is correctly defined and targets case_history
+    from app.api.db.triggers import CASE_HISTORY_IMMUTABILITY_SQL
+
+    assert "case_history" in CASE_HISTORY_IMMUTABILITY_SQL
+    assert "BEFORE UPDATE OR DELETE" in CASE_HISTORY_IMMUTABILITY_SQL
+    assert "prevent_case_history_mutation" in CASE_HISTORY_IMMUTABILITY_SQL

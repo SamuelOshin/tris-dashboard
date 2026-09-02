@@ -62,6 +62,11 @@ async def unauthorized_client(db_session: AsyncSession):
     app.dependency_overrides.clear()
 
 
+# ─────────────────────────────────────────────────────────────
+# VULN-001: Rule update requires auth + correct role
+# ─────────────────────────────────────────────────────────────
+
+
 @pytest.mark.asyncio
 async def test_vuln001_unauthenticated_rule_update_rejected(
     unauthenticated_client: AsyncClient,
@@ -88,6 +93,11 @@ async def test_vuln001_unauthorized_role_rule_update_rejected(
     assert res.json()["error_code"] == "PERMISSION_DENIED"
 
 
+# ─────────────────────────────────────────────────────────────
+# VULN-002: Case transition requires auth
+# ─────────────────────────────────────────────────────────────
+
+
 @pytest.mark.asyncio
 async def test_vuln002_unauthenticated_case_transition_rejected(
     unauthenticated_client: AsyncClient,
@@ -99,6 +109,11 @@ async def test_vuln002_unauthenticated_case_transition_rejected(
     )
     assert res.status_code == 401
     assert res.json()["error_code"] == "AUTHENTICATION_FAILED"
+
+
+# ─────────────────────────────────────────────────────────────
+# VULN-003: Ingestion requires auth
+# ─────────────────────────────────────────────────────────────
 
 
 @pytest.mark.asyncio
@@ -117,3 +132,89 @@ async def test_vuln003_unauthenticated_ingestion_rejected(
     )
     assert res.status_code == 401
     assert res.json()["error_code"] == "AUTHENTICATION_FAILED"
+
+
+# ─────────────────────────────────────────────────────────────
+# VULN-004: Read endpoints require authentication (OWASP API1/API2)
+# ─────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_vuln004_unauthenticated_case_list_rejected(
+    unauthenticated_client: AsyncClient,
+):
+    """VULN-004: GET /api/v1/cases MUST return 401 without authentication."""
+    res = await unauthenticated_client.get("/api/v1/cases")
+    assert res.status_code == 401
+    assert res.json()["error_code"] == "AUTHENTICATION_FAILED"
+
+
+@pytest.mark.asyncio
+async def test_vuln004_unauthenticated_case_detail_rejected(
+    unauthenticated_client: AsyncClient,
+):
+    """VULN-004: GET /api/v1/cases/{id} MUST return 401 without authentication."""
+    res = await unauthenticated_client.get("/api/v1/cases/TEST-CASE-001")
+    assert res.status_code == 401
+    assert res.json()["error_code"] == "AUTHENTICATION_FAILED"
+
+
+@pytest.mark.asyncio
+async def test_vuln004_unauthenticated_supplier_list_rejected(
+    unauthenticated_client: AsyncClient,
+):
+    """VULN-004: GET /api/v1/suppliers MUST return 401 without authentication."""
+    res = await unauthenticated_client.get("/api/v1/suppliers")
+    assert res.status_code == 401
+    assert res.json()["error_code"] == "AUTHENTICATION_FAILED"
+
+
+@pytest.mark.asyncio
+async def test_vuln004_unauthenticated_supplier_baseline_rejected(
+    unauthenticated_client: AsyncClient,
+):
+    """VULN-004: GET /api/v1/suppliers/{id}/baseline MUST return 401 without authentication."""
+    res = await unauthenticated_client.get("/api/v1/suppliers/SUP-001/baseline")
+    assert res.status_code == 401
+    assert res.json()["error_code"] == "AUTHENTICATION_FAILED"
+
+
+@pytest.mark.asyncio
+async def test_vuln004_unauthenticated_transaction_list_rejected(
+    unauthenticated_client: AsyncClient,
+):
+    """VULN-004: GET /api/v1/transactions MUST return 401 without authentication."""
+    res = await unauthenticated_client.get("/api/v1/transactions")
+    assert res.status_code == 401
+    assert res.json()["error_code"] == "AUTHENTICATION_FAILED"
+
+
+@pytest.mark.asyncio
+async def test_vuln004_unauthenticated_rules_list_rejected(
+    unauthenticated_client: AsyncClient,
+):
+    """VULN-004: GET /api/v1/rules MUST return 401 without authentication."""
+    res = await unauthenticated_client.get("/api/v1/rules")
+    assert res.status_code == 401
+    assert res.json()["error_code"] == "AUTHENTICATION_FAILED"
+
+
+# ─────────────────────────────────────────────────────────────
+# VULN-005: Case transition enforces role-based access control
+# ─────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_vuln005_low_privilege_case_transition_rejected(
+    unauthorized_client: AsyncClient,
+):
+    """
+    VULN-005: A 'procurement' role user MUST be denied case transitions.
+    Only reviewer, verifier, admin, compliance roles may change case status.
+    """
+    res = await unauthorized_client.post(
+        "/api/v1/cases/TEST-CASE-001/transition",
+        json={"to_status": "Assigned", "actor": "Junior Buyer"},
+    )
+    assert res.status_code == 403
+    assert res.json()["error_code"] == "PERMISSION_DENIED"

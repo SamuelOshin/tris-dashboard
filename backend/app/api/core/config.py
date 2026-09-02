@@ -31,19 +31,25 @@ class Settings(BaseSettings):
         description="Secret key for JWT generation",
     )
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
+    @property
+    def is_production(self) -> bool:
+        """Evaluates whether the active runtime environment is production/staging."""
+        return self.ENVIRONMENT.lower() not in ("development", "test", "testing")
+
     def validate_production_security(self) -> None:
         """Enforces security boundaries outside development."""
-        if self.ENVIRONMENT.lower() not in ("development", "test"):
-            if "change_in_production" in self.SECRET_KEY or len(self.SECRET_KEY) < 32:
-                raise ValueError(
-                    "CRITICAL SECURITY CONFIGURATION ERROR: "
-                    "Default or weak SECRET_KEY detected in non-development environment! "
-                    "You must configure a strong 32+ character SECRET_KEY in production."
-                )
+        if not self.is_production:
+            return
+        if "change_in_production" in self.SECRET_KEY or len(self.SECRET_KEY) < 32:
+            raise ValueError(
+                "CRITICAL SECURITY CONFIGURATION ERROR: "
+                "Default or weak SECRET_KEY detected in non-development environment! "
+                "You must configure a strong 32+ character SECRET_KEY in production."
+            )
 
 
 settings = Settings()

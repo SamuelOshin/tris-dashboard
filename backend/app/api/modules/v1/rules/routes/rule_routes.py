@@ -23,8 +23,11 @@ router = APIRouter(prefix="/rules", tags=["Rules"])
 
 
 @router.get("", response_model=None)
-async def list_rules(db: Annotated[AsyncSession, Depends(get_db)] = None):
-    """Retrieve all detection rule configurations."""
+async def list_rules(
+    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,
+):
+    """Retrieve all detection rule configurations. Requires authenticated session."""
     rules = await RuleEngineService.get_all_rules(session=db)
     data = [RuleConfigResponse.model_validate(r).model_dump() for r in rules]
     return success_response(
@@ -35,8 +38,12 @@ async def list_rules(db: Annotated[AsyncSession, Depends(get_db)] = None):
 
 
 @router.get("/{rule_code}", response_model=None)
-async def get_rule(rule_code: str, db: Annotated[AsyncSession, Depends(get_db)] = None):
-    """Retrieve configuration for a specific rule code."""
+async def get_rule(
+    rule_code: str,
+    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,
+):
+    """Retrieve configuration for a specific rule code. Requires authenticated session."""
     rule = await RuleEngineService.get_rule_by_code(rule_code=rule_code, session=db)
     data = RuleConfigResponse.model_validate(rule).model_dump()
     return success_response(

@@ -8,6 +8,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.core.config import settings
 from app.api.core.dependencies import get_current_user
 from app.api.db.database import get_db
 from app.api.modules.v1.auth.models.user import User
@@ -24,7 +25,11 @@ async def login(
     response: Response,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
-    """Authenticate user with username/password and issue JWT token/cookie."""
+    """
+    Authenticate user and issue session.
+    - Web UI authenticates via the server-set HttpOnly cookie (no JS access).
+    - Non-browser API clients (ERP pipelines, CLI scripts) receive the Bearer token in the body.
+    """
     user, token = await AuthService.authenticate_user(
         username=payload.username,
         password=payload.password,
@@ -42,7 +47,7 @@ async def login(
         value=token,
         httponly=True,
         samesite="lax",
-        secure=False,  # True in production HTTPS
+        secure=settings.is_production,
     )
     return res
 
@@ -66,5 +71,10 @@ async def logout(response: Response):
         message="Logout successful",
         data=None,
     )
-    res.delete_cookie("access_token")
+    res.delete_cookie(
+        key="access_token",
+        httponly=True,
+        samesite="lax",
+        secure=settings.is_production,
+    )
     return res
