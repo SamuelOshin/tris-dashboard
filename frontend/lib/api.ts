@@ -143,6 +143,20 @@ export interface CaseTransitionPayload {
 
 const API_BASE = '/api/v1'
 
+export class ApiError extends Error {
+  code?: string
+  status?: number
+  errors?: Record<string, string[]>
+
+  constructor(message: string, code?: string, status?: number, errors?: Record<string, string[]>) {
+    super(message)
+    this.name = 'ApiError'
+    this.code = code
+    this.status = status
+    this.errors = errors
+  }
+}
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers || {})
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
@@ -157,14 +171,24 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     credentials: 'include',
   })
 
-  const json: ApiResponse<T> = await response.json()
+  let json: ApiResponse<T> | null = null
+  try {
+    json = await response.json()
+  } catch {
+    // Non-JSON response body (e.g. proxy HTML 502/504)
+  }
 
-  if (!response.ok || json.status === 'ERROR') {
-    const errorMsg = json.message || 'An unexpected API error occurred'
-    const error = new Error(errorMsg) as Error & { code?: string; errors?: Record<string, string[]> }
-    error.code = json.error_code
-    error.errors = json.errors
-    throw error
+  if (!response.ok || (json && json.status === 'ERROR')) {
+    const errorMsg =
+      json?.message ||
+      (response.statusText
+        ? `Server error (${response.status}): ${response.statusText}`
+        : 'An unexpected API error occurred')
+    throw new ApiError(errorMsg, json?.error_code, json?.status_code || response.status, json?.errors)
+  }
+
+  if (!json) {
+    throw new ApiError('Invalid response received from server', 'INVALID_RESPONSE', response.status)
   }
 
   return json.data

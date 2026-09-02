@@ -45,6 +45,7 @@ node_modules/
 out/
 */out/
 .pnpm-debug.log*
+*.tsbuildinfo
 
 # Environment Variables
 .env

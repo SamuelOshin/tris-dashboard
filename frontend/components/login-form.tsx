@@ -70,7 +70,7 @@ export function LoginForm() {
   const [password, setPassword] = useState('password123')
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<{ title: string; message: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [activeDemoEmail, setActiveDemoEmail] = useState('reviewer@tris.internal')
   const [showForgotModal, setShowForgotModal] = useState(false)
@@ -78,9 +78,33 @@ export function LoginForm() {
   const { login } = useAuth()
   const router = useRouter()
 
+  const resolveAuthError = (err: any, fallbackTitle = 'Sign in failed') => {
+    const isServerError =
+      (err?.status && err.status >= 500) ||
+      err?.code === 'INTERNAL_SERVER_ERROR'
+    const isNetworkError =
+      err instanceof TypeError &&
+      (err.message.toLowerCase().includes('fetch') || err.message.toLowerCase().includes('network'))
+
+    let title = fallbackTitle
+    let message = err?.message
+
+    if (isServerError) {
+      title = 'Server error'
+      message = err?.message || 'An unexpected internal server error occurred. Please contact system administrator.'
+    } else if (isNetworkError) {
+      title = 'Connection error'
+      message = 'Unable to connect to the authentication server. Please check your network connection.'
+    } else if (!message) {
+      message = 'Invalid email or password. Please try again or select a demo account below.'
+    }
+
+    return { title, message }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
+    setError(null)
     setLoading(true)
 
     try {
@@ -89,10 +113,11 @@ export function LoginForm() {
         description: 'Redirecting to your dashboard...',
       })
       router.push('/')
-    } catch {
-      setError('Invalid email or password. Please try again or select a demo account below.')
-      toast.error('Sign in failed', {
-        description: 'Check your credentials or try a demo account.',
+    } catch (err: any) {
+      const authError = resolveAuthError(err, 'Sign in failed')
+      setError(authError)
+      toast.error(authError.title, {
+        description: authError.message,
       })
     } finally {
       setLoading(false)
@@ -104,15 +129,18 @@ export function LoginForm() {
     setPassword(demoUser.password)
     setActiveDemoEmail(demoUser.email)
     setLoading(true)
-    setError('')
+    setError(null)
 
     try {
       await login(demoUser.email, demoUser.password)
       toast.success(`Signed in as ${demoUser.role}`)
       router.push('/')
-    } catch {
-      setError(`Could not sign in as ${demoUser.role}`)
-      toast.error('Sign in failed')
+    } catch (err: any) {
+      const authError = resolveAuthError(err, 'Sign in failed')
+      setError(authError)
+      toast.error(authError.title, {
+        description: authError.message,
+      })
     } finally {
       setLoading(false)
     }
@@ -390,8 +418,8 @@ export function LoginForm() {
               <div className="p-3.5 rounded-xl bg-destructive/10 border border-destructive/25 flex items-start gap-2.5 text-xs text-destructive">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="font-semibold">Sign in failed</p>
-                  <p>{error}</p>
+                  <p className="font-semibold">{error.title}</p>
+                  <p>{error.message}</p>
                 </div>
               </div>
             )}
