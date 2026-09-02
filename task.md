@@ -30,8 +30,8 @@ If a new chat session starts or context is reset:
 | **Phase 0** | Baseline Tagging & Monorepo Initialization | 🟢 Complete | Git tag `v1.2-baseline`, `uv` backend initialized, Next.js build clean |
 | **Phase 1** | Core Infrastructure, Database & Ingestion Module | 🟢 Complete | `test data.xlsx` seeded (19 txns, 8 suppliers, 8 access, 10 approvals); Pytest 3/3 green |
 | **Phase 2** | Baseline Analytics Module (`suppliers`) | 🟢 Complete | `SUP-001` baseline mean = $30,471.43 strictly excluding `TX-1999`; Pytest 5/5 green |
-| **Phase 3** | Deterministic Rule Engine (`rules`) | 🟡 Active | `TX-1999` triggers R-001..R-004, consolidated into `TEST-CASE-001` (Score 100) |
-| **Phase 4** | Governed Case Lifecycle (`cases`) | ⚪ Not Started | 8-field closure validation enforced; DB trigger blocks history mutation |
+| **Phase 3** | Deterministic Rule Engine (`rules`) | 🟢 Complete | `TX-1999` triggers R-001..R-004, consolidated into `TEST-CASE-001` (Score 100); Pytest 4/4 green |
+| **Phase 4** | Governed Case Lifecycle (`cases`) | 🟡 Active | 8-field closure validation enforced; DB trigger blocks history mutation |
 | **Phase 5** | Frontend Integration & UI Workspaces | ⚪ Not Started | Next.js builds clean with 0 errors; live dynamic `/cases/[id]` active |
 | **Phase 6** | Acceptance Matrix (`T01`–`T10`) & Handover | ⚪ Not Started | 10/10 developer acceptance tests pass simultaneously |
 
@@ -112,18 +112,18 @@ If a new chat session starts or context is reset:
 ### Phase 3: Configurable Rule Engine Module (`modules/v1/rules/`)
 *Objective: Implement deterministic strategy rules R-001..R-006 with versioning & case grouping.*
 
-- [ ] **Task 3.1**: Implement strategy pattern base class and individual rules in `modules/v1/rules/service/`:
+- [x] **Task 3.1**: Implement strategy pattern base class and individual rules in `modules/v1/rules/service/`:
   - `R-001`: Amount Deviation (> 2.0x baseline) [Weight: 35]
   - `R-002`: Recent Bank Change (< 7 days) [Weight: 25]
   - `R-003`: Missing Required Approval [Weight: 25]
   - `R-004`: Off-Hours Access (outside 06:00-20:00) [Weight: 15]
   - `R-005`: Duplicate Invoice Number [Weight: 30]
   - `R-006`: 90-Day Recurrence Detection [Weight: 20]
-- [ ] **Task 3.2**: Implement Rule Versioning (`rule_version` tracking & `evaluation_snapshot` JSONB storage).
-- [ ] **Task 3.3**: Implement Additive Priority Scoring (Score >= 70 High, >= 30 Medium, < 30 Low).
-- [ ] **Task 3.4**: Implement Case Consolidation Engine (consolidates `TX-1999` multi-signals into `TEST-CASE-001`).
-- [ ] **Task 3.5**: Expose rule endpoints in `modules/v1/rules/routes/` (< 50 lines).
-- **Phase 3 Verification Gate**: `TX-1999` triggers R-001, R-002, R-003, R-004; produces single case with composite score 100 (High).
+- [x] **Task 3.2**: Implement Rule Versioning (`rule_version` tracking & `evaluation_snapshot` JSONB storage).
+- [x] **Task 3.3**: Implement Additive Priority Scoring (Score >= 70 High, >= 30 Medium, < 30 Low).
+- [x] **Task 3.4**: Implement Case Consolidation Engine (consolidates `TX-1999` multi-signals into `TEST-CASE-001`).
+- [x] **Task 3.5**: Expose rule endpoints in `modules/v1/rules/routes/` (< 50 lines).
+- **Phase 3 Verification Gate**: `TX-1999` triggers R-001, R-002, R-003, R-004; produces single case with composite score 100 (High); Pytest 4/4 tests pass.
 
 ---
 

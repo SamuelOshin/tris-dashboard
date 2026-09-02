@@ -8,6 +8,7 @@ from fastapi import APIRouter
 from app.api.modules.v1.ingestion.routes.ingestion_routes import (
     router as ingestion_router,
 )
+from app.api.modules.v1.rules.routes.rule_routes import router as rules_router
 from app.api.modules.v1.suppliers.routes.supplier_routes import (
     router as suppliers_router,
 )
@@ -17,6 +18,7 @@ api_v1_router = APIRouter(prefix="/api/v1")
 # Register domain module routers
 api_v1_router.include_router(ingestion_router)
 api_v1_router.include_router(suppliers_router)
+api_v1_router.include_router(rules_router)
 
 
 @api_v1_router.get("/health", tags=["Health"])
