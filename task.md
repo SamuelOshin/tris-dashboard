@@ -31,8 +31,8 @@ If a new chat session starts or context is reset:
 | **Phase 1** | Core Infrastructure, Database & Ingestion Module | 🟢 Complete | `test data.xlsx` seeded (19 txns, 8 suppliers, 8 access, 10 approvals); Pytest 3/3 green |
 | **Phase 2** | Baseline Analytics Module (`suppliers`) | 🟢 Complete | `SUP-001` baseline mean = $30,471.43 strictly excluding `TX-1999`; Pytest 5/5 green |
 | **Phase 3** | Deterministic Rule Engine (`rules`) | 🟢 Complete | `TX-1999` triggers R-001..R-004, consolidated into `TEST-CASE-001` (Score 100); Pytest 4/4 green |
-| **Phase 4** | Governed Case Lifecycle (`cases`) | 🟡 Active | 8-field closure validation enforced; DB trigger blocks history mutation |
-| **Phase 5** | Frontend Integration & UI Workspaces | ⚪ Not Started | Next.js builds clean with 0 errors; live dynamic `/cases/[id]` active |
+| **Phase 4** | Governed Case Lifecycle (`cases`) | 🟢 Complete | 8-field closure validation enforced; State machine verified; Pytest 4/4 green |
+| **Phase 5** | Frontend Integration & UI Workspaces | 🟡 Active | Next.js builds clean with 0 errors; live dynamic `/cases/[id]` active |
 | **Phase 6** | Acceptance Matrix (`T01`–`T10`) & Handover | ⚪ Not Started | 10/10 developer acceptance tests pass simultaneously |
 
 ---
@@ -130,17 +130,17 @@ If a new chat session starts or context is reset:
 ### Phase 4: Governed Case Lifecycle Module (`modules/v1/cases/`)
 *Objective: Implement case state machine, 8-field verified closure gatekeeper, and 90-day recurrence.*
 
-- [ ] **Task 4.1**: Implement state machine in `modules/v1/cases/service/`:
+- [x] **Task 4.1**: Implement state machine in `modules/v1/cases/service/`:
   - `New` -> `Assigned` -> `Under Investigation` -> `Corrective Action` -> `Pending Verification` -> `Closed`.
   - Rejection: `Pending Verification` -> `Under Investigation`.
   - Reopen: `Closed` -> `Reopened`.
-- [ ] **Task 4.2**: Implement 8-Field Verified Closure Validator:
+- [x] **Task 4.2**: Implement 8-Field Verified Closure Validator:
   - Requires: `root_cause`, `corrective_action`, `closure_type`, `closure_evidence`, `verified_by`, `closure_date`, `follow_up_requirement`, `recurrence_monitoring`.
   - Raises `VerifiedClosureValidationError` if any field missing/empty.
-- [ ] **Task 4.3**: Implement `RecurrenceService` scanning 90-day lookback window.
-- [ ] **Task 4.4**: Implement immutable `CaseHistory` append-only logger bound to authenticated user.
-- [ ] **Task 4.5**: Expose case routes in `modules/v1/cases/routes/` (< 50 lines).
-- **Phase 4 Verification Gate**: Closure blocked when fields missing; succeeds when 8 fields present; DB trigger blocks UPDATE/DELETE on history.
+- [x] **Task 4.3**: Implement `RecurrenceService` scanning 90-day lookback window.
+- [x] **Task 4.4**: Implement immutable `CaseHistory` append-only logger bound to authenticated user.
+- [x] **Task 4.5**: Expose case routes in `modules/v1/cases/routes/` (< 50 lines).
+- **Phase 4 Verification Gate**: Closure blocked when fields missing; succeeds when 8 fields present; DB trigger blocks UPDATE/DELETE on history; Pytest 4/4 tests pass.
 
 ---
 
