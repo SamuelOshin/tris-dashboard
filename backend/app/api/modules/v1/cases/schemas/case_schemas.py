@@ -50,6 +50,7 @@ class CaseResponse(BaseModel):
     recurrence_monitoring: Optional[str] = None
 
     history: List[CaseHistoryResponse] = []
+    prior_cases: List[Dict[str, Any]] = []
     created_at: datetime
     updated_at: datetime
 

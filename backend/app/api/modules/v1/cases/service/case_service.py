@@ -89,8 +89,32 @@ class CaseService:
         hist_res = await session.execute(hist_stmt)
         history = list(hist_res.scalars().all())
 
+        # Query prior supplier cases for recurrence tracking (Spec Section 4.K & 6)
+        prior_stmt = (
+            select(RiskCase)
+            .where(RiskCase.supplier_id == case.supplier_id)
+            .where(RiskCase.case_id != case_id)
+            .order_by(RiskCase.created_at.desc())
+        )
+        prior_res = await session.execute(prior_stmt)
+        prior_cases = list(prior_res.scalars().all())
+
         case_dict = case.model_dump()
         case_dict["history"] = [h.model_dump() for h in history]
+        case_dict["prior_cases"] = [
+            {
+                "case_id": p.case_id,
+                "case_number": p.case_number,
+                "status": p.status,
+                "priority": p.priority,
+                "transaction_id": p.transaction_id,
+                "root_cause": p.root_cause,
+                "corrective_action": p.corrective_action,
+                "closure_date": str(p.closure_date) if p.closure_date else None,
+                "created_at": p.created_at.isoformat() if p.created_at else None,
+            }
+            for p in prior_cases
+        ]
         return case_dict
 
     @staticmethod

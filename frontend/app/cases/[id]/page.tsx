@@ -18,7 +18,9 @@ import {
   History,
   XCircle,
   RotateCcw,
+  ShieldCheck,
 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 
 export default function CaseDetailPage() {
@@ -332,6 +334,61 @@ export default function CaseDetailPage() {
                   </div>
                 ))}
               </div>
+            </Card>
+
+            {/* Recurrence Surveillance & Prior Case History Widget (Spec Section 4.K & 6) */}
+            <Card className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+                  <RotateCcw className="w-5 h-5 text-primary" />
+                  <span>Recurrence Surveillance & Prior Case History</span>
+                </h2>
+                <Badge variant="outline" className="font-mono text-xs">
+                  {caseData.prior_cases?.length || 0} Prior Cases
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                90-day historical lookback across supplier <code className="font-mono font-semibold text-foreground">{caseData.supplier_id}</code> for recurring control failures (Rule R-006).
+              </p>
+
+              {(!caseData.prior_cases || caseData.prior_cases.length === 0) ? (
+                <div className="p-4 rounded-lg bg-muted/20 border border-border flex items-start gap-3">
+                  <ShieldCheck className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1 text-xs">
+                    <p className="font-semibold text-foreground">Zero Recurrence Detected</p>
+                    <p className="text-muted-foreground">
+                      No prior risk cases recorded for supplier <span className="font-mono font-medium text-foreground">{caseData.supplier_id}</span> within the configured 90-day surveillance window. This represents an isolated anomaly under R-006 monitoring.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {caseData.prior_cases.map((pc: any) => (
+                    <div key={pc.case_id} className="p-4 rounded-lg border border-warning/30 bg-warning/5 space-y-2 text-xs">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-warning" />
+                          <span className="font-mono font-bold text-foreground">{pc.case_id}</span>
+                          <span className="text-muted-foreground">({pc.transaction_id})</span>
+                        </div>
+                        <Badge variant="outline" className="text-[10px]">
+                          {pc.status}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-muted-foreground pt-1">
+                        <div>
+                          <span className="font-semibold text-foreground">Prior Root Cause: </span>
+                          {pc.root_cause || 'Under investigation'}
+                        </div>
+                        <div>
+                          <span className="font-semibold text-foreground">Corrective Action: </span>
+                          {pc.corrective_action || 'None recorded'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
           </div>
 
