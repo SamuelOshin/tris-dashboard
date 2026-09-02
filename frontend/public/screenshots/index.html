@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRIS v1.3 — Real Browser E2E Test Audit Evidence</title>
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card: #12141c;
+      --border: #222634;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #6366f1;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 40px 24px;
+      line-height: 1.5;
+    }
+    .container { max-width: 1300px; margin: 0 auto; }
+    header {
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .badge-pass {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(580px, 1fr));
+      gap: 24px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover {
+      border-color: var(--primary);
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .card-step {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .card-desc {
+      padding: 12px 20px;
+      font-size: 13px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+    }
+    .img-wrap {
+      background: #000;
+      padding: 8px;
+      cursor: zoom-in;
+      text-align: center;
+    }
+    .img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 6px;
+    }
+    /* Modal / Lightbox */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      cursor: zoom-out;
+    }
+    #lightbox img {
+      max-width: 95vw;
+      max-height: 95vh;
+      border-radius: 8px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1 style="font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+          🛡️ TRIS v1.3 — Real Browser E2E Test Audit Evidence
+        </h1>
+        <p style="color: var(--muted); font-size: 14px; margin-top: 6px;">
+          Captured live in headless Chromium via Playwright • Proving deterministic calculations, baseline exclusion, and 8-field closure gatekeeper
+        </p>
+      </div>
+      <div class="badge-pass">
+        ✓ 11 / 11 E2E SCREENSHOTS PASSING
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- 01 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">1. Authentication Gateway</span>
+          <span class="card-step">01_login_form.png</span>
+        </div>
+        <div class="card-desc">Real credentials typing (reviewer@tris.internal) and Argon2id session authentication against PostgreSQL.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="01_login_form.png" alt="Login Form">
+        </div>
+      </div>
+
+      <!-- 02 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">2. Executive Overview & Live Telemetry</span>
+          <span class="card-step">02_dashboard_overview.png</span>
+        </div>
+        <div class="card-desc">Zero mock data: Live PostgreSQL counts (2 cases, 8 suppliers, 19 invoices) and target anomaly spotlight.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="02_dashboard_overview.png" alt="Dashboard Overview">
+        </div>
+      </div>
+
+      <!-- 03 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">3. Monitored Suppliers Directory</span>
+          <span class="card-step">03_suppliers_table.png</span>
+        </div>
+        <div class="card-desc">Live supplier ledger with risk tiering, search filtering, and baseline inspection triggers.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="03_suppliers_table.png" alt="Suppliers Table">
+        </div>
+      </div>
+
+      <!-- 04 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">4. Supplier Baseline Analysis Drawer</span>
+          <span class="card-step">04_supplier_baseline_drawer.png</span>
+        </div>
+        <div class="card-desc"><strong>Target Exclusion Protocol Active:</strong> Shows $30,471.43 mean, $30,400 median, $1,306.03 std dev, strictly excluding TX-1999.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="04_supplier_baseline_drawer.png" alt="Supplier Baseline Drawer">
+        </div>
+      </div>
+
+      <!-- 05 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">5. Cases & Fraud Detection Ledger</span>
+          <span class="card-step">05_cases_ledger.png</span>
+        </div>
+        <div class="card-desc">TEST-CASE-001 flagged as HIGH PRIORITY with composite score 100 on Northstar Components LLC.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="05_cases_ledger.png" alt="Cases Ledger">
+        </div>
+      </div>
+
+      <!-- 06 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">6. Governed Case Workspace & Recurrence Widget</span>
+          <span class="card-step">06_case_workspace_signals.png</span>
+        </div>
+        <div class="card-desc">Consolidated signals (R-001, R-002, R-003, R-004) + 90-day Recurrence Surveillance (Zero Recurrence Detected).</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="06_case_workspace_signals.png" alt="Case Workspace Signals">
+        </div>
+      </div>
+
+      <!-- 07 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">7. Governed State Transitions</span>
+          <span class="card-step">07_pending_verification.png</span>
+        </div>
+        <div class="card-desc">Progressed through state machine: New → Assigned → Under Investigation → Corrective Action → Pending Verification.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="07_pending_verification.png" alt="Pending Verification State">
+        </div>
+      </div>
+
+      <!-- 08 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">8. 8-Field Verified Closure Gatekeeper Alert</span>
+          <span class="card-step">08_closure_validation_gatekeeper.png</span>
+        </div>
+        <div class="card-desc"><strong>Compliance Gatekeeper Rejection:</strong> Submitting with blank inputs triggers red alert listing missing mandatory fields.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="08_closure_validation_gatekeeper.png" alt="Closure Validation Gatekeeper Alert">
+        </div>
+      </div>
+
+      <!-- 09 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">9. Complete 8 Mandatory Compliance Fields</span>
+          <span class="card-step">09_closure_modal_filled.png</span>
+        </div>
+        <div class="card-desc">All 8 fields populated: root cause, closure type, corrective action, evidence, verifier, date, follow-up, recurrence surveillance.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="09_closure_modal_filled.png" alt="Closure Modal Filled">
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">10. Verified Closure Seal & Audit Trail</span>
+          <span class="card-step">10_case_sealed_closed.png</span>
+        </div>
+        <div class="card-desc"><strong>Sealed Closed (Compliant):</strong> Green seal displayed; PostgreSQL immutable audit trail records complete chronological transitions.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="10_case_sealed_closed.png" alt="Case Sealed Closed">
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">11. Developer Acceptance Matrix</span>
+          <span class="card-step">11_acceptance_matrix_dashboard.png</span>
+        </div>
+        <div class="card-desc">Live dashboard proving 10 / 10 acceptance criteria (T01 through T10) are passing and verified.</div>
+        <div class="img-wrap" onclick="openLightbox(this)">
+          <img src="11_acceptance_matrix_dashboard.png" alt="Acceptance Matrix Dashboard">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Zoomed Screenshot">
+  </div>
+
+  <script>
+    function openLightbox(el) {
+      const img = el.querySelector('img');
+      const lb = document.getElementById('lightbox');
+      const lbImg = document.getElementById('lightbox-img');
+      lbImg.src = img.src;
+      lb.style.display = 'flex';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
