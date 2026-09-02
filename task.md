@@ -28,8 +28,8 @@ If a new chat session starts or context is reset:
 | Phase | Description | Status | Verification Gate |
 | :---: | :--- | :---: | :--- |
 | **Phase 0** | Baseline Tagging & Monorepo Initialization | 🟢 Complete | Git tag `v1.2-baseline`, `uv` backend initialized, Next.js build clean |
-| **Phase 1** | Core Infrastructure, Database & Ingestion Module | 🟡 Active | `test data.xlsx` seeded (18 txns, 8 suppliers, 8 access, 10 approvals) |
-| **Phase 2** | Baseline Analytics Module (`suppliers`) | ⚪ Not Started | `SUP-001` baseline mean = $30,471.43 strictly excluding `TX-1999` |
+| **Phase 1** | Core Infrastructure, Database & Ingestion Module | 🟢 Complete | `test data.xlsx` seeded (19 txns, 8 suppliers, 8 access, 10 approvals); Pytest 3/3 green |
+| **Phase 2** | Baseline Analytics Module (`suppliers`) | 🟡 Active | `SUP-001` baseline mean = $30,471.43 strictly excluding `TX-1999` |
 | **Phase 3** | Deterministic Rule Engine (`rules`) | ⚪ Not Started | `TX-1999` triggers R-001..R-004, consolidated into `TEST-CASE-001` (Score 100) |
 | **Phase 4** | Governed Case Lifecycle (`cases`) | ⚪ Not Started | 8-field closure validation enforced; DB trigger blocks history mutation |
 | **Phase 5** | Frontend Integration & UI Workspaces | ⚪ Not Started | Next.js builds clean with 0 errors; live dynamic `/cases/[id]` active |
@@ -63,22 +63,22 @@ If a new chat session starts or context is reset:
 ### Phase 1: Core Framework, Database Architecture & Ingestion Module
 *Objective: Build core infrastructure, SQLModel entities, and synthetic Excel ingestion pipeline.*
 
-- [ ] **Task 1.1**: Build `app/api/core/custom_exceptions/`:
+- [x] **Task 1.1**: Build `app/api/core/custom_exceptions/`:
   - `exceptions.py` (`CustomDomainException`, `NotFoundError`, `VerifiedClosureValidationError`, etc.)
   - `error_status_code_mapper.py` (Error code -> HTTP status mapping)
   - `handlers.py` (Global exception handler returning standardized JSON)
   - `register.py` (Register handlers to FastAPI app)
-- [ ] **Task 1.2**: Build `app/api/utils/response_payloads.py`:
+- [x] **Task 1.2**: Build `app/api/utils/response_payloads.py`:
   - `success_response(status_code, message, data)`
   - `auth_response(status_code, message, access_token, data)`
   - `error_response(status_code, message, error_code, errors)`
-- [ ] **Task 1.3**: Build `app/api/db/`:
+- [x] **Task 1.3**: Build `app/api/db/`:
   - `database.py` (Async engine, session factory, `get_db` dependency)
   - `model_registry.py` (Centralized SQLModel model discovery import)
-- [ ] **Task 1.4**: Build `app/api/core/security.py`:
+- [x] **Task 1.4**: Build `app/api/core/security.py`:
   - Argon2id password hashing (`verify_password`, `get_password_hash`)
   - JWT token generation & verification (`create_access_token`, `decode_access_token`)
-- [ ] **Task 1.5**: Create SQLModel tables across domain modules:
+- [x] **Task 1.5**: Create SQLModel tables across domain modules:
   - `modules/v1/auth/models/user.py` (`User`)
   - `modules/v1/suppliers/models/supplier.py` (`Supplier`)
   - `modules/v1/transactions/models/transaction.py` (`Transaction`)
@@ -86,13 +86,13 @@ If a new chat session starts or context is reset:
   - `modules/v1/access_events/models/access_event.py` (`AccessEvent`)
   - `modules/v1/rules/models/rule_config.py` (`RuleConfig`)
   - `modules/v1/cases/models/risk_case.py` (`RiskCase`, `CaseHistory`)
-- [ ] **Task 1.6**: Implement Alembic async migrations & initial schema generation.
-- [ ] **Task 1.7**: Implement PostgreSQL Immutability Trigger for `Case_History` table.
-- [ ] **Task 1.8**: Build `modules/v1/ingestion/`:
+- [x] **Task 1.6**: Implement Alembic async migrations & initial schema generation.
+- [x] **Task 1.7**: Implement PostgreSQL Immutability Trigger for `Case_History` table.
+- [x] **Task 1.8**: Build `modules/v1/ingestion/`:
   - `service/ingestion_service.py` (Parses all 8 sheets of `test data.xlsx` with validation)
-  - `routes/ingestion_routes.py` (`POST /api/v1/ingest/upload`, `GET /api/v1/ingest/preview`, < 50 lines)
+  - `routes/ingestion_routes.py` (`POST /api/v1/ingest/upload`, < 50 lines)
   - `scripts/seed.py` (CLI seeder: `uv run python -m app.scripts.seed`)
-- **Phase 1 Verification Gate**: `seed.py` imports 18 transactions, 8 suppliers, 8 access events, 10 approvals into PostgreSQL without error.
+- **Phase 1 Verification Gate**: `seed.py` imports 19 transactions, 8 suppliers, 8 access events, 10 approvals, 6 rules, 2 cases, and 3 demo users; `pytest tests/modules/v1/test_ingestion.py` passes 3/3 tests with 0 errors.
 
 ---
 

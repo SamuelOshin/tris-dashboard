@@ -141,7 +141,7 @@ if not supplier:
 if missing_fields:
     raise VerifiedClosureValidationError(
         message=f"Verified closure failed: missing mandatory fields {missing_fields}",
-        code="VERIFIED_CLOSURE_VALIDATION_ERROR"
+        code="VERIFIED_CLOSURE_VALIDATION_ERROR",
     )
 ```
 
@@ -167,15 +167,12 @@ async def close_case(
     current_user: User = Depends(get_current_user),
 ):
     case = await CaseService.close_case(
-        case_id=case_id,
-        closure_data=payload,
-        actor=current_user.name,
-        session=db
+        case_id=case_id, closure_data=payload, actor=current_user.name, session=db
     )
     return success_response(
         status_code=status.HTTP_200_OK,
         message="Case verified and closed successfully",
-        data=case.model_dump()
+        data=case.model_dump(),
     )
 ```
 
@@ -196,22 +193,27 @@ pwd_context = CryptContext(
     schemes=["argon2"],
     deprecated="auto",
     argon2__memory_cost=65536,  # 64 MB
-    argon2__time_cost=3,        # 3 iterations
-    argon2__parallelism=4       # 4 parallel threads
+    argon2__time_cost=3,  # 3 iterations
+    argon2__parallelism=4,  # 4 parallel threads
 )
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verifies a plain password against an Argon2id hash."""
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def get_password_hash(password: str) -> str:
     """Hashes a password using Argon2id."""
     return pwd_context.hash(password)
 
+
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """Creates a signed JWT access token."""
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 ```
