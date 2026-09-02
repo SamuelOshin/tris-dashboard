@@ -463,8 +463,9 @@ export default function CaseDetailPage() {
               <form onSubmit={handleVerifiedClosureSubmit} className="space-y-4 text-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">1. Root Cause Analysis *</label>
+                    <label htmlFor="closure_root_cause" className="text-xs font-semibold text-foreground">1. Root Cause Analysis *</label>
                     <input
+                      id="closure_root_cause"
                       type="text"
                       value={closureForm.root_cause}
                       onChange={(e) => setClosureForm({ ...closureForm, root_cause: e.target.value })}
@@ -474,8 +475,9 @@ export default function CaseDetailPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">2. Closure Type *</label>
+                    <label htmlFor="closure_type" className="text-xs font-semibold text-foreground">2. Closure Type *</label>
                     <select
+                      id="closure_type"
                       value={closureForm.closure_type}
                       onChange={(e) => setClosureForm({ ...closureForm, closure_type: e.target.value })}
                       className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
@@ -489,8 +491,9 @@ export default function CaseDetailPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">3. Corrective Action Taken *</label>
+                  <label htmlFor="closure_corrective_action" className="text-xs font-semibold text-foreground">3. Corrective Action Taken *</label>
                   <textarea
+                    id="closure_corrective_action"
                     rows={2}
                     value={closureForm.corrective_action}
                     onChange={(e) => setClosureForm({ ...closureForm, corrective_action: e.target.value })}
@@ -500,8 +503,9 @@ export default function CaseDetailPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">4. Closure Evidence / Ticket Reference *</label>
+                  <label htmlFor="closure_evidence" className="text-xs font-semibold text-foreground">4. Closure Evidence / Ticket Reference *</label>
                   <input
+                    id="closure_evidence"
                     type="text"
                     value={closureForm.closure_evidence}
                     onChange={(e) => setClosureForm({ ...closureForm, closure_evidence: e.target.value })}
@@ -512,18 +516,21 @@ export default function CaseDetailPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">5. Verified By (Independent) *</label>
+                    <label htmlFor="closure_verified_by" className="text-xs font-semibold text-foreground">5. Verified By (Independent) *</label>
                     <input
+                      id="closure_verified_by"
                       type="text"
                       value={closureForm.verified_by}
                       onChange={(e) => setClosureForm({ ...closureForm, verified_by: e.target.value })}
+                      placeholder="e.g. B. Verifier (Compliance Lead)"
                       className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground">6. Closure Date *</label>
+                    <label htmlFor="closure_date" className="text-xs font-semibold text-foreground">6. Closure Date *</label>
                     <input
+                      id="closure_date"
                       type="date"
                       value={closureForm.closure_date}
                       onChange={(e) => setClosureForm({ ...closureForm, closure_date: e.target.value })}
@@ -533,8 +540,9 @@ export default function CaseDetailPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">7. Follow-Up Requirement *</label>
+                  <label htmlFor="closure_follow_up" className="text-xs font-semibold text-foreground">7. Follow-Up Requirement *</label>
                   <input
+                    id="closure_follow_up"
                     type="text"
                     value={closureForm.follow_up_requirement}
                     onChange={(e) => setClosureForm({ ...closureForm, follow_up_requirement: e.target.value })}
@@ -544,11 +552,13 @@ export default function CaseDetailPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">8. Recurrence Monitoring Protocol *</label>
+                  <label htmlFor="closure_recurrence_monitoring" className="text-xs font-semibold text-foreground">8. Recurrence Monitoring Protocol *</label>
                   <input
+                    id="closure_recurrence_monitoring"
                     type="text"
                     value={closureForm.recurrence_monitoring}
                     onChange={(e) => setClosureForm({ ...closureForm, recurrence_monitoring: e.target.value })}
+                    placeholder="e.g. Active 90-day surveillance on supplier SUP-001"
                     className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
