@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <DashboardLayout
       title={`Welcome Back, ${user.name} !`}
-      description={roleDescriptions[user.role?.toLowerCase()] || 'Enterprise Fraud Detection & Anomaly Intelligence Studio'}
+      description={roleDescriptions[user.role?.toLowerCase()] || 'Enterprise Risk Intelligence & Anomaly Detection Studio'}
     >
       <div className="space-y-6">
         {/* Top KPI Metrics Row: Borderless elevated cards */}

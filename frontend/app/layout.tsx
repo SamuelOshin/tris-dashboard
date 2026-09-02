@@ -10,7 +10,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'TRIS - Zero-Trust Risk & Integrity Studio',
-  description: 'Advanced financial fraud detection and supplier risk management platform for manufacturing companies',
+  description: 'Enterprise risk intelligence and anomaly detection platform for supplier risk management and procurement governance',
   generator: 'v0.app',
   icons: {
     icon: [

@@ -188,7 +188,7 @@ export function LoginForm() {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-mono font-medium">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>ENTERPRISE FRAUD DETECTION</span>
+              <span>ENTERPRISE RISK INTELLIGENCE</span>
             </div>
             <h2 className="text-3xl xl:text-4xl font-extrabold text-white tracking-tight leading-tight">
               Continuous risk intelligence for enterprise procurement.

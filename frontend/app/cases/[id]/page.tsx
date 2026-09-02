@@ -52,7 +52,7 @@ export default function CaseDetailPage() {
   const [closureForm, setClosureForm] = useState({
     root_cause: '',
     corrective_action: '',
-    closure_type: 'Confirmed Fraud / Blocked',
+    closure_type: '',
     closure_evidence: '',
     verified_by: user?.name ? `${user.name} (${user.role})` : 'Independent Controls Auditor',
     closure_date: new Date().toISOString().split('T')[0],
@@ -70,7 +70,7 @@ export default function CaseDetailPage() {
       setClosureForm({
         root_cause: caseData.root_cause || '',
         corrective_action: caseData.corrective_action || '',
-        closure_type: caseData.closure_type || 'Confirmed Fraud / Blocked',
+        closure_type: caseData.closure_type || '',
         closure_evidence: caseData.closure_evidence || '',
         verified_by: user?.name ? `${user.name} (${user.role})` : (caseData.verified_by || 'Independent Controls Auditor'),
         closure_date: new Date().toISOString().split('T')[0],
@@ -678,7 +678,9 @@ export default function CaseDetailPage() {
                         value={closureForm.closure_type}
                         onChange={(e) => setClosureForm({ ...closureForm, closure_type: e.target.value })}
                         className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        required
                       >
+                        <option value="" disabled>— Select closure classification —</option>
                         <option value="Confirmed Fraud / Blocked">Confirmed Fraud / Blocked</option>
                         <option value="Process Error / Remedied">Process Error / Remedied</option>
                         <option value="Legitimate Exception Approved">Legitimate Exception Approved</option>

@@ -20,7 +20,7 @@ interface Report {
 const sampleReports: Report[] = [
   {
     id: '1',
-    title: 'Financial Fraud Detection - Q2 2024',
+    title: 'Financial Risk Analysis - Q2 2024',
     type: 'fraud',
     period: 'Q2 2024',
     status: 'completed',
