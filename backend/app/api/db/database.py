@@ -15,6 +15,7 @@ engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DB_ECHO,
     future=True,
+    pool_pre_ping=True,
 )
 
 # Async session factory
