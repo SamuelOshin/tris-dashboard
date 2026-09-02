@@ -16,16 +16,15 @@ interface DemoUser {
 }
 
 const DEMO_USERS: DemoUser[] = [
-  { email: 'sarah@company.com', role: 'CFO', password: 'password' },
-  { email: 'james@company.com', role: 'Procurement Officer', password: 'password' },
-  { email: 'maria@company.com', role: 'Compliance Officer', password: 'password' },
-  { email: 'david@company.com', role: 'Security Team', password: 'password' },
-  { email: 'alex@company.com', role: 'Admin', password: 'password' },
+  { email: 'reviewer@tris.internal', role: 'Risk Reviewer (Finance)', password: 'password123' },
+  { email: 'verifier@tris.internal', role: 'Compliance Verifier', password: 'password123' },
+  { email: 'sarah@company.com', role: 'CFO (Executive)', password: 'password' },
+  { email: 'admin@tris.internal', role: 'System Admin', password: 'admin123' },
 ]
 
 export function LoginForm() {
-  const [email, setEmail] = useState('sarah@company.com')
-  const [password, setPassword] = useState('password')
+  const [email, setEmail] = useState('reviewer@tris.internal')
+  const [password, setPassword] = useState('password123')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()

@@ -5,8 +5,9 @@ Pure business logic — uses Argon2id cryptography and raises domain exceptions.
 
 from typing import Tuple
 
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import or_, select
 
 from app.api.core.custom_exceptions.exceptions import AuthenticationError
 from app.api.core.security import create_access_token, verify_password
@@ -28,7 +29,13 @@ class AuthService:
         Raises:
             AuthenticationError: If credentials fail or user is disabled.
         """
-        statement = select(User).where(User.username == username)
+        cleaned_identifier = username.strip().lower()
+        statement = select(User).where(
+            or_(
+                func.lower(User.username) == cleaned_identifier,
+                func.lower(User.email) == cleaned_identifier,
+            )
+        )
         result = await session.execute(statement)
         user = result.scalar_one_or_none()
 
