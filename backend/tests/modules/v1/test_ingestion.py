@@ -4,6 +4,7 @@ Verifies parsing and relational seeding of test data.xlsx.
 """
 
 from pathlib import Path
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -91,10 +92,11 @@ async def test_upload_workbook_endpoint(async_client: AsyncClient):
     """Verify POST /api/v1/ingest/upload gateway route."""
     assert DATA_FILE.exists()
 
+    mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     with open(DATA_FILE, "rb") as f:
         response = await async_client.post(
             "/api/v1/ingest/upload",
-            files={"file": ("test_data.xlsx", f, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
+            files={"file": ("test_data.xlsx", f, mime_type)},
         )
 
     assert response.status_code == 201

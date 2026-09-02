@@ -29,8 +29,8 @@ If a new chat session starts or context is reset:
 | :---: | :--- | :---: | :--- |
 | **Phase 0** | Baseline Tagging & Monorepo Initialization | 🟢 Complete | Git tag `v1.2-baseline`, `uv` backend initialized, Next.js build clean |
 | **Phase 1** | Core Infrastructure, Database & Ingestion Module | 🟢 Complete | `test data.xlsx` seeded (19 txns, 8 suppliers, 8 access, 10 approvals); Pytest 3/3 green |
-| **Phase 2** | Baseline Analytics Module (`suppliers`) | 🟡 Active | `SUP-001` baseline mean = $30,471.43 strictly excluding `TX-1999` |
-| **Phase 3** | Deterministic Rule Engine (`rules`) | ⚪ Not Started | `TX-1999` triggers R-001..R-004, consolidated into `TEST-CASE-001` (Score 100) |
+| **Phase 2** | Baseline Analytics Module (`suppliers`) | 🟢 Complete | `SUP-001` baseline mean = $30,471.43 strictly excluding `TX-1999`; Pytest 5/5 green |
+| **Phase 3** | Deterministic Rule Engine (`rules`) | 🟡 Active | `TX-1999` triggers R-001..R-004, consolidated into `TEST-CASE-001` (Score 100) |
 | **Phase 4** | Governed Case Lifecycle (`cases`) | ⚪ Not Started | 8-field closure validation enforced; DB trigger blocks history mutation |
 | **Phase 5** | Frontend Integration & UI Workspaces | ⚪ Not Started | Next.js builds clean with 0 errors; live dynamic `/cases/[id]` active |
 | **Phase 6** | Acceptance Matrix (`T01`–`T10`) & Handover | ⚪ Not Started | 10/10 developer acceptance tests pass simultaneously |
@@ -99,13 +99,13 @@ If a new chat session starts or context is reset:
 ### Phase 2: Baseline Analytics Module (`modules/v1/suppliers/`)
 *Objective: Implement transparent descriptive statistics with strict target transaction exclusion.*
 
-- [ ] **Task 2.1**: Implement `BaselineService` in `modules/v1/suppliers/service/`:
+- [x] **Task 2.1**: Implement `BaselineService` in `modules/v1/suppliers/service/`:
   - Calculate count, mean, median, min, max, standard deviation.
   - Enforce **strict exclusion** of target transaction (`exclude_transaction_id`).
-- [ ] **Task 2.2**: Verify `SUP-001` historical baseline mean is exactly **$30,471.43** across its 7 historical baseline invoices (`TX-1001` to `TX-1007`) excluding `TX-1999`.
-- [ ] **Task 2.3**: Expose `GET /api/v1/suppliers/{id}/baseline` in `modules/v1/suppliers/routes/` (< 50 lines).
-- [ ] **Task 2.4**: Write unit tests in `tests/modules/v1/test_suppliers.py`.
-- **Phase 2 Verification Gate**: Pytest verifies mathematical baseline calculation and exclusion proof.
+- [x] **Task 2.2**: Verify `SUP-001` historical baseline mean is exactly **$30,471.43** across its 7 historical baseline invoices (`TX-1001` to `TX-1007`) excluding `TX-1999`.
+- [x] **Task 2.3**: Expose `GET /api/v1/suppliers/{id}/baseline` in `modules/v1/suppliers/routes/` (< 50 lines).
+- [x] **Task 2.4**: Write unit tests in `tests/modules/v1/test_suppliers.py`.
+- **Phase 2 Verification Gate**: Pytest verifies mathematical baseline calculation ($30,471.43 mean, $30,400.00 median, $1,306.03 std dev) and exclusion proof; 5/5 tests pass with 0 errors.
 
 ---
 
