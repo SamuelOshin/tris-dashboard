@@ -34,10 +34,10 @@ const metrics: Metric[] = [
     icon: <DollarSign className="w-5 h-5" />
   },
   {
-    label: 'Detection Accuracy',
-    value: '96.8%',
-    change: 2,
-    trend: 'up',
+    label: 'Deterministic Rules',
+    value: '6 Active',
+    change: 0,
+    trend: 'down',
     icon: <Eye className="w-5 h-5" />
   }
 ]

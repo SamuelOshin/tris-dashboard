@@ -5,6 +5,7 @@ Combines all domain module routers under the /api/v1 prefix.
 
 from fastapi import APIRouter
 
+from app.api.modules.v1.auth.routes.auth_routes import router as auth_router
 from app.api.modules.v1.cases.routes.case_routes import router as cases_router
 from app.api.modules.v1.ingestion.routes.ingestion_routes import (
     router as ingestion_router,
@@ -17,6 +18,7 @@ from app.api.modules.v1.suppliers.routes.supplier_routes import (
 api_v1_router = APIRouter(prefix="/api/v1")
 
 # Register domain module routers
+api_v1_router.include_router(auth_router)
 api_v1_router.include_router(ingestion_router)
 api_v1_router.include_router(suppliers_router)
 api_v1_router.include_router(rules_router)

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, TrendingUp, Shield, Users, FileCheck, Activity } from 'lucide-react'
+import { Menu, X, TrendingUp, Shield, Users, FileCheck, Activity, Database, CheckSquare } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { UserMenu } from './user-menu'
 
@@ -40,6 +40,18 @@ export function TRISNavigation() {
       href: '/compliance', 
       icon: FileCheck,
       description: 'Audit & Reports'
+    },
+    { 
+      name: 'Ingestion', 
+      href: '/ingestion', 
+      icon: Database,
+      description: 'Excel Data Pipeline'
+    },
+    { 
+      name: 'Dev Tests', 
+      href: '/developer-tests', 
+      icon: CheckSquare,
+      description: 'Acceptance Matrix'
     },
   ]
 
