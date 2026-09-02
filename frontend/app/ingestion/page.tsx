@@ -28,10 +28,12 @@ export default function IngestionPage() {
 
     setLoading(true)
     setError(null)
+    setReport(null)
     try {
       const data = await api.uploadWorkbook(file)
       setReport(data)
     } catch (err: any) {
+      setReport(null)
       setError(err.message || 'Failed to ingest workbook')
     } finally {
       setLoading(false)

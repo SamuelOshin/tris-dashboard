@@ -104,3 +104,46 @@ async def test_upload_workbook_endpoint(async_client: AsyncClient):
     assert json_data["status"] == "SUCCESS"
     assert json_data["data"]["suppliers_loaded"] == 8
     assert json_data["data"]["transactions_loaded"] == 19
+
+
+@pytest.mark.asyncio
+async def test_upload_wrong_file_extension_rejected(async_client: AsyncClient):
+    """Verify non-Excel file extension is rejected with 422."""
+    response = await async_client.post(
+        "/api/v1/ingest/upload",
+        files={"file": ("fake_document.pdf", b"%PDF-1.4...", "application/pdf")},
+    )
+    assert response.status_code == 422
+    err = response.json()
+    assert err["status"] == "ERROR"
+    assert err["error_code"] == "INGESTION_ERROR"
+    assert "Unsupported file format" in err["message"]
+
+
+@pytest.mark.asyncio
+async def test_upload_invalid_excel_sheets_rejected(async_client: AsyncClient):
+    """Verify Excel workbook missing mandatory sheets is rejected with 422."""
+    from io import BytesIO
+
+    import pandas as pd
+
+    buf = BytesIO()
+    with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+        pd.DataFrame([{"col1": "val1"}]).to_excel(writer, sheet_name="RandomSheet", index=False)
+    buf.seek(0)
+
+    response = await async_client.post(
+        "/api/v1/ingest/upload",
+        files={
+            "file": (
+                "wrong_schema.xlsx",
+                buf.getvalue(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+        },
+    )
+    assert response.status_code == 422
+    err = response.json()
+    assert err["status"] == "ERROR"
+    assert err["error_code"] == "INGESTION_ERROR"
+    assert "missing mandatory sheets" in err["message"]

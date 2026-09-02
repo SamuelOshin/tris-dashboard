@@ -4,7 +4,7 @@ Parses, validates, and populates PostgreSQL tables from synthetic Excel workbook
 Pure business logic — raises domain exceptions directly.
 """
 
-from typing import Any
+from typing import Any, ClassVar
 
 import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,30 +22,57 @@ from app.api.modules.v1.transactions.models.transaction import Transaction
 class IngestionService:
     """Handles Excel parsing, sheet validation, and database population."""
 
+    REQUIRED_SHEETS: ClassVar[set[str]] = {"Suppliers", "Transactions"}
+    REQUIRED_SUPPLIER_COLUMNS: ClassVar[set[str]] = {"supplier_id", "name"}
+    REQUIRED_TRANSACTION_COLUMNS: ClassVar[set[str]] = {
+        "transaction_id",
+        "supplier_id",
+        "amount",
+    }
+
     @staticmethod
     async def ingest_excel_workbook(
         file_path_or_bytes: Any,
         session: AsyncSession,
+        filename: str | None = None,
     ) -> dict[str, Any]:
         """
-        Parses all sheets of test data.xlsx and seeds the database.
+        Parses and validates all sheets of TRIS enterprise workbook.
 
         Args:
             file_path_or_bytes: Path to .xlsx file or BytesIO object.
             session: Async database session.
+            filename: Optional original filename for extension validation.
 
         Returns:
             Dict[str, Any]: Ingestion summary report.
 
         Raises:
-            IngestionError: If file cannot be read or required sheet/column is missing.
+            IngestionError: If file cannot be read, format is invalid, or schema is missing.
         """
+        if filename:
+            clean_name = filename.strip().lower()
+            if not (clean_name.endswith(".xlsx") or clean_name.endswith(".xls")):
+                raise IngestionError(
+                    f"Unsupported file format '{filename}'. "
+                    "Only .xlsx and .xls Excel workbooks are permitted."
+                )
+
         try:
             excel_file = pd.ExcelFile(file_path_or_bytes)
         except Exception as exc:
-            raise IngestionError(f"Unable to read Excel workbook: {exc}") from exc
+            raise IngestionError(f"Unable to read file as an Excel workbook: {exc}") from exc
 
-        sheet_names = excel_file.sheet_names
+        sheet_names = set(excel_file.sheet_names)
+        missing_sheets = IngestionService.REQUIRED_SHEETS - sheet_names
+        if missing_sheets:
+            sorted_missing = sorted(list(missing_sheets))
+            sorted_found = sorted(list(sheet_names))
+            raise IngestionError(
+                "Invalid TRIS dataset format: workbook is missing mandatory sheets: "
+                f"{sorted_missing}. Found sheets: {sorted_found}."
+            )
+
         report: dict[str, Any] = {
             "suppliers_loaded": 0,
             "transactions_loaded": 0,
@@ -55,36 +82,58 @@ class IngestionService:
             "cases_loaded": 0,
         }
 
-        # 1. Ingest Suppliers
-        if "Suppliers" in sheet_names:
-            df_sup = excel_file.parse("Suppliers")
-            report["suppliers_loaded"] = await IngestionService._ingest_suppliers(df_sup, session)
+        # 1. Ingest Suppliers (Mandatory sheet)
+        df_sup = excel_file.parse("Suppliers")
+        sup_cols = set(df_sup.columns)
+        if "supplier_id" not in sup_cols or not ({"supplier_name", "name"} & sup_cols):
+            cols = list(df_sup.columns)
+            raise IngestionError(
+                "Sheet 'Suppliers' is missing mandatory columns. "
+                f"Must include 'supplier_id' and 'supplier_name' (or 'name'). Found: {cols}"
+            )
+        report["suppliers_loaded"] = await IngestionService._ingest_suppliers(df_sup, session)
 
-        # 2. Ingest Transactions
-        if "Transactions" in sheet_names:
-            df_tx = excel_file.parse("Transactions")
-            report["transactions_loaded"] = await IngestionService._ingest_transactions(
-                df_tx, session
+        # 2. Ingest Transactions (Mandatory sheet)
+        df_tx = excel_file.parse("Transactions")
+        tx_cols = set(df_tx.columns)
+        if (
+            "transaction_id" not in tx_cols
+            or "supplier_id" not in tx_cols
+            or not ({"amount_usd", "amount"} & tx_cols)
+        ):
+            raise IngestionError(
+                "Sheet 'Transactions' is missing mandatory columns. "
+                "Must include 'transaction_id', 'supplier_id', and 'amount_usd' (or 'amount'). "
+                f"Found: {list(df_tx.columns)}"
+            )
+        report["transactions_loaded"] = await IngestionService._ingest_transactions(
+            df_tx, session
+        )
+
+        # 3. Check for at least 1 record in core sheets
+        if report["suppliers_loaded"] == 0 and report["transactions_loaded"] == 0:
+            raise IngestionError(
+                "Uploaded workbook contains 0 valid supplier or transaction records to ingest."
             )
 
-        # 3. Ingest Approvals
+        # 4. Ingest Approvals (Optional sheet)
         if "Approvals" in sheet_names:
             df_app = excel_file.parse("Approvals")
             report["approvals_loaded"] = await IngestionService._ingest_approvals(df_app, session)
 
-        # 4. Ingest Access Events
+        # 5. Ingest Access Events (Optional sheet)
         if "Access_Events" in sheet_names:
             df_ae = excel_file.parse("Access_Events")
             report["access_events_loaded"] = await IngestionService._ingest_access_events(
                 df_ae, session
             )
 
-        # 5. Ingest Demo Rules
+        # 6. Ingest Demo Rules (Optional sheet)
         if "Demo_Rules" in sheet_names:
             df_rules = excel_file.parse("Demo_Rules")
             report["rules_loaded"] = await IngestionService._ingest_rules(df_rules, session)
 
-        # 6. Ingest Initial Cases & Workflow Samples
+        # 7. Ingest Initial Cases & Workflow Samples (Optional sheet)
         if "Expected_Cases" in sheet_names:
             df_cases = excel_file.parse("Expected_Cases")
             report["cases_loaded"] = await IngestionService._ingest_expected_cases(

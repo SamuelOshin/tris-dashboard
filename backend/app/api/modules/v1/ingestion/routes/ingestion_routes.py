@@ -26,6 +26,7 @@ async def upload_workbook(
     report = await IngestionService.ingest_excel_workbook(
         file_path_or_bytes=BytesIO(content),
         session=db,
+        filename=file.filename,
     )
     return success_response(
         status_code=status.HTTP_201_CREATED,
