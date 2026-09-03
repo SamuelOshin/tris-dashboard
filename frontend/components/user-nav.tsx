@@ -73,7 +73,7 @@ export function UserNav() {
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-80 p-0 rounded-2xl border-0 shadow-[0_12px_36px_rgba(0,0,0,0.12)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.5)] dark:bg-[#16181f] overflow-hidden"
+        className="w-[calc(100vw-2rem)] sm:w-80 max-w-[340px] p-0 rounded-2xl border-0 shadow-[0_12px_36px_rgba(0,0,0,0.12)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.5)] dark:bg-[#16181f] overflow-hidden"
       >
         {/* User Identity Header Card */}
         <div className="p-4 pb-3.5 bg-muted/20 dark:bg-muted/10 border-b border-border/30 space-y-2">

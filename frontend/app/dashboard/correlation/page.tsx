@@ -30,45 +30,44 @@ export default function CorrelationPage() {
       title="Correlation Intelligence"
       description="Analyze relationships between fraud, supplier, and access risks"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
-          {/* Risk Correlation Trend */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Multi-Risk Correlation Trends</CardTitle>
-              <CardDescription>
-                Monthly correlation between fraud risk, supplier risk, and access violations
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={{}} className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={correlationData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Legend />
-                    <Line type="monotone" dataKey="fraudRisk" stroke="hsl(var(--color-chart-1))" strokeWidth={2} name="Fraud Risk" />
-                    <Line type="monotone" dataKey="supplierRisk" stroke="hsl(var(--color-chart-2))" strokeWidth={2} name="Supplier Risk" />
-                    <Line type="monotone" dataKey="accessViolations" stroke="hsl(var(--color-chart-3))" strokeWidth={2} name="Access Violations" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
+      <div className="space-y-6">
+        {/* Risk Correlation Trend */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Multi-Risk Correlation Trends</CardTitle>
+            <CardDescription>
+              Monthly correlation between fraud risk, supplier risk, and access violations
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={{}} className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={correlationData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                  <Line type="monotone" dataKey="fraudRisk" stroke="hsl(var(--color-chart-1))" strokeWidth={2} name="Fraud Risk" />
+                  <Line type="monotone" dataKey="supplierRisk" stroke="hsl(var(--color-chart-2))" strokeWidth={2} name="Supplier Risk" />
+                  <Line type="monotone" dataKey="accessViolations" stroke="hsl(var(--color-chart-3))" strokeWidth={2} name="Access Violations" />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
 
-          {/* Correlation Matrix */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Risk Factor Correlations</CardTitle>
-              <CardDescription>
-                Correlation coefficients between individual factors and risk categories
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+        {/* Correlation Matrix */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Risk Factor Correlations</CardTitle>
+            <CardDescription>
+              Correlation coefficients between individual factors and risk categories
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto scrollbar-thin">
+              <table className="w-full text-sm min-w-[500px]">
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-2 px-4 font-semibold">Risk Factor</th>
@@ -140,7 +139,6 @@ export default function CorrelationPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
     </DashboardLayout>
   )
 }

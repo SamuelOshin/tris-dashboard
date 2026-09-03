@@ -301,7 +301,7 @@ export function LoginForm() {
       {/* ========================================================================= */}
       {/* RIGHT COLUMN: Enterprise Authentication Gateway Form (100% / Desktop 50%) */}
       {/* ========================================================================= */}
-      <div className="w-full lg:w-1/2 xl:w-[48%] flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 relative overflow-y-auto">
+      <div className="w-full lg:w-1/2 xl:w-[48%] flex flex-col justify-between p-4 sm:p-8 lg:p-12 xl:p-16 relative overflow-y-auto min-h-screen lg:min-h-0">
         {/* Ambient background accent for right pane */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 

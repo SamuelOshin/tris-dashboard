@@ -234,7 +234,7 @@ export default function CaseDetailPage() {
           </div>
 
           {/* Governed State Machine Action Controls */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
             {caseData.status === 'New' && (
               <Button
                 size="sm"
@@ -527,7 +527,7 @@ export default function CaseDetailPage() {
                 })
 
               return (
-                <Card className="p-5.5 bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f] h-[620px] flex flex-col overflow-hidden">
+                <Card className="p-4 sm:p-5.5 bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f] min-h-[440px] lg:h-[620px] flex flex-col overflow-hidden">
                   {/* Pinned Sticky Header */}
                   <div className="pb-3 border-b border-border/30 space-y-2.5 shrink-0">
                     <div className="flex items-center justify-between">
@@ -612,8 +612,8 @@ export default function CaseDetailPage() {
 
         {/* 8-Field Verified Closure Modal */}
         {closureModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-150">
-            <Card className="w-full max-w-2xl p-6 space-y-5 my-8 bg-card border-border shadow-2xl animate-in zoom-in-95 duration-150">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
+            <Card className="w-full max-w-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 my-auto max-h-[90vh] overflow-y-auto bg-card border-border shadow-2xl animate-in zoom-in-95 duration-150">
               <div className="flex items-center justify-between pb-3 border-b border-border">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-success/15 text-success rounded-xl border border-success/20">

@@ -52,7 +52,7 @@ export function AlertsPanel() {
 
   if (loading) {
     return (
-      <Card className="p-6 h-[640px] space-y-4 bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+      <Card className="p-6 min-h-[460px] lg:h-[640px] space-y-4 bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
         <div className="h-5 bg-muted/40 rounded-lg w-1/2 animate-pulse" />
         <div className="space-y-3 pt-2">
           {[1, 2, 3, 4].map((i) => (
@@ -64,7 +64,7 @@ export function AlertsPanel() {
   }
 
   return (
-    <Card className="p-6 sm:p-7 h-[640px] flex flex-col justify-between bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f] overflow-hidden">
+    <Card className="p-5 sm:p-7 min-h-[460px] lg:h-[640px] flex flex-col justify-between bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f] overflow-hidden">
       {/* Sticky Header with Title, ... More Button, and Search */}
       <div className="pb-3.5 space-y-3 shrink-0">
         <div className="flex items-center justify-between">

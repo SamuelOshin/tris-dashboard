@@ -75,71 +75,69 @@ export default function ReportsPage() {
       title="Reports & Analytics"
       description="Generate and download comprehensive risk analysis reports"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
-          {/* Report Generation */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Generate New Report</CardTitle>
-              <CardDescription>Create custom reports for fraud, supplier, or compliance analysis</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {['Fraud Detection', 'Supplier Risk', 'Access Audit', 'Compliance'].map((report) => (
-                  <Button key={report} variant="outline" className="h-auto flex flex-col items-center gap-2 py-4">
-                    <FileText className="w-5 h-5" />
-                    <span>{report}</span>
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+      <div className="space-y-6">
+        {/* Report Generation */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Generate New Report</CardTitle>
+            <CardDescription>Create custom reports for fraud, supplier, or compliance analysis</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {['Fraud Detection', 'Supplier Risk', 'Access Audit', 'Compliance'].map((report) => (
+                <Button key={report} variant="outline" className="h-auto flex flex-col items-center gap-2 py-4">
+                  <FileText className="w-5 h-5 text-primary" />
+                  <span className="text-xs sm:text-sm text-center">{report}</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Recent Reports */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Reports</CardTitle>
-              <CardDescription>Download or share your generated reports</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {sampleReports.map((report) => (
-                  <div key={report.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{report.title}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary" className={`text-xs ${typeColors[report.type]}`}>
-                            {report.type}
-                          </Badge>
-                          <Badge variant="secondary" className={`text-xs ${statusColors[report.status]}`}>
-                            {report.status}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{report.size}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {format(report.createdAt, 'MMM dd, yyyy')}
-                          </span>
-                        </div>
+        {/* Recent Reports */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Reports</CardTitle>
+            <CardDescription>Download or share your generated reports</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {sampleReports.map((report) => (
+                <div key={report.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl hover:bg-muted/50 transition-colors gap-3">
+                  <div className="flex items-start sm:items-center gap-3 flex-1 min-w-0">
+                    <FileText className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5 sm:mt-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{report.title}</p>
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <Badge variant="secondary" className={`text-xs ${typeColors[report.type]}`}>
+                          {report.type}
+                        </Badge>
+                        <Badge variant="secondary" className={`text-xs ${statusColors[report.status]}`}>
+                          {report.status}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">{report.size}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {format(report.createdAt, 'MMM dd, yyyy')}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Download className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Share2 className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Mail className="w-4 h-4" />
-                      </Button>
-                    </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40 w-full sm:w-auto justify-end">
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Download className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Mail className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   )

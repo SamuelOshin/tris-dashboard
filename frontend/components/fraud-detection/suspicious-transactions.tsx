@@ -194,8 +194,8 @@ export function SuspiciousTransactions() {
       {/* Live Paginated Table */}
       {!loading && !error && filtered.length > 0 && (
         <Card className="overflow-hidden bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f]">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto scrollbar-thin">
+            <table className="w-full text-left text-xs min-w-[700px]">
               <thead className="bg-muted/15 text-muted-foreground/70 font-mono font-semibold uppercase text-[10px] tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Case Identifier</th>

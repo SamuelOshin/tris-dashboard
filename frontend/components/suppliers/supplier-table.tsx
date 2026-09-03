@@ -199,8 +199,8 @@ export function SupplierTable() {
       {/* Live Paginated Table */}
       {!loading && !error && filtered.length > 0 && (
         <Card className="overflow-hidden bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f]">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto scrollbar-thin">
+            <table className="w-full text-left text-xs min-w-[700px]">
               <thead className="bg-muted/15 text-muted-foreground/70 font-mono font-semibold uppercase text-[10px] tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Supplier Entity</th>
@@ -325,8 +325,8 @@ export function SupplierTable() {
 
       {/* Supplier Baseline Slideout Drawer */}
       {activeSupplier && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-card border-l border-border h-full overflow-y-auto p-6 space-y-6 shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200">
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-150 p-0 sm:p-0">
+          <div className="w-full sm:max-w-md bg-card border-l border-border h-full overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6 shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200">
             <div className="space-y-6">
               {/* Header */}
               <div className="flex items-center justify-between pb-4 border-b border-border">

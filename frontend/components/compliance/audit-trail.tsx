@@ -125,8 +125,8 @@ export function AuditTrail() {
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[380px] overflow-y-auto">
-        <table className="w-full text-xs text-left">
+      <div className="overflow-x-auto max-h-[380px] overflow-y-auto scrollbar-thin">
+        <table className="w-full text-xs text-left min-w-[640px]">
           <thead className="bg-muted/15 border-b border-border/20 font-mono font-semibold uppercase text-[10px] text-muted-foreground/70 sticky top-0 z-10 backdrop-blur-xs">
             <tr>
               <th className="py-2.5 px-3">Timestamp</th>

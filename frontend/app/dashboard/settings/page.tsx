@@ -1006,8 +1006,8 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-3.5 text-xs">
                   {/* SAP */}
-                  <div className="p-3.5 rounded-xl bg-card border border-border flex items-center justify-between">
-                    <div className="space-y-0.5">
+                  <div className="p-3.5 rounded-xl bg-card border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="space-y-0.5 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-foreground text-xs">SAP S/4HANA</p>
                         <Badge variant="outline" className="text-[9px] text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
@@ -1025,15 +1025,15 @@ export default function SettingsPage() {
                         setSapConnected(!sapConnected)
                         toast.info(sapConnected ? 'SAP sync paused' : 'SAP sync resumed')
                       }}
-                      className="text-xs h-8"
+                      className="text-xs h-8 self-end sm:self-auto shrink-0"
                     >
                       {sapConnected ? 'Configure' : 'Reconnect'}
                     </Button>
                   </div>
 
                   {/* Oracle */}
-                  <div className="p-3.5 rounded-xl bg-card border border-border flex items-center justify-between">
-                    <div className="space-y-0.5">
+                  <div className="p-3.5 rounded-xl bg-card border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="space-y-0.5 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-foreground text-xs">Oracle NetSuite</p>
                         <Badge variant="outline" className="text-[9px] text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
@@ -1051,7 +1051,7 @@ export default function SettingsPage() {
                         setOracleConnected(!oracleConnected)
                         toast.info(oracleConnected ? 'Oracle sync paused' : 'Oracle sync resumed')
                       }}
-                      className="text-xs h-8"
+                      className="text-xs h-8 self-end sm:self-auto shrink-0"
                     >
                       {oracleConnected ? 'Configure' : 'Reconnect'}
                     </Button>

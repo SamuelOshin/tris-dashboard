@@ -98,16 +98,17 @@ export function TRISNavigation() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
-            aria-label="Toggle menu"
+            className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden pb-4 space-y-1.5 border-t border-border pt-2">
+          <div className="md:hidden pb-4 space-y-1.5 border-t border-border pt-3 animate-in slide-in-from-top-2 duration-200">
             {navigationItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
@@ -116,23 +117,23 @@ export function TRISNavigation() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                  className={`flex items-center gap-3 px-3.5 py-2.5 min-h-[44px] text-sm rounded-xl transition-colors ${
                     isActive
                       ? 'bg-primary/10 text-primary font-semibold'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className={`p-1.5 rounded-lg shrink-0 ${isActive ? 'bg-primary/15 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
                     <Icon className="w-4 h-4" />
-                    <div>
-                      <div>{item.name}</div>
-                      <div className="text-[11px] text-muted-foreground font-normal">{item.description}</div>
-                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-medium leading-tight truncate">{item.name}</div>
+                    <div className="text-[11px] text-muted-foreground font-normal truncate mt-0.5">{item.description}</div>
                   </div>
                 </Link>
               )
             })}
-            <div className="px-3 pt-3 border-t border-border mt-2">
+            <div className="px-1 pt-3 border-t border-border mt-2">
               <UserMenu />
             </div>
           </div>

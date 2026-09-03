@@ -336,20 +336,20 @@ export function DashboardLayout({
       </Sidebar>
 
       {/* Main App Inset */}
-      <SidebarInset className="bg-background flex flex-col min-h-screen">
+      <SidebarInset className="bg-background flex flex-col min-h-screen min-w-0 w-full overflow-x-hidden">
         {/* Sticky Command Header with Global Collapse Trigger */}
-        <header className="h-14 px-4 sm:px-6 border-b border-border bg-card/60 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
+        <header className="h-14 px-3 sm:px-6 border-b border-border bg-card/60 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between gap-2 sm:gap-4 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             {/* Sidebar Collapse/Expand Toggle (Always accessible) */}
             <SidebarTrigger
               title="Toggle Sidebar (Ctrl+B)"
-              className="text-muted-foreground hover:text-foreground hover:bg-muted/40 p-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted/40 p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg transition-colors cursor-pointer shrink-0"
             />
 
             {/* Breadcrumb Navigation */}
-            <nav className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
+            <nav className="flex items-center gap-1 sm:gap-1.5 text-xs text-muted-foreground min-w-0 overflow-hidden">
               {renderedBreadcrumbs.map((crumb, idx) => (
-                <div key={idx} className="flex items-center gap-1.5 min-w-0">
+                <div key={idx} className="flex items-center gap-1 sm:gap-1.5 min-w-0 truncate">
                   {idx > 0 && <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />}
                   {crumb.href && idx < renderedBreadcrumbs.length - 1 ? (
                     <Link href={crumb.href} className="hover:text-foreground truncate transition-colors">
@@ -364,7 +364,7 @@ export function DashboardLayout({
           </div>
 
           {/* Right Header Actions */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Live System Status */}
             <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-success/10 border border-success/20 text-[11px] font-mono text-success">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
@@ -373,27 +373,27 @@ export function DashboardLayout({
 
             <HeaderSearch />
             <NotificationsPopover />
-            <div className="w-px h-4 bg-border" />
+            <div className="hidden sm:block w-px h-4 bg-border" />
             <ThemeToggle />
-            <div className="w-px h-4 bg-border" />
+            <div className="hidden sm:block w-px h-4 bg-border" />
             <UserNav />
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6 min-w-0">
           {title && (
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-1">
-              <div>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4 pb-1">
+              <div className="min-w-0">
                 <p className="text-xs font-mono text-muted-foreground">{todayFormatted}</p>
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mt-0.5">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground mt-0.5 truncate">
                   {title}
                 </h1>
-                {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
+                {description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{description}</p>}
               </div>
 
               {showActions !== false && (
-                <div>{actions !== undefined ? actions : <DefaultQuickActions />}</div>
+                <div className="w-full md:w-auto overflow-x-auto pb-1 md:pb-0">{actions !== undefined ? actions : <DefaultQuickActions />}</div>
               )}
             </div>
           )}
