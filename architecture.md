@@ -93,9 +93,9 @@ flowchart TB
     end
 
     Browser <-->|HTTPS / HTML & React Bundles| NextCore
-    Browser <-->|API Requests (HttpOnly Cookies)| RewritesProxy
+    Browser <-->|API Requests - HttpOnly Cookies| RewritesProxy
     RewritesProxy <-->|Internal TLS Proxy| ASGI
-    ProcessingEngines <-->|SQLAlchemy 2.0 Async (asyncpg / psycopg)| PG
+    ProcessingEngines <-->|SQLAlchemy 2.0 Async - asyncpg / psycopg| PG
 ```
 
 ---
@@ -194,7 +194,7 @@ erDiagram
         string name "Amount Deviation"
         string description "Invoice exceeds multiplier x historical baseline"
         int weight "35"
-        jsonb threshold_params "{\"multiplier\": 2.0}"
+        jsonb threshold_params "multiplier: 2.0"
         int rule_version "1"
         boolean is_active "true"
     }
@@ -228,8 +228,18 @@ flowchart TD
         R6["R-006: 90-Day Recurrence Detection"]
     end
 
-    Evaluator --> R1 & R2 & R3 & R4 & R5 & R6
-    R1 & R2 & R3 & R4 & R5 & R6 --> Consolidator["Signal Consolidation Engine"]
+    Evaluator --> R1
+    Evaluator --> R2
+    Evaluator --> R3
+    Evaluator --> R4
+    Evaluator --> R5
+    Evaluator --> R6
+    R1 --> Consolidator["Signal Consolidation Engine"]
+    R2 --> Consolidator
+    R3 --> Consolidator
+    R4 --> Consolidator
+    R5 --> Consolidator
+    R6 --> Consolidator
     Consolidator --> Score["Additive Priority Scoring<br/>Sum of Triggered Weights"]
     Score --> Case["Generate / Update Risk Case<br/>Store Rule Snapshot in JSONB"]
 ```
