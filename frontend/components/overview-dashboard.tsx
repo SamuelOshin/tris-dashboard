@@ -26,6 +26,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import Link from 'next/link'
+import { ErrorCard } from '@/components/ui/error-card'
 
 /**
  * Currency and date formatting utility helpers
@@ -96,6 +97,7 @@ export function OverviewDashboard() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [rules, setRules] = useState<RuleConfig[]>([])
   const [loading, setLoading] = useState(true)
+  const [ingestError, setIngestError] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState<'all' | 'high_risk' | 'missing_approval' | 'over_50k'>('all')
 
   // Sequenced baseline state for the benchmark case
@@ -104,29 +106,35 @@ export function OverviewDashboard() {
   const [baselineError, setBaselineError] = useState<string | null>(null)
 
   // 1. Initial parallel data ingestion
-  useEffect(() => {
-    let mounted = true
-    Promise.all([
-      api.getCases().catch(() => []),
-      api.getTransactions(undefined, 0, 1000).catch(() => []),
-      api.getSuppliers().catch(() => []),
-      api.getRules().catch(() => []),
+  const refetchIngest = async () => {
+    setLoading(true)
+    setIngestError(null)
+    const results = await Promise.allSettled([
+      api.getCases(),
+      api.getTransactions(undefined, 0, 1000),
+      api.getSuppliers(),
+      api.getRules(),
     ])
-      .then(([fetchedCases, fetchedTxs, fetchedSuppliers, fetchedRules]) => {
-        if (mounted) {
-          setCases(fetchedCases)
-          setTransactions(fetchedTxs)
-          setSuppliers(fetchedSuppliers)
-          setRules(fetchedRules)
-        }
-      })
-      .finally(() => {
-        if (mounted) setLoading(false)
-      })
+    const [casesRes, txsRes, suppliersRes, rulesRes] = results
+    setCases(casesRes.status === 'fulfilled' ? casesRes.value : [])
+    setTransactions(txsRes.status === 'fulfilled' ? txsRes.value : [])
+    setSuppliers(suppliersRes.status === 'fulfilled' ? suppliersRes.value : [])
+    setRules(rulesRes.status === 'fulfilled' ? rulesRes.value : [])
 
-    return () => {
-      mounted = false
-    }
+    const failed = results
+      .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+      .map((r) => (r.reason instanceof Error ? r.reason.message : 'Unable to load data'))
+    setIngestError(
+      failed.length > 0
+        ? `${failed.length} of ${results.length} data sources failed to load`
+        : null,
+    )
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    void refetchIngest()
+    return () => {}
   }, [])
 
   // 2. Lookup index maps for fast O(1) correlation
@@ -606,6 +614,13 @@ export function OverviewDashboard() {
 
   return (
     <div className="space-y-6">
+      {ingestError && (
+        <ErrorCard
+          title="Some Dashboard Data Could Not Be Loaded"
+          message={ingestError}
+          onRetry={refetchIngest}
+        />
+      )}
       {/* 1. OVERVIEW HERO CARD WITH TELEMETRY SPLINE CHART */}
       <Card className="p-6 sm:p-7 bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f] transition-all">
         {/* Header with Title and Action button */}

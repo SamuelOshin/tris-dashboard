@@ -26,7 +26,16 @@ export function AccessTimeline() {
             contentStyle={{
               backgroundColor: 'var(--card)',
               border: '1px solid var(--border)',
-              borderRadius: '8px'
+              borderRadius: '8px',
+              fontSize: '12px',
+              color: 'var(--foreground)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+            }}
+            itemStyle={{
+              color: 'var(--foreground)',
+            }}
+            labelStyle={{
+              color: 'var(--foreground)',
             }}
           />
           <Area type="monotone" dataKey="legitimate" stackId="1" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} name="Legitimate" />

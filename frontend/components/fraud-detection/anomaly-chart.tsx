@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import {
   ScatterChart,
@@ -16,25 +15,21 @@ import {
 } from 'recharts'
 import { api, Transaction, formatCurrency } from '@/lib/api'
 import { Activity, AlertTriangle } from 'lucide-react'
+import { useFetchData } from '@/hooks/use-fetch-data'
+import { ErrorCard } from '@/components/ui/error-card'
 
 export function AnomalyChart() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: transactions, loading, error, refetch } = useFetchData<Transaction[]>(() =>
+    api.getTransactions(),
+  )
 
-  useEffect(() => {
-    let mounted = true
-    api.getTransactions()
-      .then((data) => {
-        if (mounted) {
-          setTransactions(data)
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (mounted) setLoading(false)
-      })
-    return () => { mounted = false }
-  }, [])
+  if (error) {
+    return (
+      <Card className="p-6 bg-card border-border">
+        <ErrorCard title="Failed to Load Anomaly Distribution" message={error} onRetry={refetch} />
+      </Card>
+    )
+  }
 
   if (loading) {
     return (
@@ -46,7 +41,8 @@ export function AnomalyChart() {
   }
 
   // Map transactions to chart coordinates
-  const plotData = transactions.map((t, idx) => {
+  const txs = transactions ?? []
+  const plotData = txs.map((t, idx) => {
     const isTargetAnomaly = t.transaction_id === 'TX-1999' || t.amount >= 80000
     const isElevated = t.amount >= 50000 && t.amount < 80000
     return {
@@ -69,11 +65,11 @@ export function AnomalyChart() {
             Transaction Amount Anomaly Distribution
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Scatter distribution of {transactions.length} audited transactions against statistical bounds
+            Scatter distribution of {txs.length} audited transactions against statistical bounds
           </p>
         </div>
         <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-muted/40 border border-border text-muted-foreground">
-          {transactions.length} Invoices
+          {txs.length} Invoices
         </span>
       </div>
 
@@ -106,7 +102,14 @@ export function AnomalyChart() {
                 border: '1px solid var(--border)',
                 borderRadius: '8px',
                 fontSize: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                color: 'var(--foreground)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+              }}
+              itemStyle={{
+                color: 'var(--foreground)',
+              }}
+              labelStyle={{
+                color: 'var(--foreground)',
               }}
               formatter={(value, name, item) => {
                 if (name === 'Invoice Amount') return [formatCurrency(Number(value)), 'Amount']

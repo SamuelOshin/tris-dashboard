@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { api, RiskCase, getCompositeScore } from '@/lib/api'
+import { useFetchData } from '@/hooks/use-fetch-data'
+import { ErrorCard } from '@/components/ui/error-card'
 import {
   ShieldAlert,
   ArrowRight,
@@ -19,27 +21,12 @@ import {
 import Link from 'next/link'
 
 export function AlertsPanel() {
-  const [cases, setCases] = useState<RiskCase[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: cases, loading, error, refetch } = useFetchData<RiskCase[]>(() =>
+    api.getCases(),
+  )
   const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => {
-    let mounted = true
-    api.getCases()
-      .then((data) => {
-        if (mounted) setCases(data)
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (mounted) setLoading(false)
-      })
-
-    return () => {
-      mounted = false
-    }
-  }, [])
-
-  const filteredCases = cases.filter((c) => {
+  const filteredCases = cases?.filter((c) => {
     if (!searchQuery.trim()) return true
     const q = searchQuery.toLowerCase()
     return (
@@ -94,7 +81,13 @@ export function AlertsPanel() {
 
       {/* Scrollable Body with Borderless Floating Item Cards */}
       <div className="flex-1 overflow-y-auto pr-1 my-2 space-y-2.5">
-        {filteredCases.length === 0 ? (
+        {error ? (
+          <ErrorCard
+            title="Failed to Load Alerts"
+            message={error}
+            onRetry={refetch}
+          />
+        ) : (filteredCases?.length ?? 0) === 0 ? (
           <div className="text-center py-20 space-y-2">
             <CheckCircle className="w-8 h-8 text-success mx-auto opacity-80" />
             <p className="text-xs font-semibold text-foreground">
@@ -105,7 +98,7 @@ export function AlertsPanel() {
             </p>
           </div>
         ) : (
-          filteredCases.map((c) => {
+          filteredCases?.map((c) => {
             const score = getCompositeScore(c)
             const isHigh = c.priority?.toLowerCase() === 'high' || score >= 70
 

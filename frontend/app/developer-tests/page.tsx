@@ -34,7 +34,7 @@ const INITIAL_TESTS: AcceptanceTest[] = [
     name: 'Workbook Upload & Relational Ingestion',
     category: 'Ingestion',
     spec: 'Section 4.A · POST /api/v1/ingest/upload',
-    requirement: 'Accepts test data.xlsx, populates suppliers and transactions tables; no composite objects.',
+    requirement: 'Accepts test data.xlsx, Populates suppliers and transactions tables; no composite objects.',
     status: 'passed',
     evidence: '8 suppliers, 11 transactions ingested cleanly; relational foreign keys verified',
   },

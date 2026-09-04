@@ -1,29 +1,28 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Users, AlertTriangle, Landmark, ShieldCheck } from 'lucide-react'
 import { api, Supplier } from '@/lib/api'
+import { useFetchData } from '@/hooks/use-fetch-data'
+import { ErrorCard } from '@/components/ui/error-card'
 
 export function SupplierMetrics() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: suppliers, loading, error, refetch } = useFetchData<Supplier[]>(() =>
+    api.getSuppliers(),
+  )
 
-  useEffect(() => {
-    let mounted = true
-    api.getSuppliers()
-      .then((data) => {
-        if (mounted) setSuppliers(data)
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (mounted) setLoading(false)
-      })
-
-    return () => {
-      mounted = false
-    }
-  }, [])
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <ErrorCard
+          title="Failed to Load Supplier Summary"
+          message={error}
+          onRetry={refetch}
+          className="sm:col-span-2 lg:col-span-4"
+        />
+      </div>
+    )
+  }
 
   if (loading) {
     return (
@@ -39,10 +38,12 @@ export function SupplierMetrics() {
     )
   }
 
-  const total = suppliers.length
-  const highRisk = suppliers.filter((s) => s.risk_tier?.toLowerCase() === 'high').length
-  const bankChanges = suppliers.filter((s) => Boolean(s.bank_change_date)).length
-  const activeCount = suppliers.filter((s) => s.status?.toLowerCase() === 'active').length
+  const txs = suppliers ?? []
+
+  const total = txs.length
+  const highRisk = txs.filter((s) => s.risk_tier?.toLowerCase() === 'high').length
+  const bankChanges = txs.filter((s) => Boolean(s.bank_change_date)).length
+  const activeCount = txs.filter((s) => s.status?.toLowerCase() === 'active').length
 
   const metrics = [
     {

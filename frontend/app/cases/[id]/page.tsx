@@ -234,9 +234,15 @@ export default function CaseDetailPage() {
           </div>
 
           {/* Governed State Machine Action Controls */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-            {caseData.status === 'New' && (
-              <Button
+          {!['reviewer', 'verifier', 'admin', 'compliance'].includes(user?.role?.toLowerCase() || '') ? (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/40 border border-border text-xs text-muted-foreground font-mono">
+              <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+              <span>Read-Only View (Investigator Clearance Required)</span>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              {caseData.status === 'New' && (
+                <Button
                 size="sm"
                 onClick={() => handleTransition('Assigned', { assigned_to: user?.name || 'Lead Investigator' })}
                 disabled={actionLoading}
@@ -331,7 +337,8 @@ export default function CaseDetailPage() {
               </>
             )}
           </div>
-        </div>
+        )}
+      </div>
 
         {error && (
           <div className="p-4 rounded-xl bg-destructive/10 text-destructive border border-destructive/20 flex items-center gap-3">

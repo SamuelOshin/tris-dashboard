@@ -11,7 +11,7 @@ import {
   History,
   Settings,
   Database,
-  CheckSquare,
+  Activity,
   LogOut,
   ChevronRight,
   Sparkles,
@@ -138,15 +138,15 @@ export function UserNav() {
           </Link>
 
           <Link
-            href="/developer-tests"
+            href="/zero-trust"
             onClick={() => setOpen(false)}
             className="flex items-center justify-between px-2.5 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <CheckSquare className="w-3.5 h-3.5 text-primary shrink-0" />
+              <Activity className="w-3.5 h-3.5 text-primary shrink-0" />
               <div className="min-w-0">
-                <p className="font-medium leading-tight">Acceptance Matrix</p>
-                <p className="text-[11px] text-muted-foreground/80 leading-tight">System validation suite</p>
+                <p className="font-medium leading-tight">Zero-Trust Access</p>
+                <p className="text-[11px] text-muted-foreground/80 leading-tight">Access pattern & off-hours telemetry</p>
               </div>
             </div>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />

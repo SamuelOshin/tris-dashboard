@@ -1,29 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { api, RuleConfig, DEFAULT_RULES_METADATA } from '@/lib/api'
 import { Cpu, ShieldAlert } from 'lucide-react'
+import { useFetchData } from '@/hooks/use-fetch-data'
+import { ErrorCard } from '@/components/ui/error-card'
 
 export function AnomalyPatterns() {
-  const [rules, setRules] = useState<RuleConfig[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: rules, loading, error, refetch } = useFetchData<RuleConfig[]>(() =>
+    api.getRules(),
+  )
 
-  useEffect(() => {
-    let mounted = true
-    api.getRules()
-      .then((data) => {
-        if (mounted) {
-          setRules(data)
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (mounted) setLoading(false)
-      })
-    return () => { mounted = false }
-  }, [])
+  if (error) {
+    return (
+      <Card className="p-5 bg-card border-border">
+        <ErrorCard title="Failed to Load Detection Rules" message={error} onRetry={refetch} />
+      </Card>
+    )
+  }
 
   if (loading) {
     return (
@@ -37,7 +32,7 @@ export function AnomalyPatterns() {
   }
 
   // Fallback to DEFAULT_RULES_METADATA if API returned empty
-  const displayRules = rules.length > 0 ? rules : Object.entries(DEFAULT_RULES_METADATA).map(([code, meta]) => ({
+  const displayRules = (rules ?? []).length > 0 ? rules! : Object.entries(DEFAULT_RULES_METADATA).map(([code, meta]) => ({
     rule_code: code,
     name: meta.name,
     description: meta.description,

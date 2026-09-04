@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { api, Supplier } from '@/lib/api'
 import { Layers } from 'lucide-react'
+import { useFetchData } from '@/hooks/use-fetch-data'
+import { ErrorCard } from '@/components/ui/error-card'
 
 const PALETTE = [
   { bg: 'bg-blue-500', hex: '#3b82f6', text: 'text-blue-400' },
@@ -17,26 +18,17 @@ const PALETTE = [
 ]
 
 export function SupplierPortfolio() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: suppliers, loading, error, refetch } = useFetchData<Supplier[]>(() =>
+    api.getSuppliers(),
+  )
 
-  useEffect(() => {
-    let mounted = true
-    api
-      .getSuppliers()
-      .then((data) => {
-        if (mounted) {
-          setSuppliers(data)
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (mounted) setLoading(false)
-      })
-    return () => {
-      mounted = false
-    }
-  }, [])
+  if (error) {
+    return (
+      <Card className="p-6 bg-card border-border">
+        <ErrorCard title="Failed to Load Supplier Portfolio" message={error} onRetry={refetch} />
+      </Card>
+    )
+  }
 
   if (loading) {
     return (
@@ -47,14 +39,16 @@ export function SupplierPortfolio() {
     )
   }
 
+  const txs = suppliers ?? []
+
   // Aggregate by category
   const categoryCounts: Record<string, number> = {}
-  suppliers.forEach((s) => {
+  txs.forEach((s) => {
     const cat = s.category || 'General'
     categoryCounts[cat] = (categoryCounts[cat] || 0) + 1
   })
 
-  const total = suppliers.length || 1
+  const total = txs.length || 1
   const categories = Object.entries(categoryCounts).map(([name, count], index) => {
     const color = PALETTE[index % PALETTE.length]
     const percent = Math.round((count / total) * 100)
@@ -71,7 +65,7 @@ export function SupplierPortfolio() {
               Supplier Category Distribution
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Portfolio breakdown across {suppliers.length} active vendors
+              Portfolio breakdown across {txs.length} active vendors
             </p>
           </div>
           <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-muted/40 border border-border text-muted-foreground">

@@ -179,3 +179,23 @@
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 }
+
+/* Recharts default tooltip dark mode & light mode contrast */
+.recharts-default-tooltip {
+  color: var(--foreground) !important;
+}
+
+.recharts-default-tooltip .recharts-tooltip-item {
+  color: var(--foreground) !important;
+}
+
+.recharts-default-tooltip .recharts-tooltip-label {
+  color: var(--foreground) !important;
+}
+
+.recharts-tooltip-item-name,
+.recharts-tooltip-item-separator,
+.recharts-tooltip-item-value {
+  color: inherit !important;
+}
+

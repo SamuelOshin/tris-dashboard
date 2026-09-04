@@ -1,35 +1,33 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { ShieldAlert, Cpu, Award, CheckCircle2 } from 'lucide-react'
 import { api, RiskCase, RuleConfig, getCompositeScore } from '@/lib/api'
+import { useFetchData } from '@/hooks/use-fetch-data'
+import { ErrorCard } from '@/components/ui/error-card'
 
 export function FraudMetrics() {
-  const [cases, setCases] = useState<RiskCase[]>([])
-  const [rules, setRules] = useState<RuleConfig[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data, loading, error, refetch } = useFetchData<{ cases: RiskCase[]; rules: RuleConfig[] }>(
+    async () => {
+      const [cases, rules] = await Promise.all([api.getCases(), api.getRules()])
+      return { cases, rules }
+    },
+  )
 
-  useEffect(() => {
-    let mounted = true
-    Promise.all([
-      api.getCases().catch(() => []),
-      api.getRules().catch(() => []),
-    ])
-      .then(([casesData, rulesData]) => {
-        if (mounted) {
-          setCases(casesData)
-          setRules(rulesData)
-        }
-      })
-      .finally(() => {
-        if (mounted) setLoading(false)
-      })
+  const { cases = [], rules = [] } = data ?? {}
 
-    return () => {
-      mounted = false
-    }
-  }, [])
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <ErrorCard
+          title="Failed to Load Fraud Summary"
+          message={error}
+          onRetry={refetch}
+          className="sm:col-span-2 lg:col-span-4"
+        />
+      </div>
+    )
+  }
 
   if (loading) {
     return (

@@ -415,11 +415,11 @@ export function SupplierTable() {
                   <div className="p-3 bg-muted/15 border border-border/60 rounded-xl text-xs flex justify-between items-center font-mono">
                     <div>
                       <span className="text-muted-foreground text-[10px] block">Historical Min</span>
-                      <span className="font-bold text-foreground">{formatCurrency(baselineData.min_amount)}</span>
+                      <span className="font-bold text-foreground">{formatCurrency(baselineData.min_amount ?? 0)}</span>
                     </div>
                     <div className="text-right">
                       <span className="text-muted-foreground text-[10px] block">Historical Max</span>
-                      <span className="font-bold text-foreground">{formatCurrency(baselineData.max_amount)}</span>
+                      <span className="font-bold text-foreground">{formatCurrency(baselineData.max_amount ?? 0)}</span>
                     </div>
                   </div>
 
@@ -430,11 +430,11 @@ export function SupplierTable() {
                         Included Baseline Transactions
                       </h5>
                       <span className="text-[10px] font-mono text-muted-foreground">
-                        {baselineData.baseline_transaction_ids.length} records
+                        {(baselineData.baseline_transaction_ids || []).length} records
                       </span>
                     </div>
                     <div className="max-h-36 overflow-y-auto pr-1 flex flex-wrap gap-1.5 p-1 rounded-lg bg-muted/10 border border-border/50">
-                      {baselineData.baseline_transaction_ids.map((txId) => (
+                      {(baselineData.baseline_transaction_ids || []).map((txId) => (
                         <span
                           key={txId}
                           className="px-2 py-0.5 bg-card border border-border rounded font-mono text-[11px] text-foreground"

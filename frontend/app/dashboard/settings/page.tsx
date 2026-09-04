@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { DashboardLayout } from '@/components/dashboard-layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -11,8 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth-context'
-import { api, RuleConfig, DEFAULT_RULES_METADATA } from '@/lib/api'
+import { api, RuleConfig } from '@/lib/api'
 import { toast } from 'sonner'
+import { ErrorCard } from '@/components/ui/error-card'
 import {
   Building2,
   Shield,
@@ -117,6 +118,7 @@ export default function SettingsPage() {
   // Rules Engine state
   const [rules, setRules] = useState<RuleConfig[]>([])
   const [rulesLoading, setRulesLoading] = useState(true)
+  const [rulesError, setRulesError] = useState<string | null>(null)
   const [updatingRuleCode, setUpdatingRuleCode] = useState<string | null>(null)
   const [autoFreezeDisbursements, setAutoFreezeDisbursements] = useState(true)
   const [dualSignoffRequired, setDualSignoffRequired] = useState(true)
@@ -150,33 +152,22 @@ export default function SettingsPage() {
   const [selectedScopes, setSelectedScopes] = useState<string[]>(['cases:read'])
 
   // Fetch detection rules from API
-  useEffect(() => {
-    let mounted = true
-    api.getRules()
-      .then((data) => {
-        if (mounted) {
-          setRules(data)
-          setRulesLoading(false)
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          const fallbackRules: RuleConfig[] = Object.entries(DEFAULT_RULES_METADATA).map(([code, meta]) => ({
-            rule_code: code,
-            name: meta.name,
-            description: meta.description,
-            weight: meta.weight,
-            threshold_params: code === 'R-001' ? { multiplier: 2.0 } : {},
-            rule_version: meta.version,
-            is_active: true,
-            updated_at: new Date().toISOString(),
-          }))
-          setRules(fallbackRules)
-          setRulesLoading(false)
-        }
-      })
-    return () => { mounted = false }
+  const loadRules = useCallback(async () => {
+    setRulesLoading(true)
+    setRulesError(null)
+    try {
+      const data = await api.getRules()
+      setRules(data)
+    } catch (err: unknown) {
+      setRulesError(err instanceof Error ? err.message : 'Unable to load detection rules')
+    } finally {
+      setRulesLoading(false)
+    }
   }, [])
+
+  useEffect(() => {
+    void loadRules()
+  }, [loadRules])
 
   const handleCopyTenant = () => {
     navigator.clipboard.writeText('ten_acme_ind_9f82a17c')
@@ -231,13 +222,9 @@ export default function SettingsPage() {
       toast.success(`Rule ${ruleCode} updated`, {
         description: `Weight adjusted to ${newWeight} points.`,
       })
-    } catch {
-      setRules((prev) =>
-        prev.map((r) => (r.rule_code === ruleCode ? { ...r, weight: newWeight, rule_version: r.rule_version + 1 } : r))
-      )
-      toast.success(`Rule ${ruleCode} updated`, {
-        description: `Weight adjusted to ${newWeight} points.`,
-      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : `Unable to update rule ${ruleCode}`
+      toast.error(`Rule ${ruleCode} could not be updated`, { description: msg })
     } finally {
       setUpdatingRuleCode(null)
     }
@@ -249,11 +236,9 @@ export default function SettingsPage() {
       const updated = await api.updateRule(ruleCode, { is_active: !currentActive })
       setRules((prev) => prev.map((r) => (r.rule_code === ruleCode ? updated : r)))
       toast.success(`Rule ${ruleCode} ${!currentActive ? 'enabled' : 'disabled'}`)
-    } catch {
-      setRules((prev) =>
-        prev.map((r) => (r.rule_code === ruleCode ? { ...r, is_active: !currentActive } : r))
-      )
-      toast.success(`Rule ${ruleCode} ${!currentActive ? 'enabled' : 'disabled'}`)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : `Unable to update rule ${ruleCode}`
+      toast.error(`Rule ${ruleCode} could not be updated`, { description: msg })
     } finally {
       setUpdatingRuleCode(null)
     }
@@ -310,10 +295,7 @@ export default function SettingsPage() {
               size="sm"
               onClick={() => {
                 toast.info('Refreshing rules and settings...')
-                api.getRules().then((data) => {
-                  setRules(data)
-                  toast.success('Rules refreshed successfully')
-                })
+                void loadRules()
               }}
               className="text-xs h-9 gap-1.5"
             >
@@ -611,7 +593,13 @@ export default function SettingsPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4 text-xs">
-                    {rulesLoading ? (
+                    {rulesError ? (
+                      <ErrorCard
+                        title="Failed to Load Detection Rules"
+                        message={rulesError}
+                        onRetry={loadRules}
+                      />
+                    ) : rulesLoading ? (
                       <div className="space-y-2 py-4">
                         <div className="h-10 bg-muted/30 rounded-xl animate-pulse" />
                         <div className="h-10 bg-muted/30 rounded-xl animate-pulse" />

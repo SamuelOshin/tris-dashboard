@@ -10,7 +10,7 @@ import {
   Shield,
   Users,
   Database,
-  CheckSquare,
+  Activity,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { UserMenu } from './user-menu'
@@ -46,10 +46,10 @@ export function TRISNavigation() {
       description: 'Excel Relational Pipeline',
     },
     {
-      name: 'Acceptance Matrix',
-      href: '/developer-tests',
-      icon: CheckSquare,
-      description: 'T01 - T10 Compliance Matrix',
+      name: 'Zero-Trust Access',
+      href: '/zero-trust',
+      icon: Activity,
+      description: 'Access Telemetry & Off-Hours Events',
     },
   ]
 

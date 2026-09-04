@@ -1,32 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { api, Supplier } from '@/lib/api'
 import { ShieldAlert } from 'lucide-react'
+import { useFetchData } from '@/hooks/use-fetch-data'
+import { ErrorCard } from '@/components/ui/error-card'
 
 export function RiskMatrix() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: suppliers, loading, error, refetch } = useFetchData<Supplier[]>(() =>
+    api.getSuppliers(),
+  )
 
-  useEffect(() => {
-    let mounted = true
-    api
-      .getSuppliers()
-      .then((data) => {
-        if (mounted) {
-          setSuppliers(data)
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (mounted) setLoading(false)
-      })
-    return () => {
-      mounted = false
-    }
-  }, [])
+  if (error) {
+    return (
+      <Card className="p-6 bg-card border-border">
+        <ErrorCard title="Failed to Load Risk Stratification" message={error} onRetry={refetch} />
+      </Card>
+    )
+  }
 
   if (loading) {
     return (
@@ -37,6 +29,8 @@ export function RiskMatrix() {
     )
   }
 
+  const txs = suppliers ?? []
+
   // Count risk tiers
   const tierCounts: Record<string, number> = {
     Low: 0,
@@ -44,12 +38,12 @@ export function RiskMatrix() {
     High: 0,
   }
 
-  suppliers.forEach((s) => {
+  txs.forEach((s) => {
     const tier = s.risk_tier ? s.risk_tier.charAt(0).toUpperCase() + s.risk_tier.slice(1).toLowerCase() : 'Medium'
     tierCounts[tier] = (tierCounts[tier] || 0) + 1
   })
 
-  const total = suppliers.length || 1
+  const total = txs.length || 1
   const riskData = [
     { tier: 'Low Risk', count: tierCounts['Low'] || 0, fill: '#10b981', percent: Math.round(((tierCounts['Low'] || 0) / total) * 100) },
     { tier: 'Medium Risk', count: tierCounts['Medium'] || 0, fill: '#f59e0b', percent: Math.round(((tierCounts['Medium'] || 0) / total) * 100) },
@@ -70,7 +64,7 @@ export function RiskMatrix() {
             </p>
           </div>
           <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-muted/40 border border-border text-muted-foreground">
-            {suppliers.length} Profiles
+            {txs.length} Profiles
           </span>
         </div>
 
@@ -98,7 +92,14 @@ export function RiskMatrix() {
                   border: '1px solid var(--border)',
                   borderRadius: '8px',
                   fontSize: '12px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                  color: 'var(--foreground)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                }}
+                itemStyle={{
+                  color: 'var(--foreground)',
+                }}
+                labelStyle={{
+                  color: 'var(--foreground)',
                 }}
                 formatter={(val) => [`${val} suppliers`, 'Count']}
               />

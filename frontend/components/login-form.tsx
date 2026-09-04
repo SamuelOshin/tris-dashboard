@@ -57,6 +57,13 @@ const DEMO_USERS: DemoUser[] = [
     icon: Building,
   },
   {
+    email: 'james@company.com',
+    role: 'Procurement',
+    title: 'Supplier Resilience & Vendor Oversight',
+    password: 'password',
+    icon: Building,
+  },
+  {
     email: 'admin@tris.internal',
     role: 'System Administrator',
     title: 'Full Platform Access & Engine',

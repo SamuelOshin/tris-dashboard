@@ -1,47 +1,46 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { ShieldAlert, Users, Receipt, Cpu } from 'lucide-react'
 import { api } from '@/lib/api'
+import { useFetchData } from '@/hooks/use-fetch-data'
+import { ErrorCard } from '@/components/ui/error-card'
+
+interface RiskStats {
+  casesCount: number
+  highPriorityCount: number
+  suppliersCount: number
+  transactionsCount: number
+  rulesCount: number
+}
 
 export function RiskMetrics() {
-  const [stats, setStats] = useState<{
-    casesCount: number
-    highPriorityCount: number
-    suppliersCount: number
-    transactionsCount: number
-    rulesCount: number
-  } | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    let mounted = true
-    Promise.all([
-      api.getCases().catch(() => []),
-      api.getSuppliers().catch(() => []),
-      api.getTransactions().catch(() => []),
-      api.getRules().catch(() => []),
+  const { data: stats, loading, error, refetch } = useFetchData<RiskStats>(async () => {
+    const [cases, suppliers, transactions, rules] = await Promise.all([
+      api.getCases(),
+      api.getSuppliers(),
+      api.getTransactions(),
+      api.getRules(),
     ])
-      .then(([cases, suppliers, transactions, rules]) => {
-        if (mounted) {
-          setStats({
-            casesCount: cases.length,
-            highPriorityCount: cases.filter((c) => c.priority?.toLowerCase() === 'high').length,
-            suppliersCount: suppliers.length,
-            transactionsCount: transactions.length,
-            rulesCount: rules.length || 6,
-          })
-        }
-      })
-      .finally(() => {
-        if (mounted) setLoading(false)
-      })
-
-    return () => {
-      mounted = false
+    return {
+      casesCount: cases.length,
+      highPriorityCount: cases.filter((c) => c.priority?.toLowerCase() === 'high').length,
+      suppliersCount: suppliers.length,
+      transactionsCount: transactions.length,
+      rulesCount: rules.length || 6,
     }
-  }, [])
+  })
+
+  if (error) {
+    return (
+      <ErrorCard
+        title="Failed to Load Risk Summary"
+        message={error}
+        onRetry={refetch}
+        className="h-full"
+      />
+    )
+  }
 
   if (loading || !stats) {
     return (

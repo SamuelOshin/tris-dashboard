@@ -8,13 +8,10 @@ import {
   TrendingUp,
   Shield,
   Users,
-  FileCheck,
   LogOut,
-  BarChart3,
-  FileBarChart,
   Settings as SettingsIcon,
   Database,
-  CheckSquare,
+  Activity,
   ShieldAlert,
   ChevronRight,
   Search,
@@ -36,14 +33,15 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarRail,
+  useSidebar,
 } from '@/components/ui/sidebar'
 
 import { ThemeToggle } from './theme-toggle'
 import { NotificationsPopover } from './notifications-popover'
 import { HeaderSearch } from './header-search'
-import { UserNav } from './user-nav'
+import { UserNav } from '@/components/user-nav'
 
-interface BreadcrumbItem {
+export interface BreadcrumbItem {
   label: string
   href?: string
 }
@@ -79,32 +77,12 @@ const coreNavigation = [
     icon: Database,
   },
   {
-    name: 'Acceptance Matrix',
-    href: '/developer-tests',
-    icon: CheckSquare,
+    name: 'Zero-Trust Access',
+    href: '/zero-trust',
+    icon: Activity,
   },
 ]
 
-const intelligenceNavigation = [
-  {
-    name: 'Compliance Audits',
-    href: '/compliance',
-    icon: FileCheck,
-    tag: 'Preview',
-  },
-  {
-    name: 'Cross-Signal Correlation',
-    href: '/dashboard/correlation',
-    icon: BarChart3,
-    tag: 'Preview',
-  },
-  {
-    name: 'Reports & Export',
-    href: '/dashboard/reports',
-    icon: FileBarChart,
-    tag: 'Preview',
-  },
-]
 
 function DefaultQuickActions() {
   return (
@@ -138,14 +116,14 @@ function DefaultQuickActions() {
           Upload Data
         </Button>
       </Link>
-      <Link href="/developer-tests">
+      <Link href="/zero-trust">
         <Button
           variant="outline"
           size="sm"
           className="h-8.5 px-3.5 rounded-xl border-0 bg-card shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:bg-muted/60 text-xs font-medium flex items-center gap-1.5 transition-all"
         >
-          <CheckSquare className="w-3.5 h-3.5 text-muted-foreground" />
-          Acceptance Gates
+          <Activity className="w-3.5 h-3.5 text-muted-foreground" />
+          Access Logs
         </Button>
       </Link>
     </div>
@@ -187,7 +165,7 @@ export function DashboardLayout({
   if (!user) return null
 
   // Compute breadcrumbs if not provided
-  const activeNav = [...coreNavigation, ...intelligenceNavigation].find((n) => n.href === pathname)
+  const activeNav = coreNavigation.find((n) => n.href === pathname)
   const defaultBreadcrumbs: BreadcrumbItem[] = [
     { label: 'TRIS Studio', href: '/' },
     ...(activeNav && activeNav.href !== '/' ? [{ label: activeNav.name, href: activeNav.href }] : []),
@@ -255,45 +233,7 @@ export function DashboardLayout({
             </SidebarMenu>
           </SidebarGroup>
 
-          {/* Intelligence Modules */}
-          <SidebarGroup>
-            <SidebarGroupLabel className="px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1">
-              Intelligence
-            </SidebarGroupLabel>
-            <SidebarMenu className="gap-1">
-              {intelligenceNavigation.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
 
-                return (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.name}
-                      className={`h-9 px-2.5 rounded-lg text-xs font-medium transition-all ${
-                        isActive
-                          ? 'bg-primary/15 text-primary font-semibold shadow-xs'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
-                      }`}
-                    >
-                      <Link href={item.href} className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                          <span className="truncate group-data-[collapsible=icon]:hidden">{item.name}</span>
-                        </div>
-                        {item.tag && (
-                          <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-muted/40 text-muted-foreground border border-border/50 group-data-[collapsible=icon]:hidden">
-                            {item.tag}
-                          </span>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroup>
         </SidebarContent>
 
         {/* Sidebar Footer */}
