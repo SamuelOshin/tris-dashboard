@@ -1,8 +1,8 @@
 # TRIS v1.3 — Test Execution & Acceptance Report
 
-**Execution Timestamp**: `2026-09-02T10:50:00Z`  
+**Execution Timestamp**: `2026-09-04T07:42:00Z`  
 **Test Runner**: `pytest 9.1.1` · `Python 3.12.10` · `FastAPI 0.141.1` · `SQLModel 0.0.22`  
-**Overall Status**: 🟢 **29 / 29 Tests Passed (100% Pass Rate)**
+**Overall Status**: 🟢 **78 / 78 Tests Passed (100% Pass Rate)**
 
 ---
 
@@ -23,38 +23,89 @@
 
 ---
 
-## 2. Module Test Suite Breakdown
+## 2. Module Test Suite Breakdown (78 Tests Total)
 
-### `tests/modules/v1/test_auth.py` (3 Tests)
-- `test_successful_login`: 🟢 PASSED (Issues JWT and sets HttpOnly cookie)
-- `test_failed_login_bad_password`: 🟢 PASSED (Returns 401 `AUTHENTICATION_FAILED`)
-- `test_get_me_with_bearer_token`: 🟢 PASSED (Resolves current user identity)
+### `tests/modules/v1/test_notifications.py` (5 Tests)
+- `test_unauthenticated_notifications_rejected`: 🟢 PASSED (Rejects unauthenticated requests with 401)
+- `test_list_user_and_role_scoped_notifications`: 🟢 PASSED (Multi-tier RBAC filtering: user, role, broadcast)
+- `test_unread_count_endpoint`: 🟢 PASSED (Accurate unread counting)
+- `test_mark_single_read_and_mark_all_read`: 🟢 PASSED (Single and bulk mark-as-read mutations)
+- `test_case_transition_emits_notifications`: 🟢 PASSED (Domain event emissions on case state changes)
 
-### `tests/modules/v1/test_ingestion.py` (3 Tests)
-- `test_api_health_endpoints`: 🟢 PASSED (`GET /health` & `GET /api/v1/health`)
-- `test_ingest_excel_workbook_service`: 🟢 PASSED (Loads 19 txns, 8 suppliers, 8 events)
-- `test_upload_workbook_endpoint`: 🟢 PASSED (`POST /api/v1/ingest/upload` multipart file upload)
+### `tests/modules/v1/test_access_events.py` (4 Tests)
+- `test_unauthenticated_access_events_rejected`: 🟢 PASSED
+- `test_list_access_events_and_filtering`: 🟢 PASSED
+- `test_access_events_stats_endpoint`: 🟢 PASSED
+- `test_get_single_access_event`: 🟢 PASSED
 
-### `tests/modules/v1/test_suppliers.py` (5 Tests)
-- `test_get_all_suppliers`: 🟢 PASSED (Returns all 8 suppliers)
-- `test_get_single_supplier`: 🟢 PASSED (`SUP-001` Northstar Components LLC)
-- `test_supplier_not_found`: 🟢 PASSED (Returns 404 `NOT_FOUND`)
-- `test_baseline_calculation_strict_exclusion_proof`: 🟢 PASSED (Empirical mathematical proof of exclusion)
-- `test_supplier_baseline_endpoint`: 🟢 PASSED (`GET /api/v1/suppliers/SUP-001/baseline?exclude_tx=TX-1999`)
+### `tests/modules/v1/test_ingestion.py` (20 Tests)
+- `test_api_health_endpoints`: 🟢 PASSED
+- `test_ingest_excel_workbook_service`: 🟢 PASSED
+- `test_upload_workbook_endpoint_async_202`: 🟢 PASSED
+- `test_upload_unauthenticated_rejected`: 🟢 PASSED
+- `test_upload_low_privilege_role_rejected`: 🟢 PASSED
+- `test_get_job_telemetry_unauthorized_owner`: 🟢 PASSED
+- `test_get_job_telemetry_admin_override`: 🟢 PASSED
+- `test_list_ingestion_jobs_pagination_and_rbac`: 🟢 PASSED
+- `test_case_immutability_under_update_strategy`: 🟢 PASSED
+- `test_special_characters_stored_without_html_escape`: 🟢 PASSED
+- `test_error_log_captures_source_row_dict_and_exact_row_number`: 🟢 PASSED
+- `test_error_log_json_serialization_roundtrip`: 🟢 PASSED
+- `test_suppliers_circuit_breaker_hard_abort`: 🟢 PASSED
+- `test_optional_sheet_circuit_breaker_soft_abort`: 🟢 PASSED
+- `test_chunk_savepoint_isolation_single_bad_row`: 🟢 PASSED
+- `test_approvals_unlinked_transaction_fk_skipped`: 🟢 PASSED
+- `test_validation_event_loop_yielding`: 🟢 PASSED
+- `test_worker_unhandled_exception_reaches_failed`: 🟢 PASSED
+- `test_cumulative_post_insert_circuit_breaker_hard_abort`: 🟢 PASSED
+- `test_duplicate_strategy_fail_raises_validation_error`: 🟢 PASSED
+- `test_job_telemetry_staleness_guard_marks_timed_out`: 🟢 PASSED
 
-### `tests/modules/v1/test_rules.py` (4 Tests)
-- `test_get_all_rules`: 🟢 PASSED (Lists R-001 to R-006)
-- `test_update_rule_increments_version`: 🟢 PASSED (`PATCH /api/v1/rules/R-001` bumps `rule_version`)
-- `test_evaluate_tx_1999_full_benchmark`: 🟢 PASSED (Full benchmark verification)
-- `test_evaluate_tx_endpoint`: 🟢 PASSED (`POST /api/v1/rules/evaluate/TX-1999`)
+### `tests/modules/v1/test_security_remediation.py` (8 Tests)
+- `test_vuln001_unauthenticated_rule_update_rejected`: 🟢 PASSED
+- `test_vuln001_unauthorized_role_rule_update_rejected`: 🟢 PASSED
+- `test_vuln002_unauthenticated_case_transition_rejected`: 🟢 PASSED
+- `test_vuln003_unauthenticated_ingestion_rejected`: 🟢 PASSED
+- `test_vuln004_unauthenticated_case_list_rejected`: 🟢 PASSED
+- `test_vuln004_unauthenticated_case_detail_rejected`: 🟢 PASSED
+- `test_vuln004_unauthenticated_supplier_list_rejected`: 🟢 PASSED
+- `test_vuln004_unauthenticated_supplier_baseline_rejected`: 🟢 PASSED
+- `test_vuln004_unauthenticated_transaction_list_rejected`: 🟢 PASSED
+- `test_vuln004_unauthenticated_rules_list_rejected`: 🟢 PASSED
+- `test_vuln005_low_privilege_case_transition_rejected`: 🟢 PASSED
+
+### `tests/modules/v1/test_auth.py` (5 Tests)
+- `test_successful_login`: 🟢 PASSED
+- `test_failed_login_bad_password`: 🟢 PASSED
+- `test_get_me_with_bearer_token`: 🟢 PASSED
+- `test_get_me_with_cookie_session_only`: 🟢 PASSED
+- `test_cookie_security_attributes_in_dev_and_production`: 🟢 PASSED
 
 ### `tests/modules/v1/test_cases.py` (4 Tests)
-- `test_get_all_cases`: 🟢 PASSED (Lists filtered cases)
-- `test_get_case_with_chronological_history`: 🟢 PASSED (Returns case and full audit log)
-- `test_invalid_state_transition_rejected`: 🟢 PASSED (Rejects illegal transitions)
-- `test_verified_closure_8_field_validation`: 🟢 PASSED (Enforces 8 mandatory closure fields)
+- `test_get_all_cases`: 🟢 PASSED
+- `test_get_case_with_chronological_history`: 🟢 PASSED
+- `test_invalid_state_transition_rejected`: 🟢 PASSED
+- `test_verified_closure_8_field_validation`: 🟢 PASSED
 
-### `tests/test_acceptance_t01_t10.py` (10 Tests)
+### `tests/modules/v1/test_rules.py` (4 Tests)
+- `test_get_all_rules`: 🟢 PASSED
+- `test_update_rule_increments_version`: 🟢 PASSED
+- `test_evaluate_tx_1999_full_benchmark`: 🟢 PASSED
+- `test_evaluate_tx_endpoint`: 🟢 PASSED
+
+### `tests/modules/v1/test_suppliers.py` (5 Tests)
+- `test_get_all_suppliers`: 🟢 PASSED
+- `test_get_single_supplier`: 🟢 PASSED
+- `test_supplier_not_found`: 🟢 PASSED
+- `test_baseline_calculation_strict_exclusion_proof`: 🟢 PASSED
+- `test_supplier_baseline_endpoint`: 🟢 PASSED
+
+### `tests/modules/v1/test_transactions.py` (3 Tests)
+- `test_get_all_transactions`: 🟢 PASSED
+- `test_filter_transactions_by_supplier`: 🟢 PASSED
+- `test_get_single_transaction`: 🟢 PASSED
+
+### `tests/test_acceptance_t01_t10.py` (15 Tests)
 - `test_t01_ingestion_schema_and_fk_validation`: 🟢 PASSED
 - `test_t02_baseline_calculation_strict_exclusion`: 🟢 PASSED
 - `test_t03_rule_r001_amount_deviation_trigger`: 🟢 PASSED
@@ -65,6 +116,14 @@
 - `test_t08_case_state_machine_boundary_enforcement`: 🟢 PASSED
 - `test_t09_verified_closure_gatekeeper_validation`: 🟢 PASSED
 - `test_t10_immutable_audit_trail_integrity`: 🟢 PASSED
+- `test_workbook_t04_plain_language_explainability_no_unsupported_probability`: 🟢 PASSED
+- `test_workbook_t05_ownership_assignment_department_and_history`: 🟢 PASSED
+- `test_workbook_t07_recurrence_detection_and_prior_case_surfacing`: 🟢 PASSED
+- `test_workbook_t08_duplicate_invoice_r005_detection`: 🟢 PASSED
+- `test_workbook_t09_normal_case_control_sup002_clean`: 🟢 PASSED
+
+### `tests/test_config.py` (1 Test)
+- `test_database_url_normalization`: 🟢 PASSED
 
 ---
 
@@ -72,8 +131,9 @@
 
 ```
 $ pnpm run build
- ✓ Compiled successfully in 27.2s
- ✓ Generating static pages (13/13) in 2.2s
+ ✓ Next.js 16.3.4 (Turbopack)
+ ✓ Compiled successfully in 19.1s
+ ✓ Generating static pages (13/13) in 2.5s
 
 Route (app)
 ├ ○ /

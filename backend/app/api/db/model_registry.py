@@ -16,6 +16,8 @@ MODEL_MODULES = [
     "app.api.modules.v1.access_events.models",
     "app.api.modules.v1.rules.models",
     "app.api.modules.v1.cases.models",
+    "app.api.modules.v1.ingestion.models",
+    "app.api.modules.v1.notifications.models",
 ]
 
 

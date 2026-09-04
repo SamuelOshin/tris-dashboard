@@ -208,6 +208,7 @@ class RuleEngineService:
                     evaluation_snapshot=snapshot,
                 )
                 session.add(new_case)
+                await session.flush()
 
                 history = CaseHistory(
                     case_id=case_id,

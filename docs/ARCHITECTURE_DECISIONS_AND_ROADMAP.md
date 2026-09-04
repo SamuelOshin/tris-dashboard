@@ -25,6 +25,8 @@
    - [ADR-006: Immutable Audit Trail — Database-Enforced](#adr-006-immutable-audit-trail--database-enforced)
    - [ADR-007: Authentication & Authorization Strategy](#adr-007-authentication--authorization-strategy)
    - [ADR-008: CORS & Security Posture](#adr-008-cors--security-posture)
+   - [ADR-009: Ingestion Engine Resilience & Asynchronous Scale](#adr-009-ingestion-engine-resilience--asynchronous-scale)
+   - [ADR-010: Real-Time Notification Hub & Event Alerting Architecture](#adr-010-real-time-notification-hub--event-alerting-architecture)
 4. [Granular Phase Breakdown & Progress Tracker](#4-granular-phase-breakdown--progress-tracker)
 5. [Risk Analysis, Tradeoffs & Mitigations](#5-risk-analysis-tradeoffs--mitigations)
 6. [Principal Engineer Review Sign-Off Log](#6-principal-engineer-review-sign-off-log)
@@ -529,6 +531,40 @@ flowchart LR
       allow_headers=["*"],
   )
   ```
+
+---
+
+### ADR-009: Ingestion Engine Resilience & Asynchronous Scale
+
+* **Status**: ACCEPTED & SIGNED OFF  
+* **Context**: The synthetic Excel ingestion pipeline was originally a synchronous HTTP handler executing N+1 queries per row and lacking error isolation. Uploading large multi-sheet workbooks blocked client threads, risked proxy timeouts (nginx/Cloudflare), and aborted completely upon any single malformed cell.
+* **Decision**: 
+  1. **Asynchronous Hand-off**: Migrate `POST /api/v1/ingest/upload` to return `202 Accepted` with a tracking `job_id`, delegating file processing to FastAPI `BackgroundTasks` for v1.3. Provide a telemetry endpoint (`GET /api/v1/ingest/jobs/{job_id}`) for live polling.
+  2. **Row-Level Error Isolation & 20% Circuit Breaker**: Individual row validation failures append to an `error_log` without rolling back valid records. If validation failures exceed **20% of rows** on a sheet with >= 10 rows, a **Circuit Breaker** trips, aborting that sheet to prevent database pollution. Hard decision: **YES**.
+  3. **Batch PK Pre-Fetch**: Replace per-row `session.get(Model, pk)` with a single `select(Model.pk).where(Model.pk.in_(...))` per sheet, reducing network roundtrips from O(N) to O(1).
+  4. **Multi-Tier Sanitization**: Strip non-printable ASCII control characters (`[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]`), escape HTML entities, and truncate strictly to column `max_length`.
+  5. **Configurable Duplicate Handling**: Support `skip` (default idempotent safe mode), `update` (upsert), and `fail` modes via query parameters.
+  6. **Future Migration Pathway (v1.4+)**: Migrate from in-process `BackgroundTasks` to Redis + `arq` when scaling horizontally across multi-container instances.
+* **Full Specification**: See dedicated architecture blueprint in [`docs/INGESTION_ARCHITECTURE_AND_RESILIENCE_PLAN.md`](./INGESTION_ARCHITECTURE_AND_RESILIENCE_PLAN.md).
+
+---
+
+### ADR-010: Real-Time Notification Hub & Event Alerting Architecture
+
+* **Status**: ACCEPTED & IMPLEMENTED  
+* **Context**: Prior to v1.3, notification management was non-functional and rendered static client-side fixtures (`sampleNotifications`). As TRIS handles automated risk anomaly detection, background file ingestion workflows, and zero-trust security events, operators required a persistent, role-scoped notification hub to act upon critical system events in real time.
+* **Decision**:
+  1. **Relational PostgreSQL Persistence (`Notification` Table)**: Persist all notifications in a dedicated table with composite indexes on `(recipient_user_id, is_read)`, `(recipient_role, is_read)`, and `created_at DESC` for sub-millisecond unread counts.
+  2. **Multi-Tier Recipient Scoping**:
+     - User-Specific (`recipient_user_id`): Direct assignments and personal job uploads.
+     - Role-Specific (`recipient_role`): Broadcasts to operational groups (e.g. `compliance` officers for pending verification items).
+     - Global Broadcast (`NULL` user and role): System-wide security and maintenance notices.
+  3. **Automated Domain Event Emissions**:
+     - `CaseService.transition_case`: Automatically emits alerts on case assignment, `Pending Verification` submissions, and verified closures.
+     - `IngestionService.run_ingestion_job`: Automatically emits job completion (`COMPLETED`, `COMPLETED_WITH_ERRORS`, `FAILED`) and circuit breaker trip notifications to the uploader.
+  4. **Strict 4-Layer Module Architecture**: Encapsulate all logic within `app/api/modules/v1/notifications/` with zero `try-except` masking in routes.
+  5. **Frontend Polling & Deep Links**: Next.js header `NotificationsPopover` with 30s background polling, dynamic unread badge, tabbed filters (`All`, `Unread`, `High Risk`), optimistic mark-as-read transitions, and direct router deep-linking (`/cases/{id}`, `/zero-trust`, `/ingestion`).
+* **Full Specification**: See dedicated architecture blueprint in [`docs/NOTIFICATION_SYSTEM_ARCHITECTURE.md`](./NOTIFICATION_SYSTEM_ARCHITECTURE.md).
 
 ---
 

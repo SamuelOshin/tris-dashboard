@@ -36,6 +36,7 @@ class CaseResponse(BaseModel):
     supplier_id: str
     transaction_id: str
     assigned_to: Optional[str] = None
+    department: Optional[str] = None
     trigger_signals: List[Dict[str, Any]] = []
     evaluation_snapshot: Dict[str, Any] = {}
 
@@ -62,6 +63,7 @@ class CaseTransitionRequest(BaseModel):
     actor: str = Field(..., description="User or service performing transition")
     note: Optional[str] = Field(None, description="Investigation or transition notes")
     assigned_to: Optional[str] = Field(None, description="Assigned investigator")
+    department: Optional[str] = Field(None, description="Assigned department")
 
     # 8 Verified Closure Fields (Mandatory when to_status == 'Closed')
     root_cause: Optional[str] = None

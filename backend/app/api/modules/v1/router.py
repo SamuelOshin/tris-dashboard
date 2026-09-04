@@ -5,10 +5,16 @@ Combines all domain module routers under the /api/v1 prefix.
 
 from fastapi import APIRouter
 
+from app.api.modules.v1.access_events.routes.access_event_routes import (
+    router as access_events_router,
+)
 from app.api.modules.v1.auth.routes.auth_routes import router as auth_router
 from app.api.modules.v1.cases.routes.case_routes import router as cases_router
 from app.api.modules.v1.ingestion.routes.ingestion_routes import (
     router as ingestion_router,
+)
+from app.api.modules.v1.notifications.routes.notification_routes import (
+    router as notifications_router,
 )
 from app.api.modules.v1.rules.routes.rule_routes import router as rules_router
 from app.api.modules.v1.suppliers.routes.supplier_routes import (
@@ -27,6 +33,8 @@ api_v1_router.include_router(suppliers_router)
 api_v1_router.include_router(transactions_router)
 api_v1_router.include_router(rules_router)
 api_v1_router.include_router(cases_router)
+api_v1_router.include_router(access_events_router)
+api_v1_router.include_router(notifications_router)
 
 
 @api_v1_router.get("/health", tags=["Health"])

@@ -21,7 +21,7 @@ from app.api.utils.response_payloads import success_response
 router = APIRouter(prefix="/cases", tags=["Cases"])
 
 # Roles permitted to read case data
-_READ_ROLES = ["reviewer", "verifier", "admin", "compliance", "cfo", "security"]
+_READ_ROLES = ["reviewer", "verifier", "admin", "compliance", "cfo", "security", "procurement"]
 # Roles permitted to transition case status
 _TRANSITION_ROLES = ["reviewer", "verifier", "admin", "compliance"]
 

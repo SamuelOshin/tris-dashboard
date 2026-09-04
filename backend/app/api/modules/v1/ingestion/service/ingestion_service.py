@@ -1,55 +1,176 @@
 """
-Ingestion Service for TRIS.
-Parses, validates, and populates PostgreSQL tables from synthetic Excel workbooks.
+Ingestion Service for TRIS (Revision 2.2).
+Handles Excel parsing, sheet validation, batch DB operations, row-level error isolation,
+circuit breakers, input sanitization, and asynchronous background lifecycle management.
 Pure business logic — raises domain exceptions directly.
 """
 
+import asyncio
+import logging
+import re
+from datetime import UTC, date, datetime
+from io import BytesIO
 from typing import Any, ClassVar
 
 import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import SQLModel, select
 
 from app.api.core.custom_exceptions.exceptions import IngestionError
+from app.api.db import database
 from app.api.modules.v1.access_events.models.access_event import AccessEvent
 from app.api.modules.v1.approvals.models.approval import Approval
 from app.api.modules.v1.cases.models.risk_case import CaseHistory, RiskCase
+from app.api.modules.v1.ingestion.models.ingestion_job import IngestionJob
 from app.api.modules.v1.rules.models.rule_config import RuleConfig
 from app.api.modules.v1.suppliers.models.supplier import Supplier
 from app.api.modules.v1.transactions.models.transaction import Transaction
 
+logger = logging.getLogger("tris.ingestion")
+
+CONTROL_CHAR_REGEX = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+CIRCUIT_BREAKER_THRESHOLD = 0.20  # 20%
+CIRCUIT_BREAKER_MIN_SAMPLES = 10
+CHUNK_SIZE = 500
+
+
+class CircuitBreakerTrippedError(Exception):
+    """Raised when sheet validation or insertion failure rate exceeds 20%."""
+
+    def __init__(
+        self,
+        sheet_name: str,
+        error_count: int,
+        total_rows: int,
+        is_mandatory: bool,
+        stage: str = "validation",
+    ):
+        self.sheet_name = sheet_name
+        self.error_count = error_count
+        self.total_rows = total_rows
+        self.is_mandatory = is_mandatory
+        self.stage = stage
+        self.ratio = (error_count / total_rows) if total_rows > 0 else 0.0
+        super().__init__(
+            f"Circuit breaker tripped on sheet '{sheet_name}' during {stage}: "
+            f"{error_count}/{total_rows} ({self.ratio:.1%}) rows failed (tolerance: 20%). "
+            f"Action: {'ABORTING ENTIRE JOB' if is_mandatory else 'SKIPPING SHEET'}."
+        )
+
+
+def _to_json_safe(v: Any) -> Any:
+    """Coerce pandas/numpy types to native JSON-serializable primitives (D13)."""
+    if pd.isna(v):
+        return None
+    if isinstance(v, (pd.Timestamp, datetime, date)):
+        return v.isoformat()
+    if hasattr(v, "item"):  # numpy scalar types (int64, float64, bool_)
+        return v.item()
+    return v
+
+
+def sanitize_text(value: Any, max_length: int = 255) -> str | None:
+    """
+    Sanitize text input (D9):
+    1. Strip control characters
+    2. Enforce max_length truncation
+    NOTE: html.escape() is omitted to prevent DB double-encoding.
+    """
+    if value is None:
+        return None
+    raw = str(value).strip()
+    if not raw or raw.lower() in ("nan", "none", "null"):
+        return None
+    cleaned = CONTROL_CHAR_REGEX.sub("", raw)
+    return cleaned[:max_length] if cleaned else None
+
+
+async def _prefetch_existing_pks(
+    session: AsyncSession,
+    model_cls: type,
+    pk_attr_name: str,
+    candidate_pks: list[str],
+) -> set[str]:
+    """Single bulk query to fetch all existing primary keys (O(1) roundtrips)."""
+    if not candidate_pks:
+        return set()
+    attr = getattr(model_cls, pk_attr_name)
+    stmt = select(attr).where(attr.in_(candidate_pks))
+    result = await session.execute(stmt)
+    return {str(row[0]) for row in result.fetchall()}
+
+
+def check_circuit_breaker(
+    sheet_name: str,
+    total_rows: int,
+    error_count: int,
+    is_mandatory: bool,
+    stage: str = "validation",
+) -> None:
+    """Evaluates circuit breaker ratio (D10 / D12)."""
+    if total_rows < CIRCUIT_BREAKER_MIN_SAMPLES:
+        return
+    ratio = error_count / total_rows
+    if ratio > CIRCUIT_BREAKER_THRESHOLD:
+        raise CircuitBreakerTrippedError(
+            sheet_name=sheet_name,
+            error_count=error_count,
+            total_rows=total_rows,
+            is_mandatory=is_mandatory,
+            stage=stage,
+        )
+
+
+async def _flush_chunk_with_isolation(
+    session: AsyncSession,
+    chunk: list[tuple[SQLModel, dict[str, Any]]],
+    error_log: list[dict[str, Any]],
+    sheet_name: str,
+) -> tuple[int, int]:
+    """
+    Attempts bulk chunk flush in savepoint. If DB constraint fails,
+    retries row-by-row inside sub-savepoints to isolate bad rows (D5).
+    """
+    if not chunk:
+        return (0, 0)
+
+    try:
+        async with session.begin_nested():
+            session.add_all([item[0] for item in chunk])
+            await session.flush()
+        return (len(chunk), 0)
+    except Exception:
+        # Fallback: isolate row-by-row
+        inserted = 0
+        errors = 0
+        for entity, source_dict in chunk:
+            try:
+                async with session.begin_nested():
+                    session.add(entity)
+                    await session.flush()
+                inserted += 1
+            except Exception as row_exc:
+                errors += 1
+                error_log.append(
+                    {
+                        "sheet": sheet_name,
+                        "row": getattr(entity, "_source_row_num", -1),
+                        "field": "database_constraint",
+                        "error": str(row_exc),
+                        "raw_value": source_dict,
+                    }
+                )
+        return (inserted, errors)
+
 
 class IngestionService:
-    """Handles Excel parsing, sheet validation, and database population."""
+    """Handles Excel parsing, validation, batch DB operations, and async background execution."""
 
     REQUIRED_SHEETS: ClassVar[set[str]] = {"Suppliers", "Transactions"}
-    REQUIRED_SUPPLIER_COLUMNS: ClassVar[set[str]] = {"supplier_id", "name"}
-    REQUIRED_TRANSACTION_COLUMNS: ClassVar[set[str]] = {
-        "transaction_id",
-        "supplier_id",
-        "amount",
-    }
 
     @staticmethod
-    async def ingest_excel_workbook(
-        file_path_or_bytes: Any,
-        session: AsyncSession,
-        filename: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Parses and validates all sheets of TRIS enterprise workbook.
-
-        Args:
-            file_path_or_bytes: Path to .xlsx file or BytesIO object.
-            session: Async database session.
-            filename: Optional original filename for extension validation.
-
-        Returns:
-            Dict[str, Any]: Ingestion summary report.
-
-        Raises:
-            IngestionError: If file cannot be read, format is invalid, or schema is missing.
-        """
+    def validate_workbook_preflight(file_bytes: bytes, filename: str | None = None) -> pd.ExcelFile:
+        """Synchronous pre-flight check before accepting upload."""
         if filename:
             clean_name = filename.strip().lower()
             if not (clean_name.endswith(".xlsx") or clean_name.endswith(".xls")):
@@ -59,7 +180,7 @@ class IngestionService:
                 )
 
         try:
-            excel_file = pd.ExcelFile(file_path_or_bytes)
+            excel_file = pd.ExcelFile(BytesIO(file_bytes))
         except Exception as exc:
             raise IngestionError(f"Unable to read file as an Excel workbook: {exc}") from exc
 
@@ -73,6 +194,201 @@ class IngestionService:
                 f"{sorted_missing}. Found sheets: {sorted_found}."
             )
 
+        return excel_file
+
+    @staticmethod
+    async def run_ingestion_job(
+        job_id: str,
+        file_bytes: bytes,
+        duplicate_strategy: str = "skip",
+        session_factory=None,
+    ) -> None:
+        """
+        Background task worker executing workbook ingestion in an isolated session (D4, D8).
+        """
+        factory = session_factory or database.async_session_factory
+        async with factory() as session:
+            job = None
+            for _ in range(5):
+                job = await session.get(IngestionJob, job_id)
+                if job:
+                    break
+                await asyncio.sleep(0.1)
+
+            if not job:
+                logger.error(f"Ingestion job '{job_id}' not found in database after retries.")
+                return
+
+            job.status = "PROCESSING"
+            job.started_at = datetime.now(UTC)
+            await session.commit()
+
+            try:
+                excel_file = pd.ExcelFile(BytesIO(file_bytes))
+                report, error_log, counts = await IngestionService._execute_pipeline(
+                    excel_file=excel_file,
+                    session=session,
+                    duplicate_strategy=duplicate_strategy,
+                )
+
+                job.summary_report = report
+                job.error_log = error_log[:200]  # Cap at 200 entries to prevent oversized payloads
+                job.total_rows = counts["total_rows"]
+                job.processed_rows = counts["processed_rows"]
+                job.inserted_rows = counts["inserted_rows"]
+                job.updated_rows = counts["updated_rows"]
+                job.skipped_rows = counts["skipped_rows"]
+                job.error_rows = counts["error_rows"]
+                job.completed_at = datetime.now(UTC)
+
+                if job.error_rows > 0:
+                    job.status = "COMPLETED_WITH_ERRORS"
+                else:
+                    job.status = "COMPLETED"
+
+                # Emit notification
+                from app.api.modules.v1.notifications.service.notification_service import (
+                    NotificationService,
+                )
+
+                notif_severity = "SUCCESS" if job.status == "COMPLETED" else "WARNING"
+                if job.status == "COMPLETED":
+                    notif_msg = (
+                        f"Dataset '{job.filename}' processed successfully "
+                        f"({job.inserted_rows} inserted, {job.skipped_rows} skipped)."
+                    )
+                else:
+                    notif_msg = (
+                        f"Dataset '{job.filename}' processed with {job.error_rows} "
+                        f"isolated errors ({job.inserted_rows} inserted)."
+                    )
+                await NotificationService.emit(
+                    db=session,
+                    title=f"Ingestion Job {job.job_id} {job.status.replace('_', ' ').title()}",
+                    message=notif_msg,
+                    category="INGESTION_JOB",
+                    severity=notif_severity,
+                    recipient_user_id=job.uploaded_by,
+                    link_url="/ingestion",
+                    metadata_json={"job_id": job.job_id, "status": job.status},
+                )
+
+                await session.commit()
+
+            except CircuitBreakerTrippedError as cb_exc:
+                logger.warning(f"Circuit breaker tripped for job '{job_id}': {cb_exc}")
+                await session.rollback()
+                job = await session.get(IngestionJob, job_id)
+                if job:
+                    job.status = "FAILED"
+                    job.completed_at = datetime.now(UTC)
+                    current_log = list(job.error_log or [])
+                    current_log.append(
+                        {
+                            "sheet": cb_exc.sheet_name,
+                            "row": -1,
+                            "field": "circuit_breaker",
+                            "error": str(cb_exc),
+                            "raw_value": {},
+                        }
+                    )
+                    job.error_log = current_log
+
+                    from app.api.modules.v1.notifications.service.notification_service import (
+                        NotificationService,
+                    )
+
+                    await NotificationService.emit(
+                        db=session,
+                        title=f"Ingestion Job {job.job_id} Circuit Breaker Tripped",
+                        message=f"Job aborted: {cb_exc}",
+                        category="INGESTION_JOB",
+                        severity="CRITICAL",
+                        recipient_user_id=job.uploaded_by,
+                        link_url="/ingestion",
+                        metadata_json={"job_id": job.job_id, "error": str(cb_exc)},
+                    )
+
+                    await session.commit()
+
+            except Exception as exc:
+                logger.exception(f"Unexpected error in background ingestion job '{job_id}': {exc}")
+                await session.rollback()
+                job = await session.get(IngestionJob, job_id)
+                if job:
+                    job.status = "FAILED"
+                    job.completed_at = datetime.now(UTC)
+                    current_log = list(job.error_log or [])
+                    current_log.append(
+                        {
+                            "sheet": "General",
+                            "row": -1,
+                            "field": "unhandled_exception",
+                            "error": str(exc),
+                            "raw_value": {},
+                        }
+                    )
+                    job.error_log = current_log
+
+                    from app.api.modules.v1.notifications.service.notification_service import (
+                        NotificationService,
+                    )
+
+                    await NotificationService.emit(
+                        db=session,
+                        title=f"Ingestion Job {job.job_id} Failed",
+                        message=f"Unexpected error during workbook processing: {exc}",
+                        category="INGESTION_JOB",
+                        severity="CRITICAL",
+                        recipient_user_id=job.uploaded_by,
+                        link_url="/ingestion",
+                        metadata_json={"job_id": job.job_id, "error": str(exc)},
+                    )
+
+                    await session.commit()
+
+    @staticmethod
+    async def ingest_excel_workbook(
+        file_path_or_bytes: Any,
+        session: AsyncSession,
+        filename: str | None = None,
+        duplicate_strategy: str = "skip",
+    ) -> dict[str, Any]:
+        """
+        Synchronous entry point used by test suites and CLI seed scripts.
+        """
+        if isinstance(file_path_or_bytes, bytes):
+            bytes_data = file_path_or_bytes
+        elif hasattr(file_path_or_bytes, "read"):
+            bytes_data = file_path_or_bytes.read()
+        else:
+            with open(file_path_or_bytes, "rb") as f:
+                bytes_data = f.read()
+
+        excel_file = IngestionService.validate_workbook_preflight(bytes_data, filename)
+        report, error_log, counts = await IngestionService._execute_pipeline(
+            excel_file=excel_file,
+            session=session,
+            duplicate_strategy=duplicate_strategy,
+        )
+        return report
+
+    @staticmethod
+    async def _execute_pipeline(
+        excel_file: pd.ExcelFile,
+        session: AsyncSession,
+        duplicate_strategy: str = "skip",
+    ) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, int]]:
+        sheet_names = set(excel_file.sheet_names)
+        error_log: list[dict[str, Any]] = []
+        counts = {
+            "total_rows": 0,
+            "processed_rows": 0,
+            "inserted_rows": 0,
+            "updated_rows": 0,
+            "skipped_rows": 0,
+            "error_rows": 0,
+        }
         report: dict[str, Any] = {
             "suppliers_loaded": 0,
             "transactions_loaded": 0,
@@ -82,205 +398,594 @@ class IngestionService:
             "cases_loaded": 0,
         }
 
-        # 1. Ingest Suppliers (Mandatory sheet)
+        # ── 1. MANDATORY SHEET: Suppliers ───────────────────────────────────
         df_sup = excel_file.parse("Suppliers")
-        sup_cols = set(df_sup.columns)
-        if "supplier_id" not in sup_cols or not ({"supplier_name", "name"} & sup_cols):
-            cols = list(df_sup.columns)
-            raise IngestionError(
-                "Sheet 'Suppliers' is missing mandatory columns. "
-                f"Must include 'supplier_id' and 'supplier_name' (or 'name'). Found: {cols}"
-            )
-        report["suppliers_loaded"] = await IngestionService._ingest_suppliers(df_sup, session)
+        counts["total_rows"] += len(df_sup)
+        counts["processed_rows"] += len(df_sup)
 
-        # 2. Ingest Transactions (Mandatory sheet)
+        known_supplier_ids = await IngestionService._ingest_suppliers_sheet(
+            df=df_sup,
+            session=session,
+            duplicate_strategy=duplicate_strategy,
+            report=report,
+            counts=counts,
+            error_log=error_log,
+        )
+
+        # ── 2. MANDATORY SHEET: Transactions ────────────────────────────────
         df_tx = excel_file.parse("Transactions")
-        tx_cols = set(df_tx.columns)
+        counts["total_rows"] += len(df_tx)
+        counts["processed_rows"] += len(df_tx)
+
+        known_transaction_ids = await IngestionService._ingest_transactions_sheet(
+            df=df_tx,
+            session=session,
+            duplicate_strategy=duplicate_strategy,
+            known_supplier_ids=known_supplier_ids,
+            report=report,
+            counts=counts,
+            error_log=error_log,
+        )
+
+        if (
+            report["suppliers_loaded"] == 0
+            and report["transactions_loaded"] == 0
+            and counts["skipped_rows"] == 0
+        ):
+            raise IngestionError(
+                "Uploaded workbook contains 0 valid supplier or transaction records to ingest."
+            )
+
+        # ── 3. OPTIONAL SHEET: Approvals ────────────────────────────────────
+        if "Approvals" in sheet_names:
+            df_app = excel_file.parse("Approvals")
+            counts["total_rows"] += len(df_app)
+            counts["processed_rows"] += len(df_app)
+            await IngestionService._ingest_approvals_sheet(
+                df=df_app,
+                session=session,
+                duplicate_strategy=duplicate_strategy,
+                known_transaction_ids=known_transaction_ids,
+                report=report,
+                counts=counts,
+                error_log=error_log,
+            )
+
+        # ── 4. OPTIONAL SHEET: Access_Events ────────────────────────────────
+        if "Access_Events" in sheet_names:
+            df_ae = excel_file.parse("Access_Events")
+            counts["total_rows"] += len(df_ae)
+            counts["processed_rows"] += len(df_ae)
+            await IngestionService._ingest_access_events_sheet(
+                df=df_ae,
+                session=session,
+                duplicate_strategy=duplicate_strategy,
+                report=report,
+                counts=counts,
+                error_log=error_log,
+            )
+
+        # ── 5. OPTIONAL SHEET: Demo_Rules ───────────────────────────────────
+        if "Demo_Rules" in sheet_names:
+            df_rules = excel_file.parse("Demo_Rules")
+            counts["total_rows"] += len(df_rules)
+            counts["processed_rows"] += len(df_rules)
+            await IngestionService._ingest_demo_rules_sheet(
+                df=df_rules,
+                session=session,
+                duplicate_strategy=duplicate_strategy,
+                report=report,
+                counts=counts,
+                error_log=error_log,
+            )
+
+        # ── 6. OPTIONAL SHEET: Expected_Cases (Strictly Insert-Only D3) ─────
+        if "Expected_Cases" in sheet_names:
+            df_cases = excel_file.parse("Expected_Cases")
+            counts["total_rows"] += len(df_cases)
+            counts["processed_rows"] += len(df_cases)
+            await IngestionService._ingest_expected_cases_sheet(
+                df=df_cases,
+                session=session,
+                report=report,
+                counts=counts,
+                error_log=error_log,
+            )
+
+        return report, error_log, counts
+
+    # ── SHEET PROCESSING IMPLEMENTATIONS ────────────────────────────────────
+
+    @staticmethod
+    async def _ingest_suppliers_sheet(
+        df: pd.DataFrame,
+        session: AsyncSession,
+        duplicate_strategy: str,
+        report: dict[str, Any],
+        counts: dict[str, int],
+        error_log: list[dict[str, Any]],
+    ) -> set[str]:
+        sheet_name = "Suppliers"
+        sup_cols = set(df.columns)
+        if "supplier_id" not in sup_cols or not ({"supplier_name", "name"} & sup_cols):
+            raise IngestionError(
+                f"Sheet 'Suppliers' is missing mandatory columns. Found: {list(df.columns)}"
+            )
+
+        raw_ids = [str(r).strip() for r in df["supplier_id"].dropna().unique() if str(r).strip()]
+        existing_pks = await _prefetch_existing_pks(session, Supplier, "supplier_id", raw_ids)
+
+        chunk: list[tuple[SQLModel, dict[str, Any]]] = []
+        validation_errors = 0
+        total_rows = len(df)
+
+        for idx, row in df.iterrows():
+            spreadsheet_row_num = idx + 2
+            source_dict = {k: _to_json_safe(v) for k, v in row.to_dict().items()}
+
+            sup_id = sanitize_text(row.get("supplier_id"), max_length=50)
+            if not sup_id:
+                counts["skipped_rows"] += 1
+                continue
+
+            name_col = "supplier_name" if "supplier_name" in row else "name"
+            sup_name = sanitize_text(row.get(name_col), max_length=255)
+            if not sup_name:
+                validation_errors += 1
+                counts["error_rows"] += 1
+                error_log.append(
+                    {
+                        "sheet": sheet_name,
+                        "row": spreadsheet_row_num,
+                        "field": name_col,
+                        "error": "Supplier name is mandatory",
+                        "raw_value": source_dict,
+                    }
+                )
+                continue
+
+            if sup_id in existing_pks:
+                if duplicate_strategy == "skip":
+                    counts["skipped_rows"] += 1
+                    continue
+                elif duplicate_strategy == "fail":
+                    validation_errors += 1
+                    counts["error_rows"] += 1
+                    error_log.append(
+                        {
+                            "sheet": sheet_name,
+                            "row": spreadsheet_row_num,
+                            "field": "supplier_id",
+                            "error": (
+                                f"Duplicate primary key '{sup_id}' encountered under strategy=fail"
+                            ),
+                            "raw_value": source_dict,
+                        }
+                    )
+                    continue
+
+            bank_change = row.get("bank_change_date")
+            bank_change_date = None
+            if pd.notna(bank_change):
+                try:
+                    bank_change_date = pd.to_datetime(bank_change).date()
+                except Exception as e:
+                    validation_errors += 1
+                    counts["error_rows"] += 1
+                    error_log.append(
+                        {
+                            "sheet": sheet_name,
+                            "row": spreadsheet_row_num,
+                            "field": "bank_change_date",
+                            "error": f"Invalid date format: {e}",
+                            "raw_value": source_dict,
+                        }
+                    )
+                    continue
+
+            supplier = Supplier(
+                supplier_id=sup_id,
+                name=sup_name,
+                category=sanitize_text(row.get("category", "General"), max_length=100) or "General",
+                risk_tier=sanitize_text(row.get("risk_tier", "Medium"), max_length=50) or "Medium",
+                bank_account=sanitize_text(row.get("bank_account"), max_length=100),
+                routing_number=sanitize_text(row.get("routing_number"), max_length=50),
+                bank_change_date=bank_change_date,
+                bank_change_reason=sanitize_text(row.get("bank_change_reason")),
+                status="Active" if row.get("active", True) else "Suspended",
+                notes=sanitize_text(row.get("notes")),
+            )
+            supplier._source_row_num = spreadsheet_row_num
+            chunk.append((supplier, source_dict))
+
+            # Event loop yield every 250 rows (D11)
+            if idx > 0 and idx % 250 == 0:
+                await asyncio.sleep(0)
+
+        # D10: Pre-validation Circuit Breaker
+        check_circuit_breaker(
+            sheet_name, total_rows, validation_errors, is_mandatory=True, stage="validation"
+        )
+
+        # Flush chunk with savepoint isolation (D5)
+        inserted, db_errors = await _flush_chunk_with_isolation(
+            session, chunk, error_log, sheet_name
+        )
+        counts["inserted_rows"] += inserted
+        counts["error_rows"] += db_errors
+        report["suppliers_loaded"] = inserted
+
+        # D12: Cumulative Post-Insert Circuit Breaker
+        total_failures = validation_errors + db_errors
+        check_circuit_breaker(
+            sheet_name, total_rows, total_failures, is_mandatory=True, stage="insertion"
+        )
+
+        # Build known suppliers set (existing in DB + newly inserted)
+        all_db_sups = await session.execute(select(Supplier.supplier_id))
+        return {str(r[0]) for r in all_db_sups.fetchall()}
+
+    @staticmethod
+    async def _ingest_transactions_sheet(
+        df: pd.DataFrame,
+        session: AsyncSession,
+        duplicate_strategy: str,
+        known_supplier_ids: set[str],
+        report: dict[str, Any],
+        counts: dict[str, int],
+        error_log: list[dict[str, Any]],
+    ) -> set[str]:
+        sheet_name = "Transactions"
+        tx_cols = set(df.columns)
         if (
             "transaction_id" not in tx_cols
             or "supplier_id" not in tx_cols
             or not ({"amount_usd", "amount"} & tx_cols)
         ):
             raise IngestionError(
-                "Sheet 'Transactions' is missing mandatory columns. "
-                "Must include 'transaction_id', 'supplier_id', and 'amount_usd' (or 'amount'). "
-                f"Found: {list(df_tx.columns)}"
-            )
-        report["transactions_loaded"] = await IngestionService._ingest_transactions(df_tx, session)
-
-        # 3. Check for at least 1 record in core sheets
-        if report["suppliers_loaded"] == 0 and report["transactions_loaded"] == 0:
-            raise IngestionError(
-                "Uploaded workbook contains 0 valid supplier or transaction records to ingest."
+                f"Sheet 'Transactions' is missing mandatory columns. Found: {list(df.columns)}"
             )
 
-        # 4. Ingest Approvals (Optional sheet)
-        if "Approvals" in sheet_names:
-            df_app = excel_file.parse("Approvals")
-            report["approvals_loaded"] = await IngestionService._ingest_approvals(df_app, session)
+        raw_ids = [str(r).strip() for r in df["transaction_id"].dropna().unique() if str(r).strip()]
+        existing_pks = await _prefetch_existing_pks(session, Transaction, "transaction_id", raw_ids)
 
-        # 5. Ingest Access Events (Optional sheet)
-        if "Access_Events" in sheet_names:
-            df_ae = excel_file.parse("Access_Events")
-            report["access_events_loaded"] = await IngestionService._ingest_access_events(
-                df_ae, session
-            )
+        chunk: list[tuple[SQLModel, dict[str, Any]]] = []
+        validation_errors = 0
+        total_rows = len(df)
 
-        # 6. Ingest Demo Rules (Optional sheet)
-        if "Demo_Rules" in sheet_names:
-            df_rules = excel_file.parse("Demo_Rules")
-            report["rules_loaded"] = await IngestionService._ingest_rules(df_rules, session)
+        for idx, row in df.iterrows():
+            spreadsheet_row_num = idx + 2
+            source_dict = {k: _to_json_safe(v) for k, v in row.to_dict().items()}
 
-        # 7. Ingest Initial Cases & Workflow Samples (Optional sheet)
-        if "Expected_Cases" in sheet_names:
-            df_cases = excel_file.parse("Expected_Cases")
-            report["cases_loaded"] = await IngestionService._ingest_expected_cases(
-                df_cases, session
-            )
-
-        await session.commit()
-        return report
-
-    @staticmethod
-    async def _ingest_suppliers(df: pd.DataFrame, session: AsyncSession) -> int:
-        count = 0
-        for _, row in df.iterrows():
-            sup_id = str(row.get("supplier_id", "")).strip()
-            if not sup_id or pd.isna(sup_id):
+            tx_id = sanitize_text(row.get("transaction_id"), max_length=50)
+            if not tx_id:
+                counts["skipped_rows"] += 1
                 continue
 
-            bank_change = row.get("bank_change_date")
-            bank_change_date = None
-            if pd.notna(bank_change):
-                bank_change_date = pd.to_datetime(bank_change).date()
-
-            supplier = await session.get(Supplier, sup_id)
-            if not supplier:
-                supplier = Supplier(
-                    supplier_id=sup_id,
-                    name=str(row.get("supplier_name", sup_id)),
-                    category=str(row.get("category", "General")),
-                    risk_tier=str(row.get("risk_tier", "Medium")),
-                    bank_change_date=bank_change_date,
-                    bank_change_reason=str(row.get("bank_change_reason", ""))
-                    if pd.notna(row.get("bank_change_reason"))
-                    else None,
-                    status="Active" if row.get("active", True) else "Suspended",
-                    notes=str(row.get("notes", "")) if pd.notna(row.get("notes")) else None,
+            sup_id = sanitize_text(row.get("supplier_id"), max_length=50)
+            # Referential Integrity Check (D7)
+            if sup_id not in known_supplier_ids:
+                validation_errors += 1
+                counts["error_rows"] += 1
+                error_log.append(
+                    {
+                        "sheet": sheet_name,
+                        "row": spreadsheet_row_num,
+                        "field": "supplier_id",
+                        "error": (
+                            f"Referential integrity failure: Supplier '{sup_id}' does not exist."
+                        ),
+                        "raw_value": source_dict,
+                    }
                 )
-                session.add(supplier)
-                count += 1
-        await session.flush()
-        return count
-
-    @staticmethod
-    async def _ingest_transactions(df: pd.DataFrame, session: AsyncSession) -> int:
-        count = 0
-        for _, row in df.iterrows():
-            tx_id = str(row.get("transaction_id", "")).strip()
-            if not tx_id or pd.isna(tx_id):
                 continue
 
-            inv_date = pd.to_datetime(row.get("invoice_date")).date()
-            post_date = (
-                pd.to_datetime(row.get("posting_date")).date()
-                if pd.notna(row.get("posting_date"))
-                else None
-            )
+            if tx_id in existing_pks:
+                if duplicate_strategy == "skip":
+                    counts["skipped_rows"] += 1
+                    continue
+                elif duplicate_strategy == "fail":
+                    validation_errors += 1
+                    counts["error_rows"] += 1
+                    error_log.append(
+                        {
+                            "sheet": sheet_name,
+                            "row": spreadsheet_row_num,
+                            "field": "transaction_id",
+                            "error": (
+                                f"Duplicate primary key '{tx_id}' encountered under strategy=fail"
+                            ),
+                            "raw_value": source_dict,
+                        }
+                    )
+                    continue
 
-            tx = await session.get(Transaction, tx_id)
-            if not tx:
-                tx = Transaction(
-                    transaction_id=tx_id,
-                    supplier_id=str(row.get("supplier_id", "")),
-                    invoice_number=str(row.get("invoice_no", "")),
-                    amount=float(row.get("amount_usd", 0.0)),
-                    currency=str(row.get("currency", "USD")),
-                    invoice_date=inv_date,
-                    posting_date=post_date,
-                    approval_required=bool(row.get("approval_required", True)),
-                    approval_status=str(row.get("approval_status", "Approved")),
-                    payment_status=str(row.get("payment_status", "Pending")),
-                    description=str(row.get("description", ""))
-                    if pd.notna(row.get("description"))
-                    else None,
+            amount_col = "amount_usd" if "amount_usd" in row else "amount"
+            try:
+                amount_val = float(row.get(amount_col, 0.0))
+            except Exception as e:
+                validation_errors += 1
+                counts["error_rows"] += 1
+                error_log.append(
+                    {
+                        "sheet": sheet_name,
+                        "row": spreadsheet_row_num,
+                        "field": amount_col,
+                        "error": f"Invalid amount format: {e}",
+                        "raw_value": source_dict,
+                    }
                 )
-                session.add(tx)
-                count += 1
-        await session.flush()
-        return count
-
-    @staticmethod
-    async def _ingest_approvals(df: pd.DataFrame, session: AsyncSession) -> int:
-        count = 0
-        for _, row in df.iterrows():
-            app_id = str(row.get("approval_id", "")).strip()
-            if not app_id or pd.isna(app_id):
                 continue
 
-            app_date = (
-                pd.to_datetime(row.get("approval_date"))
-                if pd.notna(row.get("approval_date"))
-                else None
-            )
-
-            app = await session.get(Approval, app_id)
-            if not app:
-                app = Approval(
-                    approval_id=app_id,
-                    transaction_id=str(row.get("transaction_id", "")),
-                    required_level=str(row.get("required_level", "Level 1")),
-                    approver_role=str(row.get("approver_role", ""))
-                    if pd.notna(row.get("approver_role"))
-                    else None,
-                    approval_status=str(row.get("approval_status", "Missing")),
-                    approval_date=app_date,
-                    notes=str(row.get("notes", "")) if pd.notna(row.get("notes")) else None,
+            inv_date_raw = row.get("invoice_date")
+            try:
+                inv_date = pd.to_datetime(inv_date_raw).date()
+            except Exception as e:
+                validation_errors += 1
+                counts["error_rows"] += 1
+                error_log.append(
+                    {
+                        "sheet": sheet_name,
+                        "row": spreadsheet_row_num,
+                        "field": "invoice_date",
+                        "error": f"Invalid invoice date format: {e}",
+                        "raw_value": source_dict,
+                    }
                 )
-                session.add(app)
-                count += 1
-        await session.flush()
-        return count
-
-    @staticmethod
-    async def _ingest_access_events(df: pd.DataFrame, session: AsyncSession) -> int:
-        count = 0
-        for _, row in df.iterrows():
-            event_id = str(row.get("event_id", "")).strip()
-            if not event_id or pd.isna(event_id):
                 continue
 
-            event_time = pd.to_datetime(row.get("event_time"))
+            post_date = None
+            if pd.notna(row.get("posting_date")):
+                try:
+                    post_date = pd.to_datetime(row.get("posting_date")).date()
+                except Exception:
+                    post_date = None
+
+            tx = Transaction(
+                transaction_id=tx_id,
+                supplier_id=sup_id,
+                invoice_number=sanitize_text(
+                    row.get("invoice_no", row.get("invoice_number", "")), max_length=100
+                )
+                or "",
+                amount=amount_val,
+                currency=sanitize_text(row.get("currency", "USD"), max_length=10) or "USD",
+                invoice_date=inv_date,
+                posting_date=post_date,
+                approval_required=bool(row.get("approval_required", True)),
+                approval_status=sanitize_text(row.get("approval_status", "Approved"), max_length=50)
+                or "Approved",
+                payment_status=sanitize_text(row.get("payment_status", "Pending"), max_length=50)
+                or "Pending",
+                description=sanitize_text(row.get("description")),
+            )
+            tx._source_row_num = spreadsheet_row_num
+            chunk.append((tx, source_dict))
+
+            if idx > 0 and idx % 250 == 0:
+                await asyncio.sleep(0)
+
+        check_circuit_breaker(
+            sheet_name, total_rows, validation_errors, is_mandatory=True, stage="validation"
+        )
+
+        inserted, db_errors = await _flush_chunk_with_isolation(
+            session, chunk, error_log, sheet_name
+        )
+        counts["inserted_rows"] += inserted
+        counts["error_rows"] += db_errors
+        report["transactions_loaded"] = inserted
+
+        total_failures = validation_errors + db_errors
+        check_circuit_breaker(
+            sheet_name, total_rows, total_failures, is_mandatory=True, stage="insertion"
+        )
+
+        all_db_txs = await session.execute(select(Transaction.transaction_id))
+        return {str(r[0]) for r in all_db_txs.fetchall()}
+
+    @staticmethod
+    async def _ingest_approvals_sheet(
+        df: pd.DataFrame,
+        session: AsyncSession,
+        duplicate_strategy: str,
+        known_transaction_ids: set[str],
+        report: dict[str, Any],
+        counts: dict[str, int],
+        error_log: list[dict[str, Any]],
+    ) -> None:
+        sheet_name = "Approvals"
+        raw_ids = [
+            str(r).strip()
+            for r in df.get("approval_id", pd.Series()).dropna().unique()
+            if str(r).strip()
+        ]
+        existing_pks = await _prefetch_existing_pks(session, Approval, "approval_id", raw_ids)
+
+        chunk: list[tuple[SQLModel, dict[str, Any]]] = []
+        validation_errors = 0
+        total_rows = len(df)
+
+        for idx, row in df.iterrows():
+            spreadsheet_row_num = idx + 2
+            source_dict = {k: _to_json_safe(v) for k, v in row.to_dict().items()}
+
+            app_id = sanitize_text(row.get("approval_id"), max_length=50)
+            if not app_id:
+                counts["skipped_rows"] += 1
+                continue
+
+            tx_id = sanitize_text(row.get("transaction_id"), max_length=50)
+            # Referential Pre-flight for Approvals -> Transactions (D7)
+            if tx_id not in known_transaction_ids:
+                validation_errors += 1
+                counts["error_rows"] += 1
+                error_log.append(
+                    {
+                        "sheet": sheet_name,
+                        "row": spreadsheet_row_num,
+                        "field": "transaction_id",
+                        "error": (
+                            f"Referential integrity failure: Transaction '{tx_id}' does not exist."
+                        ),
+                        "raw_value": source_dict,
+                    }
+                )
+                continue
+
+            if app_id in existing_pks and duplicate_strategy == "skip":
+                counts["skipped_rows"] += 1
+                continue
+
+            app_date = None
+            if pd.notna(row.get("approval_date")):
+                try:
+                    app_date = pd.to_datetime(row.get("approval_date"))
+                except Exception:
+                    app_date = None
+
+            app_entity = Approval(
+                approval_id=app_id,
+                transaction_id=tx_id,
+                required_level=sanitize_text(row.get("required_level", "Level 1"), max_length=50)
+                or "Level 1",
+                approver_role=sanitize_text(row.get("approver_role")),
+                approval_status=sanitize_text(row.get("approval_status", "Missing"), max_length=50)
+                or "Missing",
+                approval_date=app_date,
+                notes=sanitize_text(row.get("notes")),
+            )
+            app_entity._source_row_num = spreadsheet_row_num
+            chunk.append((app_entity, source_dict))
+
+            if idx > 0 and idx % 250 == 0:
+                await asyncio.sleep(0)
+
+        # Soft abort on optional sheet if breaker trips (D6)
+        try:
+            check_circuit_breaker(
+                sheet_name, total_rows, validation_errors, is_mandatory=False, stage="validation"
+            )
+            inserted, db_errors = await _flush_chunk_with_isolation(
+                session, chunk, error_log, sheet_name
+            )
+            counts["inserted_rows"] += inserted
+            counts["error_rows"] += db_errors
+            report["approvals_loaded"] = inserted
+            check_circuit_breaker(
+                sheet_name,
+                total_rows,
+                validation_errors + db_errors,
+                is_mandatory=False,
+                stage="insertion",
+            )
+        except CircuitBreakerTrippedError as cb_soft:
+            logger.warning(f"Soft circuit breaker tripped on sheet '{sheet_name}': {cb_soft}")
+            report["approvals_loaded"] = 0
+
+    @staticmethod
+    async def _ingest_access_events_sheet(
+        df: pd.DataFrame,
+        session: AsyncSession,
+        duplicate_strategy: str,
+        report: dict[str, Any],
+        counts: dict[str, int],
+        error_log: list[dict[str, Any]],
+    ) -> None:
+        sheet_name = "Access_Events"
+        raw_ids = [
+            str(r).strip()
+            for r in df.get("event_id", pd.Series()).dropna().unique()
+            if str(r).strip()
+        ]
+        existing_pks = await _prefetch_existing_pks(session, AccessEvent, "event_id", raw_ids)
+
+        chunk: list[tuple[SQLModel, dict[str, Any]]] = []
+        validation_errors = 0
+        total_rows = len(df)
+
+        for idx, row in df.iterrows():
+            spreadsheet_row_num = idx + 2
+            source_dict = {k: _to_json_safe(v) for k, v in row.to_dict().items()}
+
+            event_id = sanitize_text(row.get("event_id"), max_length=50)
+            if not event_id:
+                counts["skipped_rows"] += 1
+                continue
+
+            if event_id in existing_pks and duplicate_strategy == "skip":
+                counts["skipped_rows"] += 1
+                continue
+
+            try:
+                event_time = pd.to_datetime(row.get("event_time"))
+            except Exception as e:
+                validation_errors += 1
+                counts["error_rows"] += 1
+                error_log.append(
+                    {
+                        "sheet": sheet_name,
+                        "row": spreadsheet_row_num,
+                        "field": "event_time",
+                        "error": f"Invalid event timestamp: {e}",
+                        "raw_value": source_dict,
+                    }
+                )
+                continue
+
             hour = event_time.hour
             is_off_hours = hour < 6 or hour >= 20
 
-            ae = await session.get(AccessEvent, event_id)
-            if not ae:
-                ae = AccessEvent(
-                    event_id=event_id,
-                    user_id=str(row.get("user_id", "")),
-                    event_time=event_time,
-                    system=str(row.get("system", "ERP")),
-                    action=str(row.get("action", "View")),
-                    resource=str(row.get("resource", "")),
-                    supplier_id=str(row.get("supplier_id", ""))
-                    if pd.notna(row.get("supplier_id"))
-                    else None,
-                    result=str(row.get("result", "Success")),
-                    location_context=str(row.get("location_context", ""))
-                    if pd.notna(row.get("location_context"))
-                    else None,
-                    notes=str(row.get("notes", "")) if pd.notna(row.get("notes")) else None,
-                    flagged=is_off_hours,
-                )
-                session.add(ae)
-                count += 1
-        await session.flush()
-        return count
+            ae = AccessEvent(
+                event_id=event_id,
+                user_id=sanitize_text(row.get("user_id", ""), max_length=50) or "UNKNOWN",
+                event_time=event_time,
+                system=sanitize_text(row.get("system", "ERP"), max_length=50) or "ERP",
+                action=sanitize_text(row.get("action", "View"), max_length=50) or "View",
+                resource=sanitize_text(row.get("resource", ""), max_length=100) or "",
+                supplier_id=sanitize_text(row.get("supplier_id"), max_length=50),
+                result=sanitize_text(row.get("result", "Success"), max_length=50) or "Success",
+                location_context=sanitize_text(row.get("location_context"), max_length=100),
+                notes=sanitize_text(row.get("notes")),
+                flagged=is_off_hours,
+            )
+            ae._source_row_num = spreadsheet_row_num
+            chunk.append((ae, source_dict))
+
+            if idx > 0 and idx % 250 == 0:
+                await asyncio.sleep(0)
+
+        try:
+            check_circuit_breaker(
+                sheet_name, total_rows, validation_errors, is_mandatory=False, stage="validation"
+            )
+            inserted, db_errors = await _flush_chunk_with_isolation(
+                session, chunk, error_log, sheet_name
+            )
+            counts["inserted_rows"] += inserted
+            counts["error_rows"] += db_errors
+            report["access_events_loaded"] = inserted
+            check_circuit_breaker(
+                sheet_name,
+                total_rows,
+                validation_errors + db_errors,
+                is_mandatory=False,
+                stage="insertion",
+            )
+        except CircuitBreakerTrippedError as cb_soft:
+            logger.warning(f"Soft circuit breaker tripped on sheet '{sheet_name}': {cb_soft}")
+            report["access_events_loaded"] = 0
 
     @staticmethod
-    async def _ingest_rules(df: pd.DataFrame, session: AsyncSession) -> int:
-        count = 0
+    async def _ingest_demo_rules_sheet(
+        df: pd.DataFrame,
+        session: AsyncSession,
+        duplicate_strategy: str,
+        report: dict[str, Any],
+        counts: dict[str, int],
+        error_log: list[dict[str, Any]],
+    ) -> None:
+        sheet_name = "Demo_Rules"
         default_configs = {
             "R-001": {"multiplier": 2.0, "exclude_target": True},
             "R-002": {"lookback_days": 7},
@@ -290,77 +995,134 @@ class IngestionService:
             "R-006": {"lookback_days": 90},
         }
 
-        for _, row in df.iterrows():
-            rule_code = str(row.get("rule_id", "")).strip()
-            if not rule_code or pd.isna(rule_code):
+        raw_ids = [
+            str(r).strip()
+            for r in df.get("rule_id", pd.Series()).dropna().unique()
+            if str(r).strip()
+        ]
+        existing_pks = await _prefetch_existing_pks(session, RuleConfig, "rule_code", raw_ids)
+
+        chunk: list[tuple[SQLModel, dict[str, Any]]] = []
+        validation_errors = 0
+        total_rows = len(df)
+
+        for idx, row in df.iterrows():
+            spreadsheet_row_num = idx + 2
+            source_dict = {k: _to_json_safe(v) for k, v in row.to_dict().items()}
+
+            rule_code = sanitize_text(row.get("rule_id"), max_length=50)
+            if not rule_code:
+                counts["skipped_rows"] += 1
                 continue
 
-            stmt = select(RuleConfig).where(RuleConfig.rule_code == rule_code)
-            res = await session.execute(stmt)
-            rule = res.scalar_one_or_none()
+            if rule_code in existing_pks and duplicate_strategy == "skip":
+                counts["skipped_rows"] += 1
+                continue
 
-            if not rule:
-                rule = RuleConfig(
-                    rule_code=rule_code,
-                    name=str(row.get("rule_name", rule_code)),
-                    description=str(row.get("example_reason_text", "")),
-                    weight=int(row.get("default_weight", 20)),
-                    threshold_params=default_configs.get(rule_code, {}),
-                    rule_version=1,
-                    is_active=True,
-                )
-                session.add(rule)
-                count += 1
-        await session.flush()
-        return count
+            rule = RuleConfig(
+                rule_code=rule_code,
+                name=sanitize_text(row.get("rule_name", rule_code), max_length=100) or rule_code,
+                description=sanitize_text(row.get("example_reason_text", "")),
+                weight=int(row.get("default_weight", 20)),
+                threshold_params=default_configs.get(rule_code, {}),
+                rule_version=1,
+                is_active=True,
+            )
+            rule._source_row_num = spreadsheet_row_num
+            chunk.append((rule, source_dict))
+
+            if idx > 0 and idx % 250 == 0:
+                await asyncio.sleep(0)
+
+        try:
+            check_circuit_breaker(
+                sheet_name, total_rows, validation_errors, is_mandatory=False, stage="validation"
+            )
+            inserted, db_errors = await _flush_chunk_with_isolation(
+                session, chunk, error_log, sheet_name
+            )
+            counts["inserted_rows"] += inserted
+            counts["error_rows"] += db_errors
+            report["rules_loaded"] = inserted
+            check_circuit_breaker(
+                sheet_name,
+                total_rows,
+                validation_errors + db_errors,
+                is_mandatory=False,
+                stage="insertion",
+            )
+        except CircuitBreakerTrippedError as cb_soft:
+            logger.warning(f"Soft circuit breaker tripped on sheet '{sheet_name}': {cb_soft}")
+            report["rules_loaded"] = 0
 
     @staticmethod
-    async def _ingest_expected_cases(df: pd.DataFrame, session: AsyncSession) -> int:
-        count = 0
-        for _, row in df.iterrows():
-            case_id = str(row.get("case_id", "")).strip()
-            if not case_id or pd.isna(case_id):
+    async def _ingest_expected_cases_sheet(
+        df: pd.DataFrame,
+        session: AsyncSession,
+        report: dict[str, Any],
+        counts: dict[str, int],
+        error_log: list[dict[str, Any]],
+    ) -> None:
+        """
+        Expected_Cases sheet is STRICTLY insert-if-not-exists (D3 invariant).
+        Existing RiskCases are never mutated via workbook upload.
+        """
+        raw_ids = [
+            str(r).strip()
+            for r in df.get("case_id", pd.Series()).dropna().unique()
+            if str(r).strip()
+        ]
+        existing_pks = await _prefetch_existing_pks(session, RiskCase, "case_id", raw_ids)
+
+        inserted_cases = 0
+
+        for _idx, row in df.iterrows():
+            case_id = sanitize_text(row.get("case_id"), max_length=50)
+            if not case_id:
+                counts["skipped_rows"] += 1
                 continue
 
-            case = await session.get(RiskCase, case_id)
-            if not case:
-                case = RiskCase(
-                    case_id=case_id,
-                    case_number=f"CASE-{case_id.replace('TEST-CASE-', '2026-')}",
-                    priority=str(row.get("expected_priority", "High")),
-                    status="New",
-                    supplier_id=str(row.get("supplier_id", ""))
-                    if pd.notna(row.get("supplier_id"))
-                    else None,
-                    transaction_id=str(row.get("primary_record", ""))
-                    if pd.notna(row.get("primary_record"))
-                    else None,
-                    trigger_signals=[
-                        {"rule_code": flag.strip()}
-                        for flag in str(row.get("expected_flags", "")).split(";")
-                        if flag.strip()
-                    ],
-                    evaluation_snapshot={
-                        "explanation": str(row.get("expected_explanation", "")),
-                        "next_action": str(row.get("expected_next_action", "")),
-                    },
-                )
-                session.add(case)
-                await session.flush()
+            # D3: Strict non-mutation of existing cases
+            if case_id in existing_pks:
+                counts["skipped_rows"] += 1
+                continue
 
-                # Initial Case History entry
-                history = CaseHistory(
-                    case_id=case_id,
-                    actor="System / Ingestion Engine",
-                    action="Case Generated",
-                    previous_status=None,
-                    new_status="New",
-                    note=(
-                        "Imported from synthetic test dataset. "
-                        f"Target transaction: {row.get('primary_record')}"
-                    ),
-                )
-                session.add(history)
-                await session.flush()
-                count += 1
-        return count
+            case = RiskCase(
+                case_id=case_id,
+                case_number=f"CASE-{case_id.replace('TEST-CASE-', '2026-')}",
+                priority=sanitize_text(row.get("expected_priority", "High"), max_length=20)
+                or "High",
+                status="New",
+                supplier_id=sanitize_text(row.get("supplier_id"), max_length=50),
+                transaction_id=sanitize_text(row.get("primary_record"), max_length=50),
+                trigger_signals=[
+                    {"rule_code": flag.strip()}
+                    for flag in str(row.get("expected_flags", "")).split(";")
+                    if flag.strip()
+                ],
+                evaluation_snapshot={
+                    "explanation": str(row.get("expected_explanation", "")),
+                    "next_action": str(row.get("expected_next_action", "")),
+                },
+            )
+            session.add(case)
+            await session.flush()
+
+            history = CaseHistory(
+                case_id=case_id,
+                actor="System / Ingestion Engine",
+                action="Case Generated",
+                previous_status=None,
+                new_status="New",
+                note=(
+                    "Imported from synthetic test dataset. "
+                    f"Target transaction: {row.get('primary_record')}"
+                ),
+            )
+            session.add(history)
+            await session.flush()
+
+            inserted_cases += 1
+            counts["inserted_rows"] += 1
+
+        report["cases_loaded"] = inserted_cases

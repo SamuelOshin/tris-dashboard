@@ -3,6 +3,7 @@ Developer Acceptance Test Matrix (T01 through T10).
 Formally verifies all 10 acceptance criteria defined in TRIS v1.3 Specification.
 """
 
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -303,3 +304,228 @@ async def test_t10_immutable_audit_trail_integrity(
     assert "case_history" in CASE_HISTORY_IMMUTABILITY_SQL
     assert "BEFORE UPDATE OR DELETE" in CASE_HISTORY_IMMUTABILITY_SQL
     assert "prevent_case_history_mutation" in CASE_HISTORY_IMMUTABILITY_SQL
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WORKBOOK ACCEPTANCE CHECKLIST (Developer_Tests Sheet Specific Invariants)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_workbook_t04_plain_language_explainability_no_unsupported_probability(
+    db_session: AsyncSession,
+):
+    """
+    Workbook T04 Acceptance Test: Explainability.
+    Verifies that all triggered rules provide plain-language, explainable reason text
+    and explicitly do NOT contain fake ML fraud percentages or unsupported probability scores.
+    """
+    result = await RuleEngineService.evaluate_transaction("TX-1999", db_session)
+    assert len(result.triggered_signals) == 4
+
+    unsupported_terms = [
+        "probability",
+        "confidence score",
+        "% fraud",
+        "likely fraud",
+        "percent chance",
+    ]
+
+    for signal in result.triggered_signals:
+        # 1. Plain-language reason text is populated and non-trivial
+        assert signal.explanation is not None
+        assert len(signal.explanation.strip()) > 15
+
+        # 2. No pseudo-scientific statistical fraud probabilities
+        explanation_lower = signal.explanation.lower()
+        for term in unsupported_terms:
+            assert term not in explanation_lower, (
+                f"Unsupported probability term '{term}' in {signal.rule_code}"
+            )
+
+
+@pytest.mark.asyncio
+async def test_workbook_t05_ownership_assignment_department_and_history(
+    async_client: AsyncClient,
+):
+    """
+    Workbook T05 Acceptance Test: Ownership & Department Assignment Persistence.
+    Assigning a case to an owner and department must persist the assignment, timestamp,
+    status, and immutable history entry as a coherent unit.
+    """
+    case_id = "TEST-CASE-001"
+
+    assign_res = await async_client.post(
+        f"/api/v1/cases/{case_id}/transition",
+        json={
+            "to_status": "Assigned",
+            "actor": "lead_triage",
+            "assigned_to": "A. Reviewer",
+            "department": "Finance",
+            "note": "Review supplier master change, approval trail, and payment exception",
+        },
+    )
+    assert assign_res.status_code == 200
+    case_data = assign_res.json()["data"]
+
+    # Verify structured ownership and department fields
+    assert case_data["status"] == "Assigned"
+    assert case_data["assigned_to"] == "A. Reviewer"
+    assert case_data["department"] == "Finance"
+
+    # Verify audit history captured the transition and assignment details
+    history = case_data["history"]
+    latest_event = history[-1]
+    assert latest_event["new_status"] == "Assigned"
+    assert latest_event["actor"] == "A. Reviewer"
+    assert "Owner: A. Reviewer" in latest_event["note"]
+    assert "Dept: Finance" in latest_event["note"]
+
+
+@pytest.mark.asyncio
+async def test_workbook_t07_recurrence_detection_and_prior_case_surfacing(
+    async_client: AsyncClient, db_session: AsyncSession
+):
+    """
+    Workbook T07 Acceptance Test: Recurrence Detection (Rule R-006).
+    1. Complete verified closure on TEST-CASE-001 for SUP-001.
+    2. Ingest/evaluate a subsequent transaction for SUP-001.
+    3. Rule R-006 triggers (weight 20) and surfaces prior root cause and corrective action.
+    """
+    case_id = "TEST-CASE-001"
+
+    # Progress and close TEST-CASE-001 with full verified closure
+    await async_client.post(
+        f"/api/v1/cases/{case_id}/transition", json={"to_status": "Assigned", "actor": "auditor"}
+    )
+    await async_client.post(
+        f"/api/v1/cases/{case_id}/transition",
+        json={"to_status": "Under Investigation", "actor": "auditor"},
+    )
+    await async_client.post(
+        f"/api/v1/cases/{case_id}/transition",
+        json={"to_status": "Corrective Action", "actor": "auditor"},
+    )
+    await async_client.post(
+        f"/api/v1/cases/{case_id}/transition",
+        json={"to_status": "Pending Verification", "actor": "auditor"},
+    )
+
+    closure_payload = {
+        "to_status": "Closed",
+        "actor": "verifier",
+        "root_cause": "Supplier bank-change verification workflow not completed",
+        "corrective_action": (
+            "Require independent verification of supplier banking change and second approval"
+        ),
+        "closure_type": "Confirmed Fraud / Blocked",
+        "closure_evidence": "Synthetic verification reference DOC-TEST-001",
+        "verified_by": "B. Verifier",
+        "closure_date": "2026-08-30",
+        "follow_up_requirement": "Mandatory callback confirmation",
+        "recurrence_monitoring": "90-day surveillance",
+    }
+    close_res = await async_client.post(f"/api/v1/cases/{case_id}/transition", json=closure_payload)
+    assert close_res.status_code == 200
+
+    # Insert a subsequent transaction for SUP-001 within 90 days
+    recur_tx = Transaction(
+        transaction_id="TX-1999-RECUR",
+        supplier_id="SUP-001",
+        invoice_number="INV-2026-RECUR-01",
+        amount=88000.00,
+        currency="USD",
+        invoice_date=date(2026, 9, 2),
+        payment_status="Pending",
+        approval_required=True,
+        approval_status="Missing",
+    )
+    db_session.add(recur_tx)
+    await db_session.commit()
+
+    # Evaluate the recurrence transaction
+    eval_result = await RuleEngineService.evaluate_transaction(
+        transaction_id="TX-1999-RECUR",
+        session=db_session,
+        auto_create_case=True,
+    )
+
+    # Verify R-006 (Recurrence) triggered
+    r006 = next((s for s in eval_result.triggered_signals if s.rule_code == "R-006"), None)
+    assert r006 is not None, "Rule R-006 must trigger when prior closed case exists for supplier"
+    assert r006.triggered is True
+    assert r006.weight == 20
+    assert r006.score == 20
+    assert "TEST-CASE-001" in r006.diagnostics["prior_closed_cases"]
+
+    # Query the newly generated case and verify prior case context is surfaced
+    new_case_res = await async_client.get("/api/v1/cases/CASE-2026-1999-RECUR")
+    assert new_case_res.status_code == 200
+    new_case_data = new_case_res.json()["data"]
+
+    assert len(new_case_data["prior_cases"]) >= 1
+    prior_case = new_case_data["prior_cases"][0]
+    assert prior_case["case_id"] == "TEST-CASE-001"
+    assert prior_case["root_cause"] == "Supplier bank-change verification workflow not completed"
+    assert (
+        prior_case["corrective_action"]
+        == "Require independent verification of supplier banking change and second approval"
+    )
+
+
+@pytest.mark.asyncio
+async def test_workbook_t08_duplicate_invoice_r005_detection(db_session: AsyncSession):
+    """
+    Workbook T08 Acceptance Test: Duplicate Invoice Anomaly Detection.
+    Verifies TX-4002 ($78,000) from SUP-004 triggers Rule R-005 referencing prior TX-4001
+    with matching invoice number SC-260821.
+    """
+    result = await RuleEngineService.evaluate_transaction(
+        transaction_id="TX-4002",
+        session=db_session,
+        auto_create_case=True,
+    )
+
+    # 1. Rule R-005 triggers with weight 30
+    r005 = next((s for s in result.triggered_signals if s.rule_code == "R-005"), None)
+    assert r005 is not None
+    assert r005.triggered is True
+    assert r005.weight == 30
+    assert r005.score == 30
+    assert "TX-4001" in r005.diagnostics["duplicate_ids"]
+
+    # 2. Case consolidation required
+    assert result.case_required is True
+
+    # 3. Associated RiskCase is updated with R-005 signal
+    case = await db_session.get(RiskCase, "TEST-CASE-002")
+    assert case is not None
+    assert case.supplier_id == "SUP-004"
+    assert case.transaction_id == "TX-4002"
+    assert any(sig["rule_code"] == "R-005" for sig in case.trigger_signals)
+
+
+@pytest.mark.asyncio
+async def test_workbook_t09_normal_case_control_sup002_clean(db_session: AsyncSession):
+    """
+    Workbook T09 Acceptance Test: Normal-Case Control (Negative Control).
+    Processing clean, baseline-conforming transactions for SUP-002 must NOT trigger
+    any detection rules or create any spurious risk cases.
+    """
+    for tx_id in ["TX-2001", "TX-2002"]:
+        result = await RuleEngineService.evaluate_transaction(
+            transaction_id=tx_id,
+            session=db_session,
+            auto_create_case=True,
+        )
+
+        # 1. Zero triggered signals
+        assert len(result.triggered_signals) == 0, f"Spurious rule triggered on normal {tx_id}"
+        assert result.total_score == 0
+        assert result.priority == "Low"
+        assert result.case_required is False
+
+        # 2. No risk case created
+        stmt = select(RiskCase).where(RiskCase.transaction_id == tx_id)
+        case = (await db_session.execute(stmt)).scalar_one_or_none()
+        assert case is None, f"Spurious RiskCase created for normal transaction {tx_id}"

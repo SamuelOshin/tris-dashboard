@@ -115,10 +115,99 @@ async def seed_users(session) -> int:
     return count
 
 
-async def main(data_file_path: str):
-    logger.info("1. Creating database tables if not existing...")
+async def seed_initial_notifications(session) -> int:
+    """Seed sample notifications if notifications table is empty."""
+    from app.api.modules.v1.notifications.models.notification import Notification
+    from app.api.modules.v1.notifications.service.notification_service import NotificationService
+
+    stmt = select(Notification).limit(1)
+    existing = (await session.execute(stmt)).scalar_one_or_none()
+    if existing:
+        return 0
+
+    samples = [
+        {
+            "title": "High-Risk Invoice Detected",
+            "message": (
+                "Invoice NC-260828 ($104,000.00) from Northstar Components LLC "
+                "flagged for deviation & bank change."
+            ),
+            "category": "CASE_ALERT",
+            "severity": "CRITICAL",
+            "link_url": "/cases/TEST-CASE-001",
+            "recipient_role": "compliance",
+        },
+        {
+            "title": "Duplicate Invoice Flagged",
+            "message": (
+                "Potential duplicate invoice pair TX-4001 and TX-4002 ($78,000.00) detected on "
+                "supplier SUP-004."
+            ),
+            "category": "CASE_ALERT",
+            "severity": "WARNING",
+            "link_url": "/cases/TEST-CASE-002",
+            "recipient_role": "Reviewer",
+        },
+        {
+            "title": "Off-Hours Security Telemetry",
+            "message": (
+                "Unusual after-hours access (23:42) recorded for user USR-204 modifying supplier "
+                "banking records."
+            ),
+            "category": "SECURITY_EVENT",
+            "severity": "WARNING",
+            "link_url": "/zero-trust",
+            "recipient_role": "admin",
+        },
+        {
+            "title": "Dataset Ingestion Completed",
+            "message": (
+                "Master supplier baseline dataset processed cleanly. 100 suppliers and 619 "
+                "invoices loaded."
+            ),
+            "category": "INGESTION_JOB",
+            "severity": "SUCCESS",
+            "link_url": "/ingestion",
+        },
+    ]
+
+    for s in samples:
+        await NotificationService.emit(
+            db=session,
+            title=s["title"],
+            message=s["message"],
+            category=s["category"],
+            severity=s["severity"],
+            link_url=s.get("link_url"),
+            recipient_role=s.get("recipient_role"),
+        )
+    await session.commit()
+    return len(samples)
+
+
+async def seed_users_and_triggers() -> int:
+    """Create database tables, seed system users, and apply DB triggers."""
+    logger.info("1. Verifying database tables exist...")
     await create_db_and_tables()
 
+    async with async_session_factory() as session:
+        logger.info("2. Seeding default user personas...")
+        user_count = await seed_users(session)
+        logger.info(f"   -> Seeded {user_count} users")
+
+        logger.info("3. Applying database triggers...")
+        await apply_database_triggers(session)
+
+        logger.info("4. Seeding initial notification records...")
+        notif_count = await seed_initial_notifications(session)
+        logger.info(f"   -> Seeded {notif_count} notifications")
+
+    logger.info("User, trigger, and notification setup complete.")
+    return user_count
+
+
+async def ingest_workbook_data(data_file_path: str | Path) -> dict:
+    """Ingest synthetic or enterprise data from an Excel workbook."""
     file_path = Path(data_file_path).resolve()
     if not file_path.exists():
         # Check alternative common location
@@ -127,25 +216,35 @@ async def main(data_file_path: str):
             file_path = alt_path
         else:
             logger.error(f"Test data file not found at: {file_path}")
-            return
+            return {}
 
-    logger.info(f"2. Seeding database using Excel workbook: {file_path}")
+    logger.info(f"Ingesting database using Excel workbook: {file_path}")
     async with async_session_factory() as session:
-        # Seed users
-        user_count = await seed_users(session)
-        logger.info(f"   -> Seeded {user_count} users")
-
-        # Ingest Excel sheets
         report = await IngestionService.ingest_excel_workbook(file_path, session)
         logger.info("   -> Ingestion Complete:")
         for key, value in report.items():
             logger.info(f"      - {key}: {value}")
+        return report
 
-        # Apply PostgreSQL triggers
-        logger.info("3. Applying database triggers...")
-        await apply_database_triggers(session)
 
-    logger.info("TRIS Database Seeding Succeeded!")
+async def main(
+    data_file_path: str = "../test data.xlsx",
+    users_only: bool = False,
+    ingest_only: bool = False,
+):
+    """Orchestrates database seeding and/or ingestion."""
+    if users_only:
+        await seed_users_and_triggers()
+        return
+
+    if ingest_only:
+        await ingest_workbook_data(data_file_path)
+        return
+
+    # Default: Run both (users + triggers + workbook ingestion)
+    await seed_users_and_triggers()
+    await ingest_workbook_data(data_file_path)
+    logger.info("TRIS Database Seeding & Ingestion Succeeded!")
 
 
 if __name__ == "__main__":
@@ -154,11 +253,28 @@ if __name__ == "__main__":
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    parser = argparse.ArgumentParser(description="TRIS Database Seeder")
+    parser = argparse.ArgumentParser(description="TRIS Database Seeder and Ingestion CLI")
     parser.add_argument(
         "--data-file",
         default="../test data.xlsx",
         help="Path to test data.xlsx file",
     )
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--users-only",
+        action="store_true",
+        help="Only seed system users and database triggers (no Excel ingestion)",
+    )
+    group.add_argument(
+        "--ingest-only",
+        action="store_true",
+        help="Only ingest the Excel workbook (assumes tables/users exist)",
+    )
     args = parser.parse_args()
-    asyncio.run(main(args.data_file))
+    asyncio.run(
+        main(
+            data_file_path=args.data_file,
+            users_only=args.users_only,
+            ingest_only=args.ingest_only,
+        )
+    )

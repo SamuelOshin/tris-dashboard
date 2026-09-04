@@ -173,9 +173,22 @@ class CaseService:
             case.follow_up_requirement = transition.follow_up_requirement
             case.recurrence_monitoring = transition.recurrence_monitoring
 
-        # 3. Handle Assignment Update
+        # 3. Handle Assignment & Department Update
         if transition.assigned_to:
             case.assigned_to = transition.assigned_to
+        if transition.department:
+            case.department = transition.department
+
+        # Format audit note to capture ownership assignment if provided
+        audit_note = transition.note
+        if transition.assigned_to or transition.department:
+            assign_parts = []
+            if transition.assigned_to:
+                assign_parts.append(f"Owner: {transition.assigned_to}")
+            if transition.department:
+                assign_parts.append(f"Dept: {transition.department}")
+            assign_str = f"[{', '.join(assign_parts)}]"
+            audit_note = f"{audit_note} - {assign_str}" if audit_note else assign_str
 
         # 4. Record Immutable Audit History
         history = CaseHistory(
@@ -184,12 +197,62 @@ class CaseService:
             action=f"Status Transition: {current_status} -> {target_status}",
             previous_status=current_status,
             new_status=target_status,
-            note=transition.note,
+            note=audit_note,
             timestamp=datetime.now(timezone.utc),
         )
         session.add(history)
 
-        # 5. Commit Transition
+        # 5. Emit Notifications for Case Lifecycle Events
+        from app.api.modules.v1.notifications.service.notification_service import (
+            NotificationService,
+        )
+
+        if transition.assigned_to:
+            await NotificationService.emit(
+                db=session,
+                title=f"Case {case.case_id} Assigned to You",
+                message=(
+                    f"You have been assigned as lead reviewer for Case {case.case_id} "
+                    f"(Supplier: {case.supplier_id})."
+                ),
+                category="CASE_ALERT",
+                severity="INFO",
+                recipient_user_id=transition.assigned_to,
+                link_url=f"/cases/{case.case_id}",
+                metadata_json={"case_id": case.case_id, "supplier_id": case.supplier_id},
+            )
+
+        if target_status == "Pending Verification":
+            await NotificationService.emit(
+                db=session,
+                title=f"Case {case.case_id} Pending Verification",
+                message=(
+                    f"Case {case.case_id} ({case.supplier_id}) completed investigation "
+                    "and requires compliance verification sign-off."
+                ),
+                category="CASE_ALERT",
+                severity="WARNING",
+                recipient_role="compliance",
+                link_url=f"/cases/{case.case_id}",
+                metadata_json={"case_id": case.case_id, "supplier_id": case.supplier_id},
+            )
+        elif target_status == "Closed":
+            verifier = case.verified_by or transition.actor
+            await NotificationService.emit(
+                db=session,
+                title=f"Case {case.case_id} Sealed and Closed",
+                message=(
+                    f"Case {case.case_id} ({case.supplier_id}) was "
+                    f"verified and sealed by {verifier}."
+                ),
+                category="CASE_ALERT",
+                severity="SUCCESS",
+                recipient_role="compliance",
+                link_url=f"/cases/{case.case_id}",
+                metadata_json={"case_id": case.case_id, "verified_by": case.verified_by},
+            )
+
+        # 6. Commit Transition
         case.status = target_status
         case.updated_at = datetime.now(timezone.utc)
         session.add(case)

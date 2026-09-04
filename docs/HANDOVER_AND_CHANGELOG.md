@@ -15,7 +15,8 @@ TRIS v1.3 introduces a robust, auditable risk architecture designed to withstand
 3. **Consolidated Heuristics**: Coordinated Strategy Pattern rules `R-001` through `R-006` with version tracking and additive scoring ($35 + 25 + 25 + 15 = 100 \implies \text{High Priority}$), automatically consolidating multi-signal alerts into `TEST-CASE-001`.
 4. **Governed Case Lifecycle**: State machine matrix strictly prohibits illegal status jumps and enforces an **8-field verified closure gatekeeper** before any case can transition to `Closed`.
 5. **Append-Only Immutability**: Protected audit logs via PostgreSQL triggers blocking `UPDATE` and `DELETE` mutations on `case_history`.
-6. **Unified Developer Acceptance Matrix**: Automated test suite (`test_acceptance_t01_t10.py`) achieving **10/10 passing tests** (and **29/29 overall backend tests** passing with 0 warnings).
+6. **Real-Time Notification Hub**: PostgreSQL-backed event alerting engine with multi-tier RBAC routing (user, role, broadcast) and automated domain event emissions from case transitions and background ingestion jobs.
+7. **Unified Developer Acceptance Matrix & Full Suite**: Automated test suite achieving **78/78 overall backend tests passing (100% pass rate)**.
 
 ---
 
@@ -36,21 +37,24 @@ tris-app/
 │   │   │   │   ├── transactions/   # Transaction ledger tables & queries
 │   │   │   │   ├── approvals/      # Internal control approval records
 │   │   │   │   ├── access_events/  # Zero-trust telemetry logs
+│   │   │   │   ├── notifications/  # PostgreSQL notification hub & event emitter
 │   │   │   │   ├── rules/          # Strategy pattern rule engine (R-001..R-006)
 │   │   │   │   └── cases/          # Governed case state machine & 8-field closure
 │   │   │   └── utils/              # Standardized response envelopes (success, auth, error)
 │   │   ├── scripts/                # Database seeding script (seed.py)
 │   │   └── main.py                 # FastAPI application entrypoint & lifespan
-│   ├── tests/                      # Automated test suite (29 tests)
+│   ├── tests/                      # Automated test suite (78 tests)
 │   ├── pyproject.toml              # UV package specification
 │   └── docker-compose.yml          # PostgreSQL 16 container specification
 ├── frontend/
 │   ├── app/
 │   │   ├── cases/[id]/             # Dynamic Case Detail workspace & 8-field closure modal
 │   │   ├── ingestion/              # Multi-sheet Excel ingestion workspace
-│   │   ├── developer-tests/        # Visual Developer Acceptance Test Matrix (T01-T10)
+│   │   ├── zero-trust/             # Real-time access logs & telemetry dashboard
 │   │   ├── fraud-detection/        # Anomaly detection dashboard
 │   │   └── suppliers/              # Supplier portfolio & baseline statistics
+│   ├── components/
+│   │   └── notifications-popover.tsx # Live PostgreSQL notification popover with tab filters
 │   ├── lib/
 │   │   ├── api.ts                  # Typed API client connecting to FastAPI backend
 │   │   └── auth-context.tsx        # React authentication provider with live backend integration
@@ -89,11 +93,11 @@ cd backend
 # Run the 10-point Developer Acceptance Matrix (T01 to T10)
 uv run pytest tests/test_acceptance_t01_t10.py -v
 
-# Run the full 29-test suite
+# Run the full 78-test suite (100% pass rate)
 uv run pytest tests/ -v
 
 # Run Ruff linter and formatter
-uv run ruff check .
+uv run ruff check . --fix
 uv run ruff format .
 ```
 

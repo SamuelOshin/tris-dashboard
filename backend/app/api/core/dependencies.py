@@ -91,9 +91,30 @@ def require_roles(allowed_roles: list[str]):
         current_user: Annotated[User, Depends(get_current_user)],
     ) -> User:
         if current_user.role.lower() not in [r.lower() for r in allowed_roles]:
+            role_labels = {
+                "admin": "System Administrator",
+                "compliance": "Compliance Lead",
+                "reviewer": "Risk Reviewer",
+                "verifier": "Compliance Verifier",
+                "cfo": "Executive Leadership",
+                "security": "Security Analyst",
+                "procurement": "Procurement Specialist",
+            }
+            readable_roles = [role_labels.get(r.lower(), r.capitalize()) for r in allowed_roles]
+            if len(readable_roles) == 1:
+                roles_str = readable_roles[0]
+            elif len(readable_roles) == 2:
+                roles_str = f"{readable_roles[0]} or {readable_roles[1]}"
+            else:
+                roles_str = f"{', '.join(readable_roles[:-1])}, or {readable_roles[-1]}"
+
+            user_role_label = role_labels.get(
+                current_user.role.lower(), current_user.role.capitalize()
+            )
             raise PermissionDeniedError(
-                f"Role '{current_user.role}' is not authorized for this operation. "
-                f"Required role: {allowed_roles}"
+                f"Access restricted: Your account ({user_role_label}) "
+                f"does not have permission for this operation. "
+                f"This action requires {roles_str} privileges."
             )
         return current_user
 

@@ -35,3 +35,7 @@
 
 7. **[Milestone 1: Technical Assessment & Roadmap](./MILESTONE_1_TECHNICAL_ASSESSMENT.md)**
    - Answers to the 8 pre-development assessment questions, tech debt audit, and step-by-step v1.3 implementation plan.
+
+8. **[Ingestion Engine — Architecture, Resilience & Scale Plan](./INGESTION_ARCHITECTURE_AND_RESILIENCE_PLAN.md)**
+   - *Senior Architect Blueprint for High-Volume, Fault-Isolated Ingestion*
+   - Specifications for asynchronous processing via `BackgroundTasks`, 20% circuit breaker policy, batch PK pre-fetching (eliminating N+1 queries), input sanitization, referential integrity guards, and v1.4 migration path to Redis/`arq`.
