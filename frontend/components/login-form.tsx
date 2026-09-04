@@ -73,13 +73,13 @@ const DEMO_USERS: DemoUser[] = [
 ]
 
 export function LoginForm() {
-  const [email, setEmail] = useState('reviewer@tris.internal')
-  const [password, setPassword] = useState('password123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
   const [error, setError] = useState<{ title: string; message: string } | null>(null)
   const [loading, setLoading] = useState(false)
-  const [activeDemoEmail, setActiveDemoEmail] = useState('reviewer@tris.internal')
+  const [activeDemoEmail, setActiveDemoEmail] = useState<string | null>(null)
   const [showForgotModal, setShowForgotModal] = useState(false)
 
   const { login } = useAuth()
@@ -103,7 +103,7 @@ export function LoginForm() {
       title = 'Connection error'
       message = 'Unable to connect to the authentication server. Please check your network connection.'
     } else if (!message) {
-      message = 'Invalid email or password. Please try again or select a demo account below.'
+      message = 'Invalid email or password. Please check your credentials or select a demo sandbox persona below.'
     }
 
     return { title, message }
@@ -111,6 +111,14 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!email || !password) {
+      setError({
+        title: 'Missing credentials',
+        message: 'Please enter both your email address and password to sign in.',
+      })
+      return
+    }
+
     setError(null)
     setLoading(true)
 
@@ -131,12 +139,23 @@ export function LoginForm() {
     }
   }
 
-  const quickLogin = async (demoUser: DemoUser) => {
+  const selectDemoUser = (demoUser: DemoUser) => {
     setEmail(demoUser.email)
     setPassword(demoUser.password)
     setActiveDemoEmail(demoUser.email)
-    setLoading(true)
     setError(null)
+    toast.info(`Filled credentials for ${demoUser.role}`, {
+      description: 'Click "Sign in" to continue or edit the fields above.',
+    })
+  }
+
+  const quickLoginDemoUser = async (demoUser: DemoUser, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setEmail(demoUser.email)
+    setPassword(demoUser.password)
+    setActiveDemoEmail(demoUser.email)
+    setError(null)
+    setLoading(true)
 
     try {
       await login(demoUser.email, demoUser.password)
@@ -365,6 +384,7 @@ export function LoginForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
+                  autoFocus
                   className="h-11 text-xs sm:text-sm bg-card border-border pr-10 focus-visible:ring-primary"
                   required
                 />
@@ -502,14 +522,24 @@ export function LoginForm() {
             </div>
           </div>
 
-          {/* Quick Role Switcher */}
-          <div className="space-y-3 pt-2">
+          {/* Demo Sandbox Persona Selector */}
+          <div className="rounded-2xl border border-border/70 bg-muted/20 p-3.5 sm:p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-muted-foreground">
-                Demo accounts
-              </p>
-              <span className="text-[11px] text-muted-foreground">Click any role to test</span>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <p className="text-xs font-semibold text-foreground">
+                  Demo Sandbox Personas
+                </p>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
+                  Evaluation Mode
+                </span>
+              </div>
+              <span className="text-[10px] text-muted-foreground hidden sm:inline">Click to auto-fill</span>
             </div>
+
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Select any role to populate credentials and test segregation of duties:
+            </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {DEMO_USERS.map((demoUser) => {
@@ -517,32 +547,51 @@ export function LoginForm() {
                 const isCurrent = activeDemoEmail === demoUser.email
 
                 return (
-                  <button
+                  <div
                     key={demoUser.email}
-                    type="button"
-                    onClick={() => quickLogin(demoUser)}
-                    disabled={loading}
-                    className={`p-2.5 text-left rounded-xl border transition-all text-xs flex items-center gap-3 ${
+                    onClick={() => selectDemoUser(demoUser)}
+                    className={`group p-2.5 rounded-xl border transition-all text-xs flex items-center justify-between gap-2.5 cursor-pointer select-none ${
                       isCurrent
-                        ? 'bg-primary/15 border-primary/50 text-foreground ring-1 ring-primary/30 shadow-xs'
-                        : 'bg-card/50 border-border hover:bg-card hover:border-border/80 text-muted-foreground hover:text-foreground'
+                        ? 'bg-primary/10 border-primary/50 text-foreground ring-1 ring-primary/30 shadow-xs'
+                        : 'bg-card/70 border-border/80 hover:bg-card hover:border-primary/40 text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <p className="font-semibold text-xs text-foreground truncate">{demoUser.role}</p>
-                        {isCurrent && (
-                          <span className="text-[8px] font-mono px-1 rounded bg-primary/20 text-primary">
-                            Selected
-                          </span>
-                        )}
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                          isCurrent
+                            ? 'bg-primary/20 text-primary'
+                            : 'bg-muted/80 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
                       </div>
-                      <p className="text-[10px] text-muted-foreground truncate">{demoUser.title}</p>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-semibold text-xs text-foreground truncate">
+                            {demoUser.role}
+                          </p>
+                          {isCurrent && (
+                            <span className="text-[8px] font-mono px-1 rounded bg-primary/20 text-primary font-bold">
+                              ACTIVE
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground truncate">{demoUser.title}</p>
+                      </div>
                     </div>
-                  </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => quickLoginDemoUser(demoUser, e)}
+                      disabled={loading}
+                      title={`Instant sign in as ${demoUser.role}`}
+                      className="shrink-0 p-1.5 rounded-md hover:bg-primary/15 text-muted-foreground hover:text-primary transition-colors text-[10px] font-medium hidden group-hover:flex items-center gap-0.5"
+                    >
+                      <span>Sign in</span>
+                      <ArrowRight className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
                 )
               })}
             </div>
