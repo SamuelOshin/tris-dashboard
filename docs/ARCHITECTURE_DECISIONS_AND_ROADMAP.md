@@ -139,7 +139,7 @@ erDiagram
         string name "Amount Deviation"
         string description "Invoice exceeds multiplier x supplier historical baseline"
         int weight "35"
-        jsonb threshold_params "{\"multiplier\": 2.0, \"exclude_target\": true}"
+        jsonb threshold_params "multiplier: 2.0, exclude_target: true"
         int rule_version "1"
         boolean is_active "true"
     }
@@ -220,9 +220,9 @@ flowchart TB
     end
 
     Browser <-->|HTTPS / HTML & React Bundles| NextServer
-    Browser <-->|Fetch /api/* (Cookies Included)| Proxy
+    Browser <-->|Fetch /api/* - Cookies Included| Proxy
     Proxy <-->|Internal TLS API Proxy| API
-    CoreEngines <-->|SQLAlchemy 2.0 Async (asyncpg / psycopg)| PG
+    CoreEngines <-->|SQLAlchemy 2.0 Async - asyncpg / psycopg| PG
 ```
 
 ---
@@ -293,9 +293,17 @@ flowchart TD
         R6["R-006: Recurrence Detection<br/>Prior matching exception within 90 days<br/>Triggered: NO (Initial Case)"]
     end
     
-    RulePipeline --> R1 & R2 & R3 & R4 & R5 & R6
+    RulePipeline --> R1
+    RulePipeline --> R2
+    RulePipeline --> R3
+    RulePipeline --> R4
+    RulePipeline --> R5
+    RulePipeline --> R6
     
-    R1 & R2 & R3 & R4 --> Consolidator["Signal Consolidation Engine"]
+    R1 --> Consolidator["Signal Consolidation Engine"]
+    R2 --> Consolidator
+    R3 --> Consolidator
+    R4 --> Consolidator
     
     Consolidator --> ScoreSum["Additive Priority Scoring<br/>Score = 35 + 25 + 25 + 15 = 100"]
     ScoreSum --> Classify{"Score >= 70?"}

@@ -97,9 +97,9 @@ flowchart TB
     end
 
     Browser <-->|HTTPS / HTML & React Bundles| NextServer
-    Browser <-->|Fetch /api/* (Cookies Included)| Proxy
+    Browser <-->|Fetch /api/* - Cookies Included| Proxy
     Proxy <-->|Internal TLS API Proxy| API
-    CoreEngines <-->|SQLAlchemy 2.0 Async (asyncpg / psycopg)| PG
+    CoreEngines <-->|SQLAlchemy 2.0 Async - asyncpg / psycopg| PG
 ```
 
 ---
