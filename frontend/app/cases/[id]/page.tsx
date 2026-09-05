@@ -30,6 +30,9 @@ import {
   Upload,
   Activity,
   Cpu,
+  Clock,
+  Sparkles,
+  Trash2,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
@@ -58,39 +61,25 @@ export default function CaseDetailPage() {
   const [actionLoading, setActionLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  // Investigation form state
-  const [investigationNotes, setInvestigationNotes] = useState(
-    'Reviewed both invoices and related master records in the system. Verified posting dates, approval hierarchies, and vendor master changes.'
-  )
-  const [evidenceReviewed, setEvidenceReviewed] = useState(
-    'Accounts payable invoice record, vendor master bank change audit log, approval threshold policy, and off-hours ERP access logs.'
-  )
-  const [findingDisposition, setFindingDisposition] = useState(
-    'Unusual transaction amount confirmed; invoice lacked required Tier-2 authorization following recent vendor bank routing update.'
-  )
-  const [rootCauseCategory, setRootCauseCategory] = useState('Process Error / Data Entry')
-  const [rootCause, setRootCause] = useState(
-    'Duplicate invoice was entered due to manual data entry error.'
-  )
-  const [supportingEvidence, setSupportingEvidence] = useState('invoice_comparison.png')
+  // Investigation form state — starts clean, populated dynamically from case data or autofill
+  const [investigationNotes, setInvestigationNotes] = useState('')
+  const [evidenceReviewed, setEvidenceReviewed] = useState('')
+  const [findingDisposition, setFindingDisposition] = useState('')
+  const [rootCauseCategory, setRootCauseCategory] = useState('')
+  const [rootCause, setRootCause] = useState('')
+  const [supportingEvidence, setSupportingEvidence] = useState('')
 
-  // Corrective action form state
-  const [actionTaken, setActionTaken] = useState(
-    'Duplicate invoice removed. Payment blocked. Supplier account reviewed.'
-  )
-  const [responsiblePerson, setResponsiblePerson] = useState('Risk Reviewer / Case Owner')
-  const [targetCompletionDate, setTargetCompletionDate] = useState('2026-09-08')
-  const [completionDate, setCompletionDate] = useState('2026-09-06')
-  const [evidenceOfAction, setEvidenceOfAction] = useState('supplier_update.png')
-  const [actionStatus, setActionStatus] = useState('Completed')
-  const [actionComments, setActionComments] = useState(
-    'Duplicate invoice deleted. Confirmed with supplier. No payment made.'
-  )
+  // Corrective action form state — starts clean, populated dynamically from case data or autofill
+  const [actionTaken, setActionTaken] = useState('')
+  const [responsiblePerson, setResponsiblePerson] = useState('')
+  const [targetCompletionDate, setTargetCompletionDate] = useState('')
+  const [completionDate, setCompletionDate] = useState('')
+  const [evidenceOfAction, setEvidenceOfAction] = useState('')
+  const [actionStatus, setActionStatus] = useState('In Progress')
+  const [actionComments, setActionComments] = useState('')
 
   // Closure state & checklist
-  const [closureNotes, setClosureNotes] = useState(
-    'All required actions completed. Evidence verified. Case ready for closure.'
-  )
+  const [closureNotes, setClosureNotes] = useState('')
   const [closureValidationErrors, setClosureValidationErrors] = useState<string[]>([])
 
   // Modal for 8-field closure details
@@ -123,11 +112,75 @@ export default function CaseDetailPage() {
       const data = await api.getCase(caseId)
       setCaseData(data)
 
-      // Initialize form values from case data if present
-      if (data.root_cause) setRootCause(data.root_cause)
-      if (data.corrective_action) setActionTaken(data.corrective_action)
-      if (data.closure_evidence) setSupportingEvidence(data.closure_evidence)
-      if (data.assigned_to) setResponsiblePerson(data.assigned_to)
+      const isCaseClosed = data.status === 'Closed'
+
+      if (isCaseClosed) {
+        // Case is finalized: populate all fields from the database record
+        setRootCause(data.root_cause || '')
+        setActionTaken(data.corrective_action || '')
+        setSupportingEvidence(data.closure_evidence || '')
+        setEvidenceOfAction(data.closure_evidence || '')
+        setResponsiblePerson(data.verified_by || data.assigned_to || 'Risk Reviewer / Case Owner')
+        setCompletionDate(data.closure_date ? data.closure_date.split('T')[0] : '')
+        setTargetCompletionDate(data.closure_date ? data.closure_date.split('T')[0] : '')
+        setActionStatus('Completed')
+        setRootCauseCategory(data.closure_type || 'Process Error / Data Entry')
+        setFindingDisposition(data.root_cause || 'Exception verified and remediated.')
+        setInvestigationNotes(
+          `Case investigated and closed on ${
+            data.closure_date ? new Date(data.closure_date).toLocaleDateString() : 'Sep 06, 2026'
+          }. Finding: ${data.root_cause || 'Documented.'}`
+        )
+        setEvidenceReviewed(
+          data.closure_evidence
+            ? `Primary evidence: ${data.closure_evidence}. Verified accounts payable ledger records.`
+            : 'Accounts payable invoice record, vendor master audit log.'
+        )
+        setActionComments(data.corrective_action || 'Remediation completed. Payment stopped/reconciled.')
+        setClosureNotes(data.follow_up_requirement || 'No further action required. Case validated and closed.')
+      } else {
+        // Case is active (New, Assigned, Under Investigation, Corrective Action, Pending Verification)
+        // Only populate fields that were explicitly saved in the database
+        setRootCause(data.root_cause || '')
+        setActionTaken(data.corrective_action || '')
+        setSupportingEvidence(data.closure_evidence || '')
+        setResponsiblePerson(data.assigned_to || (user?.name || 'Risk Reviewer / Case Owner'))
+        setClosureNotes(data.follow_up_requirement || '')
+        setCompletionDate('')
+        setTargetCompletionDate('')
+        setEvidenceOfAction('')
+        setActionStatus(data.status === 'Corrective Action' ? 'In Progress' : 'In Progress')
+        setInvestigationNotes('')
+        setEvidenceReviewed('')
+        setFindingDisposition('')
+        setRootCauseCategory('')
+        setActionComments('')
+
+        // Check for locally saved draft if available
+        try {
+          const draftKey = `tris_case_draft_${caseId}`
+          const savedDraft = localStorage.getItem(draftKey)
+          if (savedDraft) {
+            const draft = JSON.parse(savedDraft)
+            if (draft.investigationNotes) setInvestigationNotes(draft.investigationNotes)
+            if (draft.evidenceReviewed) setEvidenceReviewed(draft.evidenceReviewed)
+            if (draft.findingDisposition) setFindingDisposition(draft.findingDisposition)
+            if (draft.rootCauseCategory) setRootCauseCategory(draft.rootCauseCategory)
+            if (draft.rootCause && !data.root_cause) setRootCause(draft.rootCause)
+            if (draft.supportingEvidence && !data.closure_evidence) setSupportingEvidence(draft.supportingEvidence)
+            if (draft.actionTaken && !data.corrective_action) setActionTaken(draft.actionTaken)
+            if (draft.responsiblePerson) setResponsiblePerson(draft.responsiblePerson)
+            if (draft.targetCompletionDate) setTargetCompletionDate(draft.targetCompletionDate)
+            if (draft.completionDate) setCompletionDate(draft.completionDate)
+            if (draft.evidenceOfAction) setEvidenceOfAction(draft.evidenceOfAction)
+            if (draft.actionStatus) setActionStatus(draft.actionStatus)
+            if (draft.actionComments) setActionComments(draft.actionComments)
+            if (draft.closureNotes) setClosureNotes(draft.closureNotes)
+          }
+        } catch (e) {
+          // Ignore localStorage errors
+        }
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load case details')
     } finally {
@@ -140,6 +193,117 @@ export default function CaseDetailPage() {
       loadCase()
     }
   }, [caseId])
+
+  // Save drafts in localStorage when active fields change
+  const saveDraftLocally = () => {
+    if (!caseData || caseData.status === 'Closed') return
+    try {
+      const draftKey = `tris_case_draft_${caseId}`
+      const draft = {
+        investigationNotes,
+        evidenceReviewed,
+        findingDisposition,
+        rootCauseCategory,
+        rootCause,
+        supportingEvidence,
+        actionTaken,
+        responsiblePerson,
+        targetCompletionDate,
+        completionDate,
+        evidenceOfAction,
+        actionStatus,
+        actionComments,
+        closureNotes,
+      }
+      localStorage.setItem(draftKey, JSON.stringify(draft))
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  const enrichedSignals = (caseData?.trigger_signals || []).map((s) => enrichSignal(s))
+  const primarySignal = enrichedSignals[0]
+  const isClosed = caseData?.status === 'Closed'
+
+  // Autofill evaluation sample data based on triggered signal context
+  const handleAutofillSample = () => {
+    const primaryRule = primarySignal?.rule_code || 'R-005'
+
+    if (primaryRule === 'R-001' || primaryRule === 'R-002') {
+      // Amount deviation / Bank routing change scenario
+      setEvidenceReviewed(
+        `Accounts payable invoice record for ${caseData?.supplier_id || 'SUP-001'}, vendor master bank change audit log, approval threshold policy, and off-hours ERP access logs.`
+      )
+      setFindingDisposition(
+        `Unusual transaction amount confirmed ($104,000.00 vs $30,471.43 baseline mean = 3.41x deviation). Invoice lacked required Tier-2 authorization following recent vendor bank routing update.`
+      )
+      setRootCauseCategory('Approval Bypass / Threshold Breach')
+      setRootCause(
+        'Invoice was processed above standard authorization threshold without required secondary approval following vendor bank details update.'
+      )
+      setSupportingEvidence('po_threshold_verification.pdf')
+      setActionTaken(
+        'Payment disbursement put on hold. Tier-2 approval requested and obtained retroactively. ERP validation threshold lock enabled.'
+      )
+      setResponsiblePerson(user?.name ? `${user.name} (Risk Reviewer)` : 'Risk Reviewer / Case Owner')
+      setTargetCompletionDate(new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0])
+      setCompletionDate(new Date().toISOString().split('T')[0])
+      setEvidenceOfAction('cfo_authorization_signoff.pdf')
+      setActionStatus('Completed')
+      setActionComments(
+        'Hold confirmed with Treasury. Supplier account verified. Policy controls updated.'
+      )
+      setClosureNotes(
+        'All required dual-authorizations completed. Evidence verified. Case ready for closure.'
+      )
+    } else {
+      // Duplicate invoice / general detection scenario (R-005)
+      setEvidenceReviewed(
+        'Accounts payable invoice record, vendor master bank change audit log, approval threshold policy, and off-hours ERP access logs.'
+      )
+      setFindingDisposition(
+        'Duplicate invoice was entered due to manual data entry error. Two invoices sharing identical invoice number and dollar amount detected.'
+      )
+      setRootCauseCategory('Process Error / Data Entry')
+      setRootCause(
+        'Duplicate invoice was entered due to manual data entry error.'
+      )
+      setSupportingEvidence('invoice_comparison.png')
+      setActionTaken(
+        'Duplicate invoice removed. Payment blocked. Supplier account reviewed.'
+      )
+      setResponsiblePerson(user?.name ? `${user.name} (Risk Reviewer)` : 'Risk Reviewer / Case Owner')
+      setTargetCompletionDate(new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0])
+      setCompletionDate(new Date().toISOString().split('T')[0])
+      setEvidenceOfAction('supplier_update.png')
+      setActionStatus('Completed')
+      setActionComments(
+        'Duplicate invoice deleted. Confirmed with supplier. No payment made.'
+      )
+      setClosureNotes(
+        'All required actions completed. Evidence verified. Case ready for closure.'
+      )
+    }
+    setSuccessMessage('Evaluation sample data loaded into form.')
+  }
+
+  const handleClearForm = () => {
+    setEvidenceReviewed('')
+    setFindingDisposition('')
+    setRootCauseCategory('')
+    setRootCause('')
+    setSupportingEvidence('')
+    setActionTaken('')
+    setEvidenceOfAction('')
+    setActionComments('')
+    setClosureNotes('')
+    setTargetCompletionDate('')
+    setCompletionDate('')
+    try {
+      localStorage.removeItem(`tris_case_draft_${caseId}`)
+    } catch (e) {}
+    setSuccessMessage('Form fields cleared.')
+  }
 
   const handleTransition = async (toStatus: string, extra: Partial<CaseTransitionPayload> = {}) => {
     setActionLoading(true)
@@ -157,6 +321,11 @@ export default function CaseDetailPage() {
       setSuccessMessage(`Case transitioned to ${toStatus} successfully.`)
       setClosureModalOpen(false)
       setReopenModalOpen(false)
+      if (toStatus === 'Closed') {
+        try {
+          localStorage.removeItem(`tris_case_draft_${caseId}`)
+        } catch (e) {}
+      }
     } catch (err: any) {
       setError(err.message || `Failed to transition case to ${toStatus}`)
     } finally {
@@ -171,6 +340,7 @@ export default function CaseDetailPage() {
       assigned_to: ownerName,
       note: `Ownership assigned to ${ownerName}`,
     })
+    setResponsiblePerson(ownerName)
   }
 
   // Start Investigation
@@ -185,13 +355,14 @@ export default function CaseDetailPage() {
   const handleSaveInvestigation = async () => {
     setActionLoading(true)
     setSuccessMessage(null)
+    saveDraftLocally()
     try {
       if (caseData?.status === 'Assigned') {
         await handleTransition('Under Investigation', {
-          note: `Investigation saved. Root cause: ${rootCause} [Category: ${rootCauseCategory}]`,
+          note: `Investigation saved. Root cause: ${rootCause || 'Under Review'} [Category: ${rootCauseCategory || 'Pending'}]`,
         })
       } else {
-        setSuccessMessage('Investigation details saved successfully.')
+        setSuccessMessage('Investigation details saved.')
       }
     } catch (err: any) {
       setError(err.message || 'Failed to save investigation')
@@ -204,13 +375,14 @@ export default function CaseDetailPage() {
   const handleSaveCorrectiveAction = async () => {
     setActionLoading(true)
     setSuccessMessage(null)
+    saveDraftLocally()
     try {
       if (caseData?.status === 'Under Investigation') {
         await handleTransition('Corrective Action', {
           note: `Corrective action recorded: ${actionTaken} | Responsible: ${responsiblePerson}`,
         })
       } else {
-        setSuccessMessage('Corrective action plan saved successfully.')
+        setSuccessMessage('Corrective action plan saved.')
       }
     } catch (err: any) {
       setError(err.message || 'Failed to save corrective action')
@@ -219,7 +391,13 @@ export default function CaseDetailPage() {
     }
   }
 
-  // Validate Closure Checklist
+  // Real-time closure criteria evaluation
+  const hasRootCause = !!(rootCause.trim() || caseData?.root_cause)
+  const hasCorrectiveAction = !!(actionTaken.trim() || caseData?.corrective_action)
+  const hasEvidence = !!(supportingEvidence.trim() || evidenceOfAction.trim() || caseData?.closure_evidence)
+  const isPendingOrClosed = caseData?.status === 'Pending Verification' || isClosed
+
+  // Validate Closure Checklist and Execute
   const executeClosure = async () => {
     setClosureValidationErrors([])
     setError(null)
@@ -228,19 +406,19 @@ export default function CaseDetailPage() {
     const payload = {
       root_cause: rootCause.trim() || caseData?.root_cause || '',
       corrective_action: actionTaken.trim() || caseData?.corrective_action || '',
-      closure_type: closureForm.closure_type || 'Process Error / Remedied',
+      closure_type: rootCauseCategory || closureForm.closure_type || 'Process Error / Remedied',
       closure_evidence: (supportingEvidence.trim() || evidenceOfAction.trim()) || caseData?.closure_evidence || '',
-      verified_by: user?.name || 'Risk Reviewer / Case Owner',
+      verified_by: user?.name ? `${user.name} (Risk Reviewer)` : 'Risk Reviewer / Case Owner',
       closure_date: new Date().toISOString().split('T')[0],
-      follow_up_requirement: closureForm.follow_up_requirement || 'Periodic invoice audit',
+      follow_up_requirement: closureNotes.trim() || closureForm.follow_up_requirement || 'None',
       recurrence_monitoring: 'Enrolled in 90-day monitoring under Rule R-006',
     }
 
     // Verify all 8 fields are non-empty
     const missing: string[] = []
-    if (!payload.root_cause) missing.push('Root cause documented')
-    if (!payload.corrective_action) missing.push('Corrective action completed')
-    if (!payload.closure_evidence) missing.push('Evidence provided')
+    if (!payload.root_cause) missing.push('Root cause documented (Investigation tab)')
+    if (!payload.corrective_action) missing.push('Corrective action completed (Corrective Action tab)')
+    if (!payload.closure_evidence) missing.push('Evidence provided (Attachment required)')
     if (!payload.verified_by) missing.push('Verified by (Reviewer identity)')
     if (!payload.closure_date) missing.push('Closure date')
     if (!payload.follow_up_requirement) missing.push('Follow-up requirement')
@@ -248,7 +426,7 @@ export default function CaseDetailPage() {
 
     if (missing.length > 0) {
       setClosureValidationErrors(missing)
-      setError(`Closure blocked: missing mandatory fields [${missing.join(', ')}]`)
+      setError(`Closure blocked: missing mandatory criteria`)
       return
     }
 
@@ -259,16 +437,19 @@ export default function CaseDetailPage() {
         await api.transitionCase(caseId, {
           to_status: 'Pending Verification',
           actor: user?.name || 'Risk Reviewer / Case Owner',
-          note: 'Submitted for system-validated closure',
+          note: 'Submitted for system-validated closure sign-off',
         })
       }
       const closed = await api.transitionCase(caseId, {
         to_status: 'Closed',
         actor: user?.name || 'Risk Reviewer / Case Owner',
-        note: 'System-validated closure completed',
+        note: `System-validated closure completed by ${user?.name || 'Risk Reviewer'}. Evidence: ${payload.closure_evidence}`,
         ...payload,
       })
       setCaseData(closed)
+      try {
+        localStorage.removeItem(`tris_case_draft_${caseId}`)
+      } catch (e) {}
       setSuccessMessage('Case successfully closed and verified by TRIS.')
     } catch (err: any) {
       setError(err.message || 'System-validated closure failed')
@@ -321,11 +502,7 @@ export default function CaseDetailPage() {
 
   if (!caseData) return null
 
-  const enrichedSignals = (caseData.trigger_signals || []).map((s) => enrichSignal(s))
-  const primarySignal = enrichedSignals[0]
-  const isClosed = caseData.status === 'Closed'
-
-  // Determine priority color
+  // Determine priority badge color
   const priorityBadgeColor =
     caseData.priority?.toLowerCase() === 'high'
       ? 'bg-rose-500 text-white'
@@ -354,7 +531,7 @@ export default function CaseDetailPage() {
     >
       <div className="space-y-4 max-w-6xl">
         {/* ========================================================================= */}
-        {/* HEADER BAR: Case Title, Subtitle, Priority, Status Dropdown / Buttons */}
+        {/* HEADER BAR: Case Title, Priority, Status Dropdown / Action Buttons        */}
         {/* ========================================================================= */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
           <div>
@@ -373,15 +550,15 @@ export default function CaseDetailPage() {
                 {caseData.priority} Priority
               </span>
               <span className={`px-3 py-1 rounded text-xs font-medium border ${statusBadgeColor}`}>
-                Status: {isClosed ? 'Closed' : caseData.status === 'New' ? 'Open' : caseData.status === 'Pending Verification' ? 'Pending Closure' : 'In Progress'}
+                Status: {isClosed ? 'Closed' : caseData.status === 'New' ? 'Open' : caseData.status === 'Pending Verification' ? 'Pending Closure' : caseData.status}
               </span>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1 ml-9">
-              {primarySignal?.rule_name || (caseData as any).rule_description || 'Duplicate invoice detected'}
+              {primarySignal?.rule_name || (caseData as any).rule_description || 'Risk exception detected'}
             </p>
           </div>
 
-          {/* Quick Actions */}
+          {/* Quick Actions in Header */}
           <div className="flex items-center gap-2">
             {!caseData.assigned_to && caseData.status === 'New' && (
               <Button
@@ -399,7 +576,7 @@ export default function CaseDetailPage() {
                 size="sm"
                 onClick={handleStartInvestigation}
                 disabled={actionLoading}
-                className="text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
               >
                 Begin Investigation
               </Button>
@@ -434,7 +611,7 @@ export default function CaseDetailPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* HORIZONTAL TAB NAVIGATION (Wireframe layout) */}
+        {/* HORIZONTAL TAB NAVIGATION (Wireframe 6 Tabs Layout)                       */}
         {/* ========================================================================= */}
         <div className="flex border-b border-border/80 overflow-x-auto gap-1">
           {TABS.map((tab) => {
@@ -456,46 +633,47 @@ export default function CaseDetailPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* TAB 1: OVERVIEW */}
+        {/* TAB 1: OVERVIEW                                                           */}
         {/* ========================================================================= */}
         {activeTab === 'overview' && (
           <div className="space-y-6 pt-2">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Column: Case Summary */}
+              {/* Left Column: Case Details & Supplier Baseline */}
               <div className="space-y-4">
                 <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-4">
-                  <h2 className="text-sm font-bold text-foreground">Case Summary</h2>
+                  <div className="flex items-center justify-between pb-3 border-b border-border/50">
+                    <h2 className="text-sm font-bold text-foreground">Case Details</h2>
+                    <span className="text-[11px] font-mono text-muted-foreground">ID: {caseData.case_id}</span>
+                  </div>
 
-                  <div className="space-y-2.5 text-xs divide-y divide-border/40">
-                    <div className="flex justify-between items-center pt-1">
+                  <div className="space-y-3 text-xs divide-y divide-border/40">
+                    <div className="flex justify-between items-center pt-2">
                       <span className="text-muted-foreground font-medium">Case ID</span>
                       <span className="font-mono font-bold text-foreground">{caseData.case_id}</span>
                     </div>
 
                     <div className="flex justify-between items-center pt-2">
-                      <span className="text-muted-foreground font-medium">Rule</span>
-                      <span className="text-foreground font-medium text-right">
-                        {primarySignal?.rule_name || (caseData as any).rule_description || 'Duplicate invoice detected'}
+                      <span className="text-muted-foreground font-medium">Triggered Rule</span>
+                      <span className="font-semibold text-foreground text-right max-w-[240px] truncate">
+                        {primarySignal?.rule_code ? `${primarySignal.rule_code}: ${primarySignal.rule_name}` : 'Duplicate invoice detected (R-005)'}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center pt-2">
                       <span className="text-muted-foreground font-medium">Priority</span>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${priorityBadgeColor}`}>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${priorityBadgeColor}`}>
                         {caseData.priority}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center pt-2">
                       <span className="text-muted-foreground font-medium">Status</span>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${statusBadgeColor}`}>
-                        {isClosed ? 'Closed' : caseData.status === 'New' ? 'Open' : caseData.status === 'Pending Verification' ? 'Pending Closure' : 'In Progress'}
-                      </span>
+                      <span className="font-semibold text-foreground">{caseData.status}</span>
                     </div>
 
                     <div className="flex justify-between items-center pt-2">
                       <span className="text-muted-foreground font-medium">Owner</span>
-                      <span className="text-foreground font-medium">
+                      <span className="font-mono font-medium text-foreground">
                         {caseData.assigned_to || (
                           <button
                             onClick={handleAcceptCase}
@@ -538,7 +716,7 @@ export default function CaseDetailPage() {
                   </div>
                 </Card>
 
-                {/* Supplier Historical Baseline Card (Image 1 Requirement) */}
+                {/* Supplier Historical Baseline Card */}
                 <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
@@ -583,10 +761,10 @@ export default function CaseDetailPage() {
 
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {primarySignal?.explanation ||
-                      'Two invoices with the same invoice number and amount were detected for the same supplier within a short time period.'}
+                      'Automated risk detection rules identified an operational or financial anomaly requiring review.'}
                   </p>
 
-                  {/* Multi-Signal Breakdown (Image 2 & 3: R-001 to R-004 breakdown) */}
+                  {/* Multi-Signal Breakdown */}
                   <div className="space-y-2 pt-2 border-t border-border/50">
                     <p className="text-xs font-bold text-foreground">Triggered Detection Rules</p>
                     <div className="space-y-2">
@@ -633,7 +811,7 @@ export default function CaseDetailPage() {
                   </div>
                 </Card>
 
-                {/* Final Closed Case View Card (Screen 9) */}
+                {/* Final Closed Case View Card */}
                 {isClosed && (
                   <Card className="p-5 bg-emerald-500/5 border border-emerald-500/30 rounded-xl space-y-3">
                     <div className="flex items-center gap-3">
@@ -641,9 +819,9 @@ export default function CaseDetailPage() {
                         <CheckCircle2 className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-foreground">Case Closed</h3>
+                        <h3 className="text-sm font-bold text-foreground">Case Closed &amp; Verified</h3>
                         <p className="text-xs text-muted-foreground">
-                          All required actions completed and verified. This case is now closed.
+                          All required actions completed and verified by TRIS.
                         </p>
                       </div>
                     </div>
@@ -651,10 +829,10 @@ export default function CaseDetailPage() {
                     <div className="pt-2 border-t border-emerald-500/20 text-xs space-y-1.5">
                       <p className="font-semibold text-foreground">Outcome</p>
                       <ul className="text-muted-foreground space-y-1 pl-4 list-disc">
-                        <li>Duplicate invoice removed</li>
-                        <li>Payment blocked</li>
-                        <li>Supplier account reviewed</li>
-                        <li>No recurrence detected to date</li>
+                        <li>{caseData.corrective_action || 'Remediation completed'}</li>
+                        <li>Root cause: {caseData.root_cause || 'Documented and addressed'}</li>
+                        <li>Evidence on file: {caseData.closure_evidence || 'Audit verification log'}</li>
+                        <li>Enrolled in 90-day recurrence monitoring (Rule R-006)</li>
                       </ul>
                     </div>
 
@@ -673,17 +851,79 @@ export default function CaseDetailPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 2: INVESTIGATION */}
+        {/* TAB 2: INVESTIGATION                                                      */}
         {/* ========================================================================= */}
         {activeTab === 'investigation' && (
           <div className="space-y-6 pt-2">
             <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-5 max-w-3xl">
-              <div>
-                <h2 className="text-sm font-bold text-foreground">Investigation Details</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Record findings, review evidence, classify root cause, and attach supporting documentation.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/50">
+                <div>
+                  <h2 className="text-sm font-bold text-foreground">Investigation Details</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Record findings, review evidence, classify root cause, and attach supporting documentation.
+                  </p>
+                </div>
+                {!isClosed && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearForm}
+                      className="text-xs text-muted-foreground hover:text-foreground h-8 px-2"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-1" />
+                      Clear
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAutofillSample}
+                      className="text-xs h-8 text-primary border-primary/30 hover:bg-primary/10"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
+                      Autofill Sample
+                    </Button>
+                  </div>
+                )}
               </div>
+
+              {/* Lifecycle Stage Alert */}
+              {caseData.status === 'New' && (
+                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>
+                      <strong>Case Unassigned:</strong> Accept ownership in the Overview tab or click &quot;Accept Case&quot; to assign yourself before proceeding.
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={handleAcceptCase}
+                    disabled={actionLoading}
+                    className="text-xs bg-amber-600 hover:bg-amber-700 text-white shrink-0 font-medium"
+                  >
+                    Accept Case
+                  </Button>
+                </div>
+              )}
+
+              {caseData.status === 'Assigned' && (
+                <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-800 dark:text-blue-300 text-xs flex items-center gap-2">
+                  <Search className="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                  <span>
+                    <strong>Ready for Investigation:</strong> Document your findings below. Clicking &quot;Save Changes&quot; will advance the case to <strong>Under Investigation</strong>.
+                  </span>
+                </div>
+              )}
+
+              {isClosed && (
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>
+                    <strong>Investigation Finalized:</strong> Case is closed. Investigation findings and root-cause classification are permanently preserved in the audit log.
+                  </span>
+                </div>
+              )}
 
               <div className="space-y-4 text-xs">
                 {/* Evidence Reviewed */}
@@ -692,9 +932,13 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={evidenceReviewed}
-                    onChange={(e) => setEvidenceReviewed(e.target.value)}
-                    placeholder="Accounts payable invoice record, vendor master bank change audit log..."
-                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                    disabled={isClosed}
+                    onChange={(e) => {
+                      setEvidenceReviewed(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    placeholder="Enter records examined (e.g. accounts payable ledger, vendor master bank change log, approval hierarchy)..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed disabled:opacity-75 disabled:bg-muted/20"
                   />
                 </div>
 
@@ -704,122 +948,242 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={findingDisposition}
-                    onChange={(e) => setFindingDisposition(e.target.value)}
-                    placeholder="Document forensic findings and disposition..."
-                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                    disabled={isClosed}
+                    onChange={(e) => {
+                      setFindingDisposition(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    placeholder="Enter specific finding (e.g. duplicate invoice entered due to manual data entry error; or unusual amount confirmed without approval)..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed disabled:opacity-75 disabled:bg-muted/20"
                   />
                 </div>
 
-                {/* Root Cause Category */}
+                {/* Root-Cause Category */}
                 <div className="space-y-1.5">
                   <label className="font-semibold text-foreground">Root-Cause Category</label>
                   <select
                     value={rootCauseCategory}
-                    onChange={(e) => setRootCauseCategory(e.target.value)}
-                    className="w-full h-9 px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    disabled={isClosed}
+                    onChange={(e) => {
+                      setRootCauseCategory(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    className="w-full h-9 px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-75 disabled:bg-muted/20"
                   >
+                    <option value="">Select Root-Cause Category...</option>
                     <option value="Process Error / Data Entry">Process Error / Data Entry</option>
-                    <option value="Internal Control Bypass">Internal Control Bypass</option>
-                    <option value="Unauthorized Vendor Master Change">Unauthorized Vendor Master Change</option>
-                    <option value="System Integration Glitch">System Integration Glitch</option>
-                    <option value="Supplier Account Compromise">Supplier Account Compromise</option>
+                    <option value="Approval Bypass / Threshold Breach">Approval Bypass / Threshold Breach</option>
+                    <option value="Bank Routing / Vendor Tampering">Bank Routing / Vendor Tampering</option>
+                    <option value="System / Integration Glitch">System / Integration Glitch</option>
+                    <option value="Authorized Legitimate Exception">Authorized Legitimate Exception</option>
                   </select>
                 </div>
 
-                {/* Investigation Notes */}
+                {/* Root Cause Explanation */}
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-foreground">Investigation Notes</label>
-                  <textarea
-                    rows={3}
-                    value={investigationNotes}
-                    onChange={(e) => setInvestigationNotes(e.target.value)}
-                    placeholder="Reviewed both invoices in the system..."
-                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
-                  />
-                </div>
-
-                {/* Root Cause Notes */}
-                <div className="space-y-1.5">
-                  <label className="font-semibold text-foreground">Root Cause Explanation</label>
+                  <label className="font-semibold text-foreground">
+                    Root Cause Explanation <span className="text-destructive">*</span>
+                  </label>
                   <textarea
                     rows={2}
                     value={rootCause}
-                    onChange={(e) => setRootCause(e.target.value)}
-                    placeholder="Enter identified root cause..."
-                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                    disabled={isClosed}
+                    onChange={(e) => {
+                      setRootCause(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    placeholder="Detail the underlying operational or technical cause of this risk exception..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed disabled:opacity-75 disabled:bg-muted/20"
                   />
                 </div>
 
-                {/* Supporting Evidence File Preview */}
+                {/* Supporting Evidence Attachment */}
                 <div className="space-y-1.5">
                   <label className="font-semibold text-foreground">Supporting Evidence</label>
                   {supportingEvidence ? (
                     <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded bg-blue-500/10 text-blue-600 flex items-center justify-center font-mono font-bold text-xs">
-                          D
+                          E
                         </div>
                         <div>
                           <p className="font-medium font-mono text-foreground">{supportingEvidence}</p>
-                          <p className="text-[10px] text-muted-foreground">Uploaded Sep 06, 2026</p>
+                          <p className="text-[10px] text-muted-foreground">Document verified</p>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSupportingEvidence('')}
-                        className="text-xs text-muted-foreground hover:text-destructive h-7 px-2"
-                      >
-                        Remove
-                      </Button>
+                      {!isClosed && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSupportingEvidence('')
+                            saveDraftLocally()
+                          }}
+                          className="text-xs text-muted-foreground hover:text-destructive h-7 px-2"
+                        >
+                          Remove
+                        </Button>
+                      )}
                     </div>
                   ) : (
-                    <div className="p-4 border-2 border-dashed border-border rounded-lg text-center space-y-1 cursor-pointer hover:border-primary/50"
-                         onClick={() => setSupportingEvidence('invoice_comparison.png')}>
+                    <div
+                      className="p-4 border-2 border-dashed border-border rounded-lg text-center space-y-1 cursor-pointer hover:border-primary/50 transition-colors"
+                      onClick={() => {
+                        if (!isClosed) {
+                          setSupportingEvidence('invoice_comparison.png')
+                          saveDraftLocally()
+                        }
+                      }}
+                    >
                       <Upload className="w-4 h-4 mx-auto text-muted-foreground" />
-                      <p className="text-[11px] text-muted-foreground">Click to attach evidence file (e.g. invoice_comparison.png)</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Click to attach evidence file (e.g. invoice_comparison.png or audit_log.pdf)
+                      </p>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-2 flex justify-end">
-                  <Button
-                    size="sm"
-                    onClick={handleSaveInvestigation}
-                    disabled={actionLoading}
-                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
-                  >
-                    Save Changes
-                  </Button>
-                </div>
+                {/* Actions */}
+                {!isClosed && (
+                  <div className="pt-2 flex justify-end">
+                    <Button
+                      size="sm"
+                      onClick={handleSaveInvestigation}
+                      disabled={actionLoading}
+                      className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                    >
+                      {actionLoading ? 'Saving...' : caseData.status === 'Assigned' ? 'Save & Begin Investigation' : 'Save Changes'}
+                    </Button>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 3: CORRECTIVE ACTION */}
+        {/* TAB 3: CORRECTIVE ACTION                                                  */}
         {/* ========================================================================= */}
         {activeTab === 'corrective-action' && (
           <div className="space-y-6 pt-2">
             <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-5 max-w-3xl">
-              <div>
-                <h2 className="text-sm font-bold text-foreground">Corrective Action Plan</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Specify remedial actions, responsible personnel, and verifiable completion dates.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/50">
+                <div>
+                  <h2 className="text-sm font-bold text-foreground">Corrective Action Plan</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Specify remedial actions, responsible personnel, and verifiable completion dates.
+                  </p>
+                </div>
+                {!isClosed && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearForm}
+                      className="text-xs text-muted-foreground hover:text-foreground h-8 px-2"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-1" />
+                      Clear
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAutofillSample}
+                      className="text-xs h-8 text-primary border-primary/30 hover:bg-primary/10"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
+                      Autofill Sample
+                    </Button>
+                  </div>
+                )}
               </div>
+
+              {/* Lifecycle Stage Alert */}
+              {(caseData.status === 'New' || caseData.status === 'Assigned') && (
+                <div className="p-3.5 rounded-xl bg-slate-500/10 border border-border text-xs text-muted-foreground flex items-center gap-2">
+                  <Clock className="w-4 h-4 shrink-0" />
+                  <span>
+                    <strong>Pending Investigation:</strong> Complete the initial investigation and root-cause classification before formulating corrective action.
+                  </span>
+                </div>
+              )}
+
+              {caseData.status === 'Under Investigation' && (
+                <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-800 dark:text-blue-300 text-xs flex items-center gap-2">
+                  <Wrench className="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                  <span>
+                    <strong>Define Remediation Plan:</strong> Document the corrective action taken. Clicking &quot;Save Changes&quot; will advance the case to <strong>Corrective Action</strong>.
+                  </span>
+                </div>
+              )}
+
+              {caseData.status === 'Corrective Action' && (
+                <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-800 dark:text-purple-300 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 shrink-0 text-purple-600 dark:text-purple-400" />
+                    <span>
+                      <strong>Remediation Active:</strong> Once actions are executed and evidence attached, submit for verification.
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={async () => {
+                      await handleTransition('Pending Verification', {
+                        note: `Corrective action verified. Submitted for closure sign-off: ${actionTaken}`,
+                      })
+                      setActiveTab('closure')
+                    }}
+                    disabled={actionLoading || !actionTaken.trim()}
+                    className="text-xs bg-purple-600 hover:bg-purple-700 text-white shrink-0 font-medium"
+                  >
+                    Submit for Verification →
+                  </Button>
+                </div>
+              )}
+
+              {caseData.status === 'Pending Verification' && (
+                <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-800 dark:text-sky-300 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <FileCheck2 className="w-4 h-4 shrink-0 text-sky-600 dark:text-sky-400" />
+                    <span>
+                      <strong>Submitted for Verification:</strong> Ready for closure sign-off. Proceed to the Closure tab to complete validation.
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => setActiveTab('closure')}
+                    className="text-xs bg-sky-600 hover:bg-sky-700 text-white shrink-0 font-medium"
+                  >
+                    Go to Closure Tab →
+                  </Button>
+                </div>
+              )}
+
+              {isClosed && (
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>
+                    <strong>Remediation Verified:</strong> All corrective actions have been completed, verified with evidence, and closed.
+                  </span>
+                </div>
+              )}
 
               <div className="space-y-4 text-xs">
                 {/* Action Taken */}
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-foreground">Action Taken</label>
+                  <label className="font-semibold text-foreground">
+                    Action Taken <span className="text-destructive">*</span>
+                  </label>
                   <textarea
                     rows={2}
                     value={actionTaken}
-                    onChange={(e) => setActionTaken(e.target.value)}
-                    placeholder="Duplicate invoice removed. Payment blocked. Supplier account reviewed."
-                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                    disabled={isClosed}
+                    onChange={(e) => {
+                      setActionTaken(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    placeholder="Enter remedial actions taken (e.g. duplicate invoice deleted, payment blocked, supplier master record updated)..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed disabled:opacity-75 disabled:bg-muted/20"
                   />
                 </div>
 
@@ -828,8 +1192,13 @@ export default function CaseDetailPage() {
                   <label className="font-semibold text-foreground">Responsible Person / Function</label>
                   <Input
                     value={responsiblePerson}
-                    onChange={(e) => setResponsiblePerson(e.target.value)}
-                    className="h-9 text-xs bg-card"
+                    disabled={isClosed}
+                    placeholder="e.g. Risk Reviewer / Case Owner"
+                    onChange={(e) => {
+                      setResponsiblePerson(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    className="h-9 text-xs bg-card disabled:opacity-75 disabled:bg-muted/20"
                   />
                 </div>
 
@@ -840,8 +1209,12 @@ export default function CaseDetailPage() {
                     <Input
                       type="date"
                       value={targetCompletionDate}
-                      onChange={(e) => setTargetCompletionDate(e.target.value)}
-                      className="h-9 text-xs bg-card font-mono"
+                      disabled={isClosed}
+                      onChange={(e) => {
+                        setTargetCompletionDate(e.target.value)
+                        saveDraftLocally()
+                      }}
+                      className="h-9 text-xs bg-card font-mono disabled:opacity-75 disabled:bg-muted/20"
                     />
                   </div>
 
@@ -851,8 +1224,12 @@ export default function CaseDetailPage() {
                     <Input
                       type="date"
                       value={completionDate}
-                      onChange={(e) => setCompletionDate(e.target.value)}
-                      className="h-9 text-xs bg-card font-mono"
+                      disabled={isClosed}
+                      onChange={(e) => {
+                        setCompletionDate(e.target.value)
+                        saveDraftLocally()
+                      }}
+                      className="h-9 text-xs bg-card font-mono disabled:opacity-75 disabled:bg-muted/20"
                     />
                   </div>
                 </div>
@@ -868,23 +1245,37 @@ export default function CaseDetailPage() {
                         </div>
                         <div>
                           <p className="font-medium font-mono text-foreground">{evidenceOfAction}</p>
-                          <p className="text-[10px] text-muted-foreground">Uploaded Sep 06, 2026</p>
+                          <p className="text-[10px] text-muted-foreground">Attached evidence document</p>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEvidenceOfAction('')}
-                        className="text-xs text-muted-foreground hover:text-destructive h-7 px-2"
-                      >
-                        Remove
-                      </Button>
+                      {!isClosed && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEvidenceOfAction('')
+                            saveDraftLocally()
+                          }}
+                          className="text-xs text-muted-foreground hover:text-destructive h-7 px-2"
+                        >
+                          Remove
+                        </Button>
+                      )}
                     </div>
                   ) : (
-                    <div className="p-4 border-2 border-dashed border-border rounded-lg text-center space-y-1 cursor-pointer hover:border-primary/50"
-                         onClick={() => setEvidenceOfAction('supplier_update.png')}>
+                    <div
+                      className="p-4 border-2 border-dashed border-border rounded-lg text-center space-y-1 cursor-pointer hover:border-primary/50 transition-colors"
+                      onClick={() => {
+                        if (!isClosed) {
+                          setEvidenceOfAction('supplier_update.png')
+                          saveDraftLocally()
+                        }
+                      }}
+                    >
                       <Upload className="w-4 h-4 mx-auto text-muted-foreground" />
-                      <p className="text-[11px] text-muted-foreground">Click to attach evidence file (e.g. supplier_update.png)</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Click to attach remediation proof (e.g. supplier_update.png or hold_notice.pdf)
+                      </p>
                     </div>
                   )}
                 </div>
@@ -894,8 +1285,12 @@ export default function CaseDetailPage() {
                   <label className="font-semibold text-foreground">Current Status</label>
                   <select
                     value={actionStatus}
-                    onChange={(e) => setActionStatus(e.target.value)}
-                    className="w-full h-9 px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    disabled={isClosed}
+                    onChange={(e) => {
+                      setActionStatus(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    className="w-full h-9 px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-75 disabled:bg-muted/20"
                   >
                     <option value="In Progress">In Progress</option>
                     <option value="Completed">Completed</option>
@@ -909,29 +1304,35 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={actionComments}
-                    onChange={(e) => setActionComments(e.target.value)}
-                    placeholder="Duplicate invoice deleted. Confirmed with supplier. No payment made."
-                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                    disabled={isClosed}
+                    onChange={(e) => {
+                      setActionComments(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    placeholder="Enter summary comments on remediation result..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed disabled:opacity-75 disabled:bg-muted/20"
                   />
                 </div>
 
-                <div className="pt-2 flex justify-end">
-                  <Button
-                    size="sm"
-                    onClick={handleSaveCorrectiveAction}
-                    disabled={actionLoading}
-                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
-                  >
-                    Save Changes
-                  </Button>
-                </div>
+                {!isClosed && (
+                  <div className="pt-2 flex justify-end">
+                    <Button
+                      size="sm"
+                      onClick={handleSaveCorrectiveAction}
+                      disabled={actionLoading}
+                      className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                    >
+                      {actionLoading ? 'Saving...' : caseData.status === 'Under Investigation' ? 'Save & Advance to Corrective Action' : 'Save Changes'}
+                    </Button>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 4: CLOSURE */}
+        {/* TAB 4: CLOSURE                                                            */}
         {/* ========================================================================= */}
         {activeTab === 'closure' && (
           <div className="space-y-6 pt-2">
@@ -943,7 +1344,7 @@ export default function CaseDetailPage() {
                 </p>
               </div>
 
-              {/* Closure Validation Errors Alert (Wireframe Screen 6 / E2E-05) */}
+              {/* Closure Validation Errors Alert */}
               {closureValidationErrors.length > 0 && (
                 <div className="p-4 rounded-xl bg-destructive/10 text-destructive border border-destructive/20 text-xs space-y-1.5">
                   <p className="font-semibold flex items-center gap-1.5">
@@ -959,61 +1360,108 @@ export default function CaseDetailPage() {
               )}
 
               <div className="space-y-4 text-xs">
-                {/* Closure Validation Checkboxes (Screen 6) */}
+                {/* Dynamic Real-Time Closure Validation Checklist */}
                 <div className="space-y-2.5 p-4 rounded-xl bg-muted/20 border border-border/60">
-                  <span className="font-bold text-foreground text-xs block">Closure Validation</span>
-
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!rootCause.trim()}
-                      onChange={() => {}}
-                      readOnly
-                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
-                    />
-                    <span className={rootCause.trim() ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-                      Root cause documented
+                  <div className="flex items-center justify-between pb-1 border-b border-border/40">
+                    <span className="font-bold text-foreground text-xs block">Closure Validation Checklist</span>
+                    <span className="font-mono text-[11px] text-muted-foreground">
+                      {[hasRootCause, hasCorrectiveAction, hasEvidence, isPendingOrClosed].filter(Boolean).length} of 4 Satisfied
                     </span>
-                  </label>
+                  </div>
 
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!actionTaken.trim()}
-                      onChange={() => {}}
-                      readOnly
-                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
-                    />
-                    <span className={actionTaken.trim() ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-                      Corrective action completed
+                  {/* 1. Root Cause */}
+                  <div className="flex items-center justify-between py-1">
+                    <label className="flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        checked={hasRootCause}
+                        readOnly
+                        className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
+                      />
+                      <span className={hasRootCause ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                        Root cause documented
+                      </span>
+                    </label>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      {hasRootCause ? (
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Documented</span>
+                      ) : (
+                        <button onClick={() => setActiveTab('investigation')} className="text-primary hover:underline">
+                          Required in Investigation →
+                        </button>
+                      )}
                     </span>
-                  </label>
+                  </div>
 
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!(supportingEvidence || evidenceOfAction)}
-                      onChange={() => {}}
-                      readOnly
-                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
-                    />
-                    <span className={(supportingEvidence || evidenceOfAction) ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-                      Evidence provided
+                  {/* 2. Corrective Action */}
+                  <div className="flex items-center justify-between py-1">
+                    <label className="flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        checked={hasCorrectiveAction}
+                        readOnly
+                        className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
+                      />
+                      <span className={hasCorrectiveAction ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                        Corrective action completed
+                      </span>
+                    </label>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      {hasCorrectiveAction ? (
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Action Recorded</span>
+                      ) : (
+                        <button onClick={() => setActiveTab('corrective-action')} className="text-primary hover:underline">
+                          Required in Corrective Action →
+                        </button>
+                      )}
                     </span>
-                  </label>
+                  </div>
 
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={true}
-                      onChange={() => {}}
-                      readOnly
-                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
-                    />
-                    <span className="text-foreground font-medium">
-                      No further action required
+                  {/* 3. Evidence */}
+                  <div className="flex items-center justify-between py-1">
+                    <label className="flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        checked={hasEvidence}
+                        readOnly
+                        className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
+                      />
+                      <span className={hasEvidence ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                        Evidence provided
+                      </span>
+                    </label>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      {hasEvidence ? (
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold truncate max-w-[150px] inline-block">
+                          ✓ {supportingEvidence || evidenceOfAction || caseData.closure_evidence}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">Attachment required</span>
+                      )}
                     </span>
-                  </label>
+                  </div>
+
+                  {/* 4. Verification Gate Precondition */}
+                  <div className="flex items-center justify-between py-1">
+                    <label className="flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        checked={isPendingOrClosed}
+                        readOnly
+                        className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
+                      />
+                      <span className={isPendingOrClosed ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                        Verification gate active (Pending Verification)
+                      </span>
+                    </label>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      {isPendingOrClosed ? (
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Active</span>
+                      ) : (
+                        <span className="text-amber-600 dark:text-amber-400">Current: {caseData.status}</span>
+                      )}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Closure Notes */}
@@ -1022,29 +1470,70 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={closureNotes}
-                    onChange={(e) => setClosureNotes(e.target.value)}
-                    placeholder="All required actions completed. Evidence verified. Case ready for closure."
-                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                    disabled={isClosed}
+                    onChange={(e) => {
+                      setClosureNotes(e.target.value)
+                      saveDraftLocally()
+                    }}
+                    placeholder="Enter closure confirmation notes and follow-up requirements..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed disabled:opacity-75 disabled:bg-muted/20"
                   />
                 </div>
 
-                {/* Close Case Button */}
-                <div className="pt-2 flex items-center justify-between">
-                  <span className="font-semibold text-foreground">Close Case</span>
-                  {isClosed ? (
-                    <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20 text-xs">
-                      Case Closed &amp; Verified
-                    </span>
-                  ) : (
-                    <Button
-                      size="sm"
-                      onClick={executeClosure}
-                      disabled={actionLoading}
-                      className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4"
-                    >
-                      {actionLoading ? 'Validating Closure...' : 'Mark as Closed'}
-                    </Button>
-                  )}
+                {/* Close Case Button Area */}
+                <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-border/60">
+                  <div>
+                    <span className="font-semibold text-foreground text-xs block">Close Case</span>
+                    <p className="text-[11px] text-muted-foreground">
+                      {isClosed
+                        ? 'Case has completed system-validated closure.'
+                        : caseData.status === 'Pending Verification'
+                          ? 'All 8 mandatory closure criteria will be validated upon submission.'
+                          : caseData.status === 'Corrective Action'
+                            ? 'Advance case to Pending Verification once remediation is completed.'
+                            : 'Case must progress through investigation and corrective action before closing.'}
+                    </p>
+                  </div>
+
+                  <div>
+                    {isClosed ? (
+                      <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20 text-xs flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Case Closed &amp; Verified
+                      </span>
+                    ) : caseData.status === 'Pending Verification' ? (
+                      <Button
+                        size="sm"
+                        onClick={executeClosure}
+                        disabled={actionLoading || !hasRootCause || !hasCorrectiveAction || !hasEvidence}
+                        className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4"
+                      >
+                        {actionLoading ? 'Validating Closure...' : 'Mark as Closed'}
+                      </Button>
+                    ) : caseData.status === 'Corrective Action' ? (
+                      <Button
+                        size="sm"
+                        onClick={async () => {
+                          await handleTransition('Pending Verification', {
+                            note: 'Remediation completed. Advanced to Pending Verification.',
+                          })
+                        }}
+                        disabled={actionLoading || !hasCorrectiveAction}
+                        className="text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4"
+                      >
+                        {actionLoading ? 'Transitioning...' : 'Advance to Pending Verification →'}
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        disabled
+                        variant="outline"
+                        className="text-xs text-muted-foreground cursor-not-allowed"
+                      >
+                        Closure Locked (Follow Workflow)
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </Card>
@@ -1052,7 +1541,7 @@ export default function CaseDetailPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 5: CASE TIMELINE / HISTORY */}
+        {/* TAB 5: CASE TIMELINE / HISTORY                                            */}
         {/* ========================================================================= */}
         {activeTab === 'history' && (
           <div className="space-y-6 pt-2">
@@ -1068,16 +1557,20 @@ export default function CaseDetailPage() {
                 </button>
               </div>
 
-              {/* Chronological Vertical Timeline (matching Wireframe Screen 7) */}
+              {/* Chronological Vertical Timeline */}
               <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border/60">
                 {/* 1. Case Created */}
                 <div className="relative space-y-1 text-xs">
                   <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-card" />
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-muted-foreground text-[11px]">Sep 05, 2026 10:15</span>
+                    <span className="font-mono text-muted-foreground text-[11px]">
+                      {caseData.created_at ? new Date(caseData.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Sep 05, 2026 10:15'}
+                    </span>
                   </div>
                   <p className="font-bold text-foreground">Case created by TRIS</p>
-                  <p className="text-muted-foreground">Duplicate invoice detected</p>
+                  <p className="text-muted-foreground">
+                    {primarySignal?.rule_name || (caseData as any).rule_description || 'Exception detected'}
+                  </p>
                 </div>
 
                 {/* 2. Ownership Assigned */}
@@ -1085,7 +1578,7 @@ export default function CaseDetailPage() {
                   <div className="relative space-y-1 text-xs">
                     <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-card" />
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-muted-foreground text-[11px]">Sep 05, 2026 11:30</span>
+                      <span className="font-mono text-muted-foreground text-[11px]">Lifecycle Step 2</span>
                     </div>
                     <p className="font-bold text-foreground">Ownership assigned</p>
                     <p className="text-muted-foreground">{caseData.assigned_to || 'Risk Reviewer / Case Owner'}</p>
@@ -1097,10 +1590,12 @@ export default function CaseDetailPage() {
                   <div className="relative space-y-1 text-xs">
                     <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-card" />
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-muted-foreground text-[11px]">Sep 06, 2026 09:20</span>
+                      <span className="font-mono text-muted-foreground text-[11px]">Lifecycle Step 3</span>
                     </div>
                     <p className="font-bold text-foreground">Investigation updated</p>
-                    <p className="text-muted-foreground">Root cause documented</p>
+                    <p className="text-muted-foreground">
+                      {caseData.root_cause ? `Root cause: ${caseData.root_cause}` : 'Findings and root cause recorded'}
+                    </p>
                   </div>
                 )}
 
@@ -1109,22 +1604,26 @@ export default function CaseDetailPage() {
                   <div className="relative space-y-1 text-xs">
                     <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-card" />
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-muted-foreground text-[11px]">Sep 06, 2026 14:10</span>
+                      <span className="font-mono text-muted-foreground text-[11px]">Lifecycle Step 4</span>
                     </div>
                     <p className="font-bold text-foreground">Corrective action completed</p>
-                    <p className="text-muted-foreground">Evidence provided</p>
+                    <p className="text-muted-foreground">
+                      {caseData.corrective_action ? `Remediation: ${caseData.corrective_action}` : 'Remediation plan executed with evidence'}
+                    </p>
                   </div>
                 )}
 
                 {/* 5. Case Closed */}
                 {isClosed && (
                   <div className="relative space-y-1 text-xs">
-                    <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-card" />
+                    <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-emerald-600 ring-4 ring-card" />
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-muted-foreground text-[11px]">Sep 06, 2026 16:00</span>
+                      <span className="font-mono text-muted-foreground text-[11px]">
+                        {caseData.closure_date ? new Date(caseData.closure_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Final Step'}
+                      </span>
                     </div>
-                    <p className="font-bold text-foreground">Case closed</p>
-                    <p className="text-muted-foreground">System-validated closure</p>
+                    <p className="font-bold text-foreground">Case closed &amp; verified</p>
+                    <p className="text-muted-foreground">All 8 mandatory closure fields verified by TRIS</p>
                   </div>
                 )}
 
@@ -1159,7 +1658,7 @@ export default function CaseDetailPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 6: RECURRENCE VIEW (Wireframe Screen 8) */}
+        {/* TAB 6: RECURRENCE VIEW                                                    */}
         {/* ========================================================================= */}
         {activeTab === 'recurrence' && (
           <div className="space-y-6 pt-2">
@@ -1167,7 +1666,7 @@ export default function CaseDetailPage() {
               <div>
                 <h2 className="text-sm font-bold text-foreground">Recurrence Monitoring</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  TRIS will monitor future data for similar issues.
+                  TRIS continuously monitors post-closure transactions for pattern recurrence (Rule R-006).
                 </p>
               </div>
 
@@ -1193,20 +1692,20 @@ export default function CaseDetailPage() {
                 </div>
 
                 <div className="flex justify-between items-center pt-3">
-                  <span className="text-muted-foreground font-medium">Monitoring Period</span>
-                  <span className="font-mono text-foreground">Sep 06, 2026 – Present</span>
+                  <span className="text-muted-foreground font-medium">Monitoring Window</span>
+                  <span className="font-mono text-foreground">90 Days Post-Closure (Rule R-006)</span>
                 </div>
 
                 <div className="flex justify-between items-center pt-3">
-                  <span className="text-muted-foreground font-medium">Rule</span>
+                  <span className="text-muted-foreground font-medium">Evaluated Rule</span>
                   <span className="text-foreground font-medium">
-                    Duplicate invoice detected (R-005)
+                    {primarySignal?.rule_name || (caseData as any).rule_description || 'Risk Exception Monitoring'}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center pt-3">
-                  <span className="text-muted-foreground font-medium">Last Checked</span>
-                  <span className="font-mono text-muted-foreground">Oct 01, 2026</span>
+                  <span className="text-muted-foreground font-medium">Supplier</span>
+                  <span className="font-mono text-muted-foreground">{caseData.supplier_id || 'SUP-001'}</span>
                 </div>
               </div>
 
@@ -1239,7 +1738,7 @@ export default function CaseDetailPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* REOPEN CONFIRMATION MODAL */}
+        {/* REOPEN CONFIRMATION MODAL                                                 */}
         {/* ========================================================================= */}
         {reopenModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-150">
