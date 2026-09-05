@@ -132,3 +132,11 @@ pnpm run dev
 | **T08** | Case State Machine Governance | `CaseService.transition_case` | Illegal transition returns 409 Conflict |
 | **T09** | 8-Field Verified Closure Validator | `CaseService.transition_case` | Incomplete returns 422; complete returns 200 |
 | **T10** | Immutable Audit Trail Integrity | `CaseHistory` + PostgreSQL trigger | Append-only history verified |
+
+---
+
+## 5. Core Documentation & Specification References
+
+- [Case Lifecycle & Governance Specification](file:///c:/Users/dell/Documents/tris-app/docs/CASE_LIFECYCLE_AND_GOVERNANCE_SPECIFICATION.md): Full reference for case state machine, Reopened pathways, 8-field verified closure dictionary, and Segregation of Duties (SoD) roadmap.
+- [Architecture Decisions & Engineering Roadmap](file:///c:/Users/dell/Documents/tris-app/docs/ARCHITECTURE_DECISIONS_AND_ROADMAP.md): 10 core ADRs, pictorial ERDs, and phased milestone breakdown.
+- [Product Manager Validation Storyboard](file:///c:/Users/dell/Documents/tris-app/docs/STORYBOARD.md): End-to-end user testing flows, credentials, and acceptance scenarios across all 4 personas.

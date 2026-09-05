@@ -429,7 +429,7 @@ flowchart LR
 
 ### ADR-005: Case State Machine with Reopen/Reject Paths
 
-* **Decision**: **Server-Enforced State Machine** with mandatory 8-field verification validation before `Closed`, plus reject and reopen transitions.
+* **Decision**: **Server-Enforced State Machine** with mandatory 8-field verification validation before `Closed`, plus reject and dual reopen transitions. For full governance, role boundaries, and SoD specifications, refer to [`docs/CASE_LIFECYCLE_AND_GOVERNANCE_SPECIFICATION.md`](CASE_LIFECYCLE_AND_GOVERNANCE_SPECIFICATION.md).
 
 > **Revision Note (from Principal Engineer Review)**: The original design was strictly linear with no way to reject verification or reopen closed cases. This has been corrected.
 
@@ -446,7 +446,8 @@ flowchart LR
 | `Pending Verification` | `Closed` | All 8 verification fields validated |
 | `Pending Verification` | `Under Investigation` | Verification rejected — returned for rework |
 | `Closed` | `Reopened` | Recurrence detected or new evidence surfaces |
-| `Reopened` | `Under Investigation` | Re-investigation initiated |
+| `Reopened` | `Under Investigation` | Re-investigation initiated (`Resume Investigation`) |
+| `Reopened` | `Pending Verification` | Fast-track re-verification (`Submit for Re-Verification`) |
 
 * **Verified Closure Guard (8 Mandatory Fields)**:
   The API endpoint `POST /api/v1/cases/{id}/close` strictly rejects any request where any of these is null or empty:
