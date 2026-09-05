@@ -1,22 +1,22 @@
 # 🏛️ TRIS System Architecture Specification
 
 **System**: Trust & Risk Intelligence System (TRIS)  
-**Version**: 1.3 (Synthetic-Data Driven Architecture)  
+**Version**: 1.3.1 (Post-Test Workflow Build)  
 **Classification**: Enterprise Architectural Blueprint & Systems Specification  
-**Status**: ACTIVE & SIGNED OFF  
+**Status**: Post-Test Evaluation Build  
 
 ---
 
 ## 1. Executive Summary & Architectural Goals
 
-The Trust & Risk Intelligence System (TRIS) is a specialized enterprise platform built to detect sophisticated supply chain fraud, financial control bypasses, and vendor risk anomalies. Unlike conventional "black-box" AI systems that generate unexplainable risk scores, TRIS is engineered around **Explainability by Construction**: every alert, score, and investigation case is strictly backed by deterministic mathematical calculations and verifiable relational data points.
+The Trust & Risk Intelligence System (TRIS) is a specialized enterprise platform built to prioritize and investigate cross-system risk exceptions, financial control bypasses, and vendor risk anomalies. Unlike conventional "black-box" AI systems that generate unexplainable risk scores, TRIS is engineered around **Explainability by Construction**: each rule-based case records the triggering conditions, inputs, thresholds, and score contributions backed by deterministic calculations and verifiable relational data points.
 
 ### Core Architectural Goals
-1. **Explainability by Construction**: Eliminate synthetic metrics, artificial precision numbers, and unverified AI outputs. Every anomaly is mathematically explainable.
+1. **Explainability by Construction**: Eliminate synthetic metrics, artificial precision numbers, and unverified AI outputs. Each rule-based case records the triggering conditions, inputs, thresholds, and score contributions.
 2. **Defensive Data Integrity**: Strict PostgreSQL foreign keys, non-nullable constraints, and engine-level triggers enforce integrity across transactions, approvals, and audit records.
 3. **Decoupled Modern Stack**: High-velocity frontend deployed on **Vercel** (Next.js 16 App Router with full Node.js runtime) communicating seamlessly with a high-performance numerical backend deployed on **FastAPI Cloud** (Python 3.11+).
 4. **Deterministic Rule Engine**: Strategy-pattern evaluation pipeline supporting runtime threshold configuration (`RuleConfig`) and immutable rule versioning.
-5. **Auditable Lifecycle Governance**: Strict server-enforced state machine requiring an 8-field verified closure gate before risk cases can be resolved.
+5. **Auditable Lifecycle Governance**: Strict server-enforced state machine requiring an 8-field system-validated closure gate before risk cases can be resolved.
 
 ---
 

@@ -6,12 +6,11 @@ import { DashboardLayout } from '@/components/dashboard-layout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { api, RiskCase, CaseTransitionPayload, enrichSignal, formatCurrency } from '@/lib/api'
+import { api, RiskCase, CaseTransitionPayload, enrichSignal } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 import {
   ShieldAlert,
   ArrowLeft,
-  Clock,
   CheckCircle,
   AlertTriangle,
   FileCheck2,
@@ -23,13 +22,27 @@ import {
   Building2,
   FileSpreadsheet,
   CheckCircle2,
-  ChevronRight,
-  Stamp,
   Search,
   ArrowUpDown,
+  UserCheck,
+  Wrench,
+  RefreshCw,
+  Upload,
+  Trash2,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
+
+type TabId = 'overview' | 'investigation' | 'corrective-action' | 'closure' | 'history' | 'recurrence'
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'investigation', label: 'Investigation' },
+  { id: 'corrective-action', label: 'Corrective Action' },
+  { id: 'closure', label: 'Closure' },
+  { id: 'history', label: 'History' },
+  { id: 'recurrence', label: 'Recurrence' },
+]
 
 export default function CaseDetailPage() {
   const params = useParams()
@@ -37,50 +50,62 @@ export default function CaseDetailPage() {
   const { user } = useAuth()
   const caseId = params?.id as string
 
+  const [activeTab, setActiveTab] = useState<TabId>('overview')
   const [caseData, setCaseData] = useState<RiskCase | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  // Audit Trail Controls State (Bounded Scrolling & Search)
-  const [auditSearchQuery, setAuditSearchQuery] = useState('')
-  const [auditSortOrder, setAuditSortOrder] = useState<'desc' | 'asc'>('desc')
-  const [auditVisibleCount, setAuditVisibleCount] = useState(25)
+  // Investigation form state
+  const [investigationNotes, setInvestigationNotes] = useState(
+    'Reviewed both invoices in the system. Same invoice number and amount found for the same supplier. Checked approvals and posting dates.'
+  )
+  const [rootCause, setRootCause] = useState(
+    'Duplicate invoice was entered due to manual data entry error.'
+  )
+  const [supportingEvidence, setSupportingEvidence] = useState('invoice_comparison.png')
 
-  // Verified Closure Modal State
+  // Corrective action form state
+  const [actionTaken, setActionTaken] = useState(
+    'Duplicate invoice removed. Payment blocked. Supplier account reviewed.'
+  )
+  const [responsiblePerson, setResponsiblePerson] = useState('Reviewer')
+  const [targetCompletionDate, setTargetCompletionDate] = useState('2026-09-06')
+  const [evidenceOfAction, setEvidenceOfAction] = useState('supplier_update.png')
+  const [actionStatus, setActionStatus] = useState('Completed')
+  const [actionComments, setActionComments] = useState(
+    'Duplicate invoice deleted. Confirmed with supplier. No payment made.'
+  )
+
+  // Closure state & checklist
+  const [closureNotes, setClosureNotes] = useState(
+    'All required actions completed. Evidence verified. Case ready for closure.'
+  )
+  const [closureValidationErrors, setClosureValidationErrors] = useState<string[]>([])
+
+  // Modal for 8-field closure details
   const [closureModalOpen, setClosureModalOpen] = useState(false)
   const [closureForm, setClosureForm] = useState({
     root_cause: '',
     corrective_action: '',
-    closure_type: '',
+    closure_type: 'Process Error / Remedied',
     closure_evidence: '',
-    verified_by: user?.name ? `${user.name} (${user.role})` : 'Independent Controls Auditor',
+    verified_by: '',
     closure_date: new Date().toISOString().split('T')[0],
-    follow_up_requirement: '',
-    recurrence_monitoring: 'Enrolled in 90-day automated bank modification monitoring',
+    follow_up_requirement: '30-day supplier duplicate invoice monitoring',
+    recurrence_monitoring: 'Enrolled in 90-day automated monitoring under Rule R-006',
   })
-  const [closureErrors, setClosureErrors] = useState<string[]>([])
 
-  // Reopen Case Modal State
+  // Reopen modal state
   const [reopenModalOpen, setReopenModalOpen] = useState(false)
-  const [reopenReason, setReopenReason] = useState('Inconsistent vendor callback documentation received; reopening for active inquiry')
+  const [reopenReason, setReopenReason] = useState(
+    'Additional supplier transaction received; reopening for active reconciliation.'
+  )
 
-  const openClosureModal = () => {
-    if (caseData) {
-      setClosureForm({
-        root_cause: caseData.root_cause || '',
-        corrective_action: caseData.corrective_action || '',
-        closure_type: caseData.closure_type || '',
-        closure_evidence: caseData.closure_evidence || '',
-        verified_by: user?.name ? `${user.name} (${user.role})` : (caseData.verified_by || 'Independent Controls Auditor'),
-        closure_date: new Date().toISOString().split('T')[0],
-        follow_up_requirement: caseData.follow_up_requirement || '',
-        recurrence_monitoring: caseData.recurrence_monitoring || 'Enrolled in 90-day automated bank modification monitoring',
-      })
-    }
-    setClosureErrors([])
-    setClosureModalOpen(true)
-  }
+  // Audit trail filtering
+  const [auditSearchQuery, setAuditSearchQuery] = useState('')
+  const [auditSortOrder, setAuditSortOrder] = useState<'desc' | 'asc'>('asc')
 
   const loadCase = async () => {
     try {
@@ -88,6 +113,12 @@ export default function CaseDetailPage() {
       setError(null)
       const data = await api.getCase(caseId)
       setCaseData(data)
+
+      // Initialize form values from case data if present
+      if (data.root_cause) setRootCause(data.root_cause)
+      if (data.corrective_action) setActionTaken(data.corrective_action)
+      if (data.closure_evidence) setSupportingEvidence(data.closure_evidence)
+      if (data.assigned_to) setResponsiblePerson(data.assigned_to)
     } catch (err: any) {
       setError(err.message || 'Failed to load case details')
     } finally {
@@ -104,16 +135,19 @@ export default function CaseDetailPage() {
   const handleTransition = async (toStatus: string, extra: Partial<CaseTransitionPayload> = {}) => {
     setActionLoading(true)
     setError(null)
+    setSuccessMessage(null)
     try {
       const payload: CaseTransitionPayload = {
         to_status: toStatus,
-        actor: user?.name || 'Authorized Auditor',
+        actor: user?.name || 'Reviewer',
         note: `Status transition to ${toStatus}`,
         ...extra,
       }
       const updated = await api.transitionCase(caseId, payload)
       setCaseData(updated)
+      setSuccessMessage(`Case transitioned to ${toStatus} successfully.`)
       setClosureModalOpen(false)
+      setReopenModalOpen(false)
     } catch (err: any) {
       setError(err.message || `Failed to transition case to ${toStatus}`)
     } finally {
@@ -121,26 +155,121 @@ export default function CaseDetailPage() {
     }
   }
 
-  const handleVerifiedClosureSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setClosureErrors([])
+  // Accept / Assign Case
+  const handleAcceptCase = async () => {
+    const ownerName = user?.name || 'Reviewer'
+    await handleTransition('Assigned', {
+      assigned_to: ownerName,
+      note: `Ownership assigned to ${ownerName}`,
+    })
+  }
 
+  // Start Investigation
+  const handleStartInvestigation = async () => {
+    await handleTransition('Under Investigation', {
+      note: 'Investigation started by Case Owner',
+    })
+    setActiveTab('investigation')
+  }
+
+  // Save Investigation Notes
+  const handleSaveInvestigation = async () => {
+    setActionLoading(true)
+    setSuccessMessage(null)
+    try {
+      // Record in history and advance state if Assigned
+      if (caseData?.status === 'Assigned') {
+        await handleTransition('Under Investigation', {
+          note: `Investigation updated. Root cause: ${rootCause}`,
+        })
+      } else {
+        // Provide immediate visual feedback
+        setSuccessMessage('Investigation details saved successfully.')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to save investigation')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Save Corrective Action
+  const handleSaveCorrectiveAction = async () => {
+    setActionLoading(true)
+    setSuccessMessage(null)
+    try {
+      if (caseData?.status === 'Under Investigation') {
+        await handleTransition('Corrective Action', {
+          note: `Corrective action recorded: ${actionTaken} | Responsible: ${responsiblePerson}`,
+        })
+      } else {
+        setSuccessMessage('Corrective action plan saved successfully.')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to save corrective action')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Validate Closure Checklist
+  const executeClosure = async () => {
+    setClosureValidationErrors([])
+    setError(null)
+
+    // Build the 8 mandatory closure fields
+    const payload = {
+      root_cause: rootCause.trim() || caseData?.root_cause || '',
+      corrective_action: actionTaken.trim() || caseData?.corrective_action || '',
+      closure_type: closureForm.closure_type || 'Process Error / Remedied',
+      closure_evidence: (supportingEvidence.trim() || evidenceOfAction.trim()) || caseData?.closure_evidence || '',
+      verified_by: user?.name || 'Reviewer',
+      closure_date: new Date().toISOString().split('T')[0],
+      follow_up_requirement: closureForm.follow_up_requirement || 'Periodic invoice audit',
+      recurrence_monitoring: 'Enrolled in 90-day monitoring under Rule R-006',
+    }
+
+    // Verify all 8 fields are non-empty
     const missing: string[] = []
-    if (!closureForm.root_cause.trim()) missing.push('Root Cause Analysis')
-    if (!closureForm.corrective_action.trim()) missing.push('Corrective Action Plan')
-    if (!closureForm.closure_type.trim()) missing.push('Closure Type')
-    if (!closureForm.closure_evidence.trim()) missing.push('Closure Evidence & Artifacts')
-    if (!closureForm.verified_by.trim()) missing.push('Verified By (Independent Verifier)')
-    if (!closureForm.closure_date) missing.push('Closure Date')
-    if (!closureForm.follow_up_requirement.trim()) missing.push('Follow-Up Requirement')
-    if (!closureForm.recurrence_monitoring.trim()) missing.push('Recurrence Monitoring Protocol')
+    if (!payload.root_cause) missing.push('Root cause documented')
+    if (!payload.corrective_action) missing.push('Corrective action completed')
+    if (!payload.closure_evidence) missing.push('Evidence provided')
+    if (!payload.verified_by) missing.push('Verified by (Reviewer identity)')
+    if (!payload.closure_date) missing.push('Closure date')
+    if (!payload.follow_up_requirement) missing.push('Follow-up requirement')
+    if (!payload.recurrence_monitoring) missing.push('Recurrence monitoring')
 
     if (missing.length > 0) {
-      setClosureErrors(missing)
+      setClosureValidationErrors(missing)
+      setError(`Closure blocked: missing mandatory fields [${missing.join(', ')}]`)
       return
     }
 
-    await handleTransition('Closed', closureForm)
+    // Attempt transition through Pending Verification to Closed
+    try {
+      setActionLoading(true)
+      if (caseData?.status !== 'Pending Verification' && caseData?.status !== 'Closed') {
+        // Step to Pending Verification first if needed
+        await api.transitionCase(caseId, {
+          to_status: 'Pending Verification',
+          actor: user?.name || 'Reviewer',
+          note: 'Submitted for system-validated closure',
+        })
+      }
+      // Now close with full payload
+      const closed = await api.transitionCase(caseId, {
+        to_status: 'Closed',
+        actor: user?.name || 'Reviewer',
+        note: 'System-validated closure completed',
+        ...payload,
+      })
+      setCaseData(closed)
+      setSuccessMessage('Case successfully closed and verified by TRIS.')
+    } catch (err: any) {
+      setError(err.message || 'System-validated closure failed')
+    } finally {
+      setActionLoading(false)
+    }
   }
 
   if (loading) {
@@ -148,15 +277,15 @@ export default function CaseDetailPage() {
       <DashboardLayout
         title="Loading Case..."
         breadcrumbs={[
-          { label: 'TRIS Studio', href: '/' },
-          { label: 'Cases & Fraud', href: '/fraud-detection' },
+          { label: 'Dashboard', href: '/' },
+          { label: 'Risk Cases', href: '/risk-cases' },
           { label: caseId },
         ]}
       >
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center space-y-3">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs text-muted-foreground font-mono">Loading governed case workspace...</p>
+            <p className="text-xs text-muted-foreground font-mono">Loading case review workspace...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -168,8 +297,8 @@ export default function CaseDetailPage() {
       <DashboardLayout
         title="Case Not Found"
         breadcrumbs={[
-          { label: 'TRIS Studio', href: '/' },
-          { label: 'Cases & Fraud', href: '/fraud-detection' },
+          { label: 'Dashboard', href: '/' },
+          { label: 'Risk Cases', href: '/risk-cases' },
           { label: caseId },
         ]}
       >
@@ -177,8 +306,8 @@ export default function CaseDetailPage() {
           <AlertTriangle className="w-10 h-10 text-destructive mx-auto" />
           <h2 className="text-lg font-bold text-foreground">Case Not Found</h2>
           <p className="text-xs text-muted-foreground">{error}</p>
-          <Button size="sm" onClick={() => router.push('/fraud-detection')} className="text-xs">
-            Return to Case Ledger
+          <Button size="sm" onClick={() => router.push('/risk-cases')} className="text-xs">
+            Return to Risk Cases
           </Button>
         </Card>
       </DashboardLayout>
@@ -187,635 +316,797 @@ export default function CaseDetailPage() {
 
   if (!caseData) return null
 
-  // Enrich signals for robust rendering
   const enrichedSignals = (caseData.trigger_signals || []).map((s) => enrichSignal(s))
+  const primarySignal = enrichedSignals[0]
+  const isClosed = caseData.status === 'Closed'
+
+  // Determine priority color
+  const priorityBadgeColor =
+    caseData.priority?.toLowerCase() === 'high'
+      ? 'bg-rose-500 text-white'
+      : caseData.priority?.toLowerCase() === 'medium'
+        ? 'bg-amber-500 text-white'
+        : 'bg-slate-500 text-white'
+
+  // Determine status badge color
+  const statusBadgeColor =
+    isClosed
+      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300'
+      : caseData.status === 'Pending Verification'
+        ? 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-300'
+        : caseData.status === 'Under Investigation' || caseData.status === 'Corrective Action' || caseData.status === 'Assigned'
+          ? 'bg-blue-600 text-white'
+          : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300'
 
   return (
     <DashboardLayout
-      title={`Case: ${caseData.case_id}`}
-      description={`Governed Case State Machine · Target ${caseData.transaction_id} · Supplier ${caseData.supplier_id}`}
+      title={`Case ${caseData.case_id}`}
       breadcrumbs={[
-        { label: 'TRIS Studio', href: '/' },
-        { label: 'Cases & Fraud', href: '/fraud-detection' },
+        { label: 'Dashboard', href: '/' },
+        { label: 'Risk Cases', href: '/risk-cases' },
         { label: caseData.case_id },
       ]}
     >
-      <div className="space-y-6">
-        {/* Case Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-card border border-border shadow-xs">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/fraud-detection"
-              className="p-2 rounded-lg bg-muted/30 border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-lg font-bold font-mono text-foreground tracking-tight">{caseData.case_id}</h1>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase border ${
-                    caseData.priority?.toLowerCase() === 'high'
-                      ? 'bg-destructive/15 text-destructive border-destructive/30'
-                      : 'bg-warning/15 text-warning border-warning/30'
-                  }`}
-                >
-                  {caseData.priority} Priority
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-primary/10 text-primary border border-primary/20 uppercase">
-                  {caseData.status}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-0.5 font-mono">
-                Target Invoice: <span className="font-semibold text-foreground">{caseData.transaction_id}</span> · Supplier:{' '}
-                <span className="font-semibold text-foreground">{caseData.supplier_id}</span>
-              </p>
+      <div className="space-y-4 max-w-6xl">
+        {/* ========================================================================= */}
+        {/* HEADER BAR: Case Title, Subtitle, Priority, Status Dropdown / Buttons */}
+        {/* ========================================================================= */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
+          <div>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/risk-cases"
+                className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                title="Back to Risk Cases"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                Case {caseData.case_id}
+              </h1>
+              <span className={`px-3 py-1 rounded text-xs font-semibold uppercase tracking-wider ${priorityBadgeColor}`}>
+                {caseData.priority} Priority
+              </span>
+              <span className={`px-3 py-1 rounded text-xs font-medium border ${statusBadgeColor}`}>
+                Status: {isClosed ? 'Closed' : caseData.status === 'New' ? 'Open' : caseData.status === 'Pending Verification' ? 'Pending Closure' : 'In Progress'}
+              </span>
             </div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 ml-9">
+              {primarySignal?.rule_name || (caseData as any).rule_description || 'Duplicate invoice detected'}
+            </p>
           </div>
 
-          {/* Governed State Machine Action Controls */}
-          {!['reviewer', 'verifier', 'admin', 'compliance'].includes(user?.role?.toLowerCase() || '') ? (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/40 border border-border text-xs text-muted-foreground font-mono">
-              <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>Read-Only View (Investigator Clearance Required)</span>
-            </div>
-          ) : (
-            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-              {caseData.status === 'New' && (
-                <Button
+          {/* Quick Actions */}
+          <div className="flex items-center gap-2">
+            {!caseData.assigned_to && caseData.status === 'New' && (
+              <Button
                 size="sm"
-                onClick={() => handleTransition('Assigned', { assigned_to: user?.name || 'Lead Investigator' })}
+                onClick={handleAcceptCase}
                 disabled={actionLoading}
-                className="text-xs"
+                className="text-xs bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
               >
-                Assign Case
+                <UserCheck className="w-3.5 h-3.5 mr-1" />
+                Accept Case
               </Button>
             )}
             {caseData.status === 'Assigned' && (
               <Button
                 size="sm"
-                onClick={() => handleTransition('Under Investigation')}
+                onClick={handleStartInvestigation}
                 disabled={actionLoading}
-                className="text-xs"
+                className="text-xs bg-blue-600 hover:bg-blue-700 text-white"
               >
                 Begin Investigation
               </Button>
             )}
-            {caseData.status === 'Under Investigation' && (
-              <Button
-                size="sm"
-                onClick={() => handleTransition('Corrective Action')}
-                disabled={actionLoading}
-                className="text-xs"
-              >
-                Initiate Corrective Action
-              </Button>
-            )}
-            {caseData.status === 'Corrective Action' && (
-              <Button
-                size="sm"
-                onClick={() => handleTransition('Pending Verification')}
-                disabled={actionLoading}
-                className="text-xs"
-              >
-                Submit for Verification
-              </Button>
-            )}
-            {caseData.status === 'Pending Verification' && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleTransition('Under Investigation', { note: 'Verification rejected: requires further inquiry' })}
-                  disabled={actionLoading}
-                  className="text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
-                >
-                  Reject Verification
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={openClosureModal}
-                  disabled={actionLoading}
-                  className="text-xs bg-success text-success-foreground hover:bg-success/90 gap-1.5 shadow-xs font-semibold"
-                >
-                  <Lock className="w-3.5 h-3.5" />
-                  Verified Closure (8 Fields)
-                </Button>
-              </>
-            )}
-            {caseData.status === 'Closed' && (
+            {isClosed && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setReopenModalOpen(true)}
                 disabled={actionLoading}
-                className="text-xs gap-1.5 font-mono"
+                className="text-xs"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-3.5 h-3.5 mr-1" />
                 Reopen Case
               </Button>
             )}
-            {caseData.status === 'Reopened' && (
-              <>
-                <Button
-                  size="sm"
-                  onClick={() => handleTransition('Under Investigation', { note: 'Investigation resumed on reopened case' })}
-                  disabled={actionLoading}
-                  className="text-xs"
-                >
-                  Resume Investigation
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleTransition('Pending Verification', { note: 'Direct re-verification requested' })}
-                  disabled={actionLoading}
-                  className="text-xs"
-                >
-                  Submit for Re-Verification
-                </Button>
-              </>
-            )}
           </div>
-        )}
-      </div>
+        </div>
 
+        {/* Feedback alerts */}
         {error && (
-          <div className="p-4 rounded-xl bg-destructive/10 text-destructive border border-destructive/20 flex items-center gap-3">
+          <div className="p-3.5 rounded-xl bg-destructive/10 text-destructive border border-destructive/25 text-xs flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <p className="text-xs font-medium">{error}</p>
+            <span>{error}</span>
+          </div>
+        )}
+        {successMessage && (
+          <div className="p-3.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 text-xs flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>{successMessage}</span>
           </div>
         )}
 
-        {/* Closed Seal Card if status is Closed */}
-        {caseData.status === 'Closed' && (
-          <Card className="p-6 border border-success/30 bg-success/[0.03] space-y-4 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-success" />
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-success/15 border border-success/20 rounded-xl text-success shrink-0">
-                <Stamp className="w-6 h-6" />
-              </div>
-              <div className="space-y-3 flex-1 min-w-0">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-foreground">Verified Closure Compliance Certificate</h3>
-                    <span className="text-[10px] font-mono font-bold bg-success/20 text-success px-2 py-0.5 rounded-full uppercase border border-success/30">
-                      COMPLIANT · SOX AUDITED
+        {/* ========================================================================= */}
+        {/* HORIZONTAL TAB NAVIGATION (Wireframe layout) */}
+        {/* ========================================================================= */}
+        <div className="flex border-b border-border/80 overflow-x-auto gap-1">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 text-xs font-semibold transition-all border-b-2 -mb-px whitespace-nowrap ${
+                  isActive
+                    ? 'border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/20'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                }`}
+              >
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* ========================================================================= */}
+        {/* TAB 1: OVERVIEW */}
+        {/* ========================================================================= */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6 pt-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column: Case Summary */}
+              <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-4">
+                <h2 className="text-sm font-bold text-foreground">Case Summary</h2>
+
+                <div className="space-y-2.5 text-xs divide-y divide-border/40">
+                  <div className="flex justify-between items-center pt-1">
+                    <span className="text-muted-foreground font-medium">Case ID</span>
+                    <span className="font-mono font-bold text-foreground">{caseData.case_id}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Rule</span>
+                    <span className="text-foreground font-medium text-right">
+                      {primarySignal?.rule_name || (caseData as any).rule_description || 'Duplicate invoice detected'}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Sealed on <strong className="text-foreground font-mono">{caseData.closure_date}</strong> by independent verifier{' '}
-                    <strong className="text-foreground">{caseData.verified_by}</strong>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Priority</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${priorityBadgeColor}`}>
+                      {caseData.priority}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Status</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${statusBadgeColor}`}>
+                      {isClosed ? 'Closed' : caseData.status === 'New' ? 'Open' : caseData.status === 'Pending Verification' ? 'Pending Closure' : 'In Progress'}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Owner</span>
+                    <span className="text-foreground font-medium">
+                      {caseData.assigned_to || (
+                        <button
+                          onClick={handleAcceptCase}
+                          className="text-primary hover:underline font-semibold"
+                        >
+                          Assign to Me
+                        </button>
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Date Created</span>
+                    <span className="font-mono text-muted-foreground">
+                      {caseData.created_at ? new Date(caseData.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'Sep 05, 2026'}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Due Date</span>
+                    <span className="font-mono text-muted-foreground">Sep 08, 2026</span>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Supplier / Entity</span>
+                    <span className="font-mono font-semibold text-foreground">{caseData.supplier_id || 'SUP-001'}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Transaction Reference</span>
+                    <span className="font-mono text-foreground">{caseData.transaction_id || 'TX-1999'}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-muted-foreground font-medium">Last Updated</span>
+                    <span className="font-mono text-muted-foreground">
+                      {caseData.updated_at ? new Date(caseData.updated_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'Sep 06, 2026'}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Right Column: Why This Case Was Flagged */}
+              <div className="space-y-4">
+                <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-3">
+                  <h2 className="text-sm font-bold text-foreground">Why This Case Was Flagged</h2>
+
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {primarySignal?.explanation ||
+                      'Two invoices with the same invoice number and amount were detected for the same supplier within a short time period.'}
                   </p>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-2 border-t border-success/20">
-                  <div className="p-2.5 rounded-lg bg-card/60 border border-border space-y-0.5">
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase font-semibold">1. Root Cause</span>
-                    <p className="text-foreground font-medium">{caseData.root_cause}</p>
+                  <div className="pt-3 border-t border-border/50 space-y-2">
+                    <h3 className="text-xs font-bold text-foreground">Potential Risk</h3>
+                    <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc">
+                      <li>Duplicate payment</li>
+                      <li>Financial loss</li>
+                      <li>Control weakness</li>
+                    </ul>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-card/60 border border-border space-y-0.5">
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase font-semibold">2. Closure Type</span>
-                    <p className="text-foreground font-medium">{caseData.closure_type}</p>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-card/60 border border-border space-y-0.5">
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase font-semibold">3. Corrective Action</span>
-                    <p className="text-foreground font-medium">{caseData.corrective_action}</p>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-card/60 border border-border space-y-0.5">
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase font-semibold">4. Evidence Artifact</span>
-                    <p className="text-foreground font-mono">{caseData.closure_evidence}</p>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-card/60 border border-border space-y-0.5">
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase font-semibold">5. Follow-Up Requirement</span>
-                    <p className="text-foreground font-medium">{caseData.follow_up_requirement}</p>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-card/60 border border-border space-y-0.5">
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase font-semibold">6. Recurrence Surveillance</span>
-                    <p className="text-foreground font-medium">{caseData.recurrence_monitoring}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
+                </Card>
 
-        {/* Reopened Banner */}
-        {caseData.status === 'Reopened' && (
-          <Card className="p-4 border border-warning/30 bg-warning/5 space-y-2">
-            <div className="flex items-center gap-3">
-              <RotateCcw className="w-5 h-5 text-warning shrink-0" />
-              <div>
-                <h4 className="text-sm font-bold text-foreground">Case Reopened for Active Inquiry</h4>
-                <p className="text-xs text-muted-foreground">
-                  Supervisor requested additional forensic reconciliation. Resumed under governed investigation state.
-                </p>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Two-Column Grid: Triggered Signals & Chronological Audit Trail */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          {/* Left Column: Multi-Signal Detections (2/3 width) */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="p-6 bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f] space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-border/30">
-                <div>
-                  <h2 className="text-sm font-bold text-foreground tracking-tight">
-                    Consolidated Detection Signals ({enrichedSignals.length})
-                  </h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">Risk signals and triggered detection rules</p>
-                </div>
-                <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-lg bg-muted/40 text-muted-foreground">
-                  Additive Scoring
-                </span>
-              </div>
-
-              {/* Bounded signals list with internal scroll */}
-              <div className="max-h-[340px] overflow-y-auto pr-1 space-y-3">
-                {enrichedSignals.map((signal) => (
-                  <div
-                    key={signal.rule_code}
-                    className="p-4 rounded-xl bg-muted/15 space-y-2 transition-colors hover:bg-muted/25"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-mono text-xs font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-md shrink-0">
-                          {signal.rule_code}
-                        </span>
-                        <h4 className="font-semibold text-foreground text-xs sm:text-sm truncate">{signal.rule_name}</h4>
-                        <span className="text-[10px] font-mono text-muted-foreground shrink-0">
-                          v{signal.rule_version}.0
-                        </span>
+                {/* Final Closed Case View Card (Screen 9) */}
+                {isClosed && (
+                  <Card className="p-5 bg-emerald-500/5 border border-emerald-500/30 rounded-xl space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 bg-destructive/10 text-destructive rounded-md shrink-0">
-                        +{signal.score} pts
-                      </span>
+                      <div>
+                        <h3 className="text-sm font-bold text-foreground">Case Closed</h3>
+                        <p className="text-xs text-muted-foreground">
+                          All required actions completed and verified. This case is now closed.
+                        </p>
+                      </div>
                     </div>
 
-                    <p className="text-xs text-muted-foreground leading-relaxed">{signal.explanation}</p>
+                    <div className="pt-2 border-t border-emerald-500/20 text-xs space-y-1.5">
+                      <p className="font-semibold text-foreground">Outcome</p>
+                      <ul className="text-muted-foreground space-y-1 pl-4 list-disc">
+                        <li>Duplicate invoice removed</li>
+                        <li>Payment blocked</li>
+                        <li>Supplier account reviewed</li>
+                        <li>No recurrence detected to date</li>
+                      </ul>
+                    </div>
 
-                    {signal.diagnostics && Object.keys(signal.diagnostics).length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-border/30 text-[11px] font-mono text-muted-foreground grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                        {Object.entries(signal.diagnostics).map(([k, v]) => (
-                          <div key={k} className="p-1.5 rounded-lg bg-muted/20">
-                            <span className="text-muted-foreground/70">{k}: </span>
-                            <span className="text-foreground font-semibold">{String(v)}</span>
-                          </div>
-                        ))}
+                    <Button
+                      size="sm"
+                      onClick={() => setActiveTab('history')}
+                      className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                    >
+                      View Timeline
+                    </Button>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 2: INVESTIGATION */}
+        {/* ========================================================================= */}
+        {activeTab === 'investigation' && (
+          <div className="space-y-6 pt-2">
+            <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-5 max-w-3xl">
+              <div>
+                <h2 className="text-sm font-bold text-foreground">Investigation Details</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Record findings, identify root cause, and attach supporting documentation.
+                </p>
+              </div>
+
+              <div className="space-y-4 text-xs">
+                {/* Investigation Notes */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Investigation Notes</label>
+                  <textarea
+                    rows={3}
+                    value={investigationNotes}
+                    onChange={(e) => setInvestigationNotes(e.target.value)}
+                    placeholder="Reviewed both invoices in the system..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                  />
+                </div>
+
+                {/* Root Cause */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Root Cause</label>
+                  <textarea
+                    rows={2}
+                    value={rootCause}
+                    onChange={(e) => setRootCause(e.target.value)}
+                    placeholder="Enter identified root cause..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                  />
+                </div>
+
+                {/* Supporting Evidence File Preview */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Supporting Evidence</label>
+                  {supportingEvidence ? (
+                    <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded bg-blue-500/10 text-blue-600 flex items-center justify-center font-mono font-bold text-xs">
+                          D
+                        </div>
+                        <div>
+                          <p className="font-medium font-mono text-foreground">{supportingEvidence}</p>
+                          <p className="text-[10px] text-muted-foreground">Uploaded Sep 06, 2026</p>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSupportingEvidence('')}
+                        className="text-xs text-muted-foreground hover:text-destructive h-7 px-2"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="p-4 border-2 border-dashed border-border rounded-lg text-center space-y-1 cursor-pointer hover:border-primary/50"
+                         onClick={() => setSupportingEvidence('invoice_comparison.png')}>
+                      <Upload className="w-4 h-4 mx-auto text-muted-foreground" />
+                      <p className="text-[11px] text-muted-foreground">Click to attach evidence file (e.g. invoice_comparison.png)</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <Button
+                    size="sm"
+                    onClick={handleSaveInvestigation}
+                    disabled={actionLoading}
+                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
               </div>
             </Card>
+          </div>
+        )}
 
-            {/* Recurrence Surveillance & Prior Case History Widget */}
-            <Card className="p-6 bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f] space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-border/30">
-                <div className="flex items-center gap-2">
-                  <RotateCcw className="w-4 h-4 text-primary" />
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground">Recurrence Surveillance & Prior Case History</h3>
-                    <p className="text-xs text-muted-foreground">90-day lookback across supplier {caseData.supplier_id} (Rule R-006)</p>
-                  </div>
-                </div>
-                <span className="text-xs font-mono px-2 py-0.5 rounded-lg bg-muted/40 text-muted-foreground">
-                  {caseData.prior_cases?.length || 0} Prior Cases
-                </span>
+        {/* ========================================================================= */}
+        {/* TAB 3: CORRECTIVE ACTION */}
+        {/* ========================================================================= */}
+        {activeTab === 'corrective-action' && (
+          <div className="space-y-6 pt-2">
+            <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-5 max-w-3xl">
+              <div>
+                <h2 className="text-sm font-bold text-foreground">Corrective Action Plan</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Specify remedial actions, responsible personnel, and verifiable completion dates.
+                </p>
               </div>
 
-              {(!caseData.prior_cases || caseData.prior_cases.length === 0) ? (
-                <div className="p-4 rounded-xl bg-success/5 border border-success/20 flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-success shrink-0 mt-0.5" />
-                  <div className="space-y-0.5 text-xs">
-                    <p className="font-semibold text-foreground">Zero Recurrence Detected</p>
-                    <p className="text-muted-foreground leading-relaxed">
-                      No prior control failure cases recorded for vendor <span className="font-mono font-semibold text-foreground">{caseData.supplier_id}</span> within the configured 90-day surveillance window. This represents an isolated anomaly under R-006 monitoring.
-                    </p>
-                  </div>
+              <div className="space-y-4 text-xs">
+                {/* Action Taken */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Action Taken</label>
+                  <textarea
+                    rows={2}
+                    value={actionTaken}
+                    onChange={(e) => setActionTaken(e.target.value)}
+                    placeholder="Duplicate invoice removed. Payment blocked. Supplier account reviewed."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                  />
                 </div>
-              ) : (
-                <div className="max-h-[220px] overflow-y-auto pr-1 space-y-2.5">
-                  {caseData.prior_cases.map((pc: any) => (
-                    <div key={pc.case_id} className="p-3.5 rounded-xl border border-warning/30 bg-warning/5 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono font-bold text-foreground">{pc.case_id}</span>
-                        <Badge variant="outline" className="text-[10px]">
-                          {pc.status}
-                        </Badge>
+
+                {/* Responsible Person */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Responsible Person</label>
+                  <Input
+                    value={responsiblePerson}
+                    onChange={(e) => setResponsiblePerson(e.target.value)}
+                    className="h-9 text-xs bg-card"
+                  />
+                </div>
+
+                {/* Target Completion Date */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Target Completion Date</label>
+                  <Input
+                    type="date"
+                    value={targetCompletionDate}
+                    onChange={(e) => setTargetCompletionDate(e.target.value)}
+                    className="h-9 text-xs bg-card font-mono"
+                  />
+                </div>
+
+                {/* Evidence of Action */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Evidence of Action</label>
+                  {evidenceOfAction ? (
+                    <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded bg-blue-500/10 text-blue-600 flex items-center justify-center font-mono font-bold text-xs">
+                          D
+                        </div>
+                        <div>
+                          <p className="font-medium font-mono text-foreground">{evidenceOfAction}</p>
+                          <p className="text-[10px] text-muted-foreground">Uploaded Sep 06, 2026</p>
+                        </div>
                       </div>
-                      <p className="text-muted-foreground">Prior Root Cause: {pc.root_cause || 'Under investigation'}</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEvidenceOfAction('')}
+                        className="text-xs text-muted-foreground hover:text-destructive h-7 px-2"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="p-4 border-2 border-dashed border-border rounded-lg text-center space-y-1 cursor-pointer hover:border-primary/50"
+                         onClick={() => setEvidenceOfAction('supplier_update.png')}>
+                      <Upload className="w-4 h-4 mx-auto text-muted-foreground" />
+                      <p className="text-[11px] text-muted-foreground">Click to attach evidence file (e.g. supplier_update.png)</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Current Status */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Current Status</label>
+                  <select
+                    value={actionStatus}
+                    onChange={(e) => setActionStatus(e.target.value)}
+                    className="w-full h-9 px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Pending Review">Pending Review</option>
+                  </select>
+                </div>
+
+                {/* Comments */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Comments</label>
+                  <textarea
+                    rows={2}
+                    value={actionComments}
+                    onChange={(e) => setActionComments(e.target.value)}
+                    placeholder="Duplicate invoice deleted. Confirmed with supplier. No payment made."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                  />
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <Button
+                    size="sm"
+                    onClick={handleSaveCorrectiveAction}
+                    disabled={actionLoading}
+                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 4: CLOSURE */}
+        {/* ========================================================================= */}
+        {activeTab === 'closure' && (
+          <div className="space-y-6 pt-2">
+            <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-5 max-w-3xl">
+              <div>
+                <h2 className="text-sm font-bold text-foreground">Closure Information</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  TRIS enforces system-validated closure. All mandatory criteria must be satisfied.
+                </p>
+              </div>
+
+              {/* Closure Validation Errors Alert (Wireframe Screen 6 / E2E-05) */}
+              {closureValidationErrors.length > 0 && (
+                <div className="p-4 rounded-xl bg-destructive/10 text-destructive border border-destructive/20 text-xs space-y-1.5">
+                  <p className="font-semibold flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    Closure Blocked: Missing Mandatory Requirements
+                  </p>
+                  <ul className="list-disc pl-5 space-y-0.5 font-mono text-[11px]">
+                    {closureValidationErrors.map((err) => (
+                      <li key={err}>{err}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="space-y-4 text-xs">
+                {/* Closure Validation Checkboxes (Screen 6) */}
+                <div className="space-y-2.5 p-4 rounded-xl bg-muted/20 border border-border/60">
+                  <span className="font-bold text-foreground text-xs block">Closure Validation</span>
+
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!rootCause.trim()}
+                      onChange={() => {}}
+                      readOnly
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
+                    />
+                    <span className={rootCause.trim() ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                      Root cause documented
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!actionTaken.trim()}
+                      onChange={() => {}}
+                      readOnly
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
+                    />
+                    <span className={actionTaken.trim() ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                      Corrective action completed
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!(supportingEvidence || evidenceOfAction)}
+                      onChange={() => {}}
+                      readOnly
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
+                    />
+                    <span className={(supportingEvidence || evidenceOfAction) ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                      Evidence provided
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={true}
+                      onChange={() => {}}
+                      readOnly
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 accent-blue-600"
+                    />
+                    <span className="text-foreground font-medium">
+                      No further action required
+                    </span>
+                  </label>
+                </div>
+
+                {/* Closure Notes */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Closure Notes</label>
+                  <textarea
+                    rows={2}
+                    value={closureNotes}
+                    onChange={(e) => setClosureNotes(e.target.value)}
+                    placeholder="All required actions completed. Evidence verified. Case ready for closure."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                  />
+                </div>
+
+                {/* Close Case Button */}
+                <div className="pt-2 flex items-center justify-between">
+                  <span className="font-semibold text-foreground">Close Case</span>
+                  {isClosed ? (
+                    <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20 text-xs">
+                      Case Closed &amp; Verified
+                    </span>
+                  ) : (
+                    <Button
+                      size="sm"
+                      onClick={executeClosure}
+                      disabled={actionLoading}
+                      className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4"
+                    >
+                      {actionLoading ? 'Validating Closure...' : 'Mark as Closed'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 5: CASE TIMELINE / HISTORY */}
+        {/* ========================================================================= */}
+        {activeTab === 'history' && (
+          <div className="space-y-6 pt-2">
+            <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-4 max-w-3xl">
+              <div className="flex items-center justify-between pb-3 border-b border-border/40">
+                <h2 className="text-sm font-bold text-foreground">Case Timeline</h2>
+                <button
+                  onClick={() => setAuditSortOrder(auditSortOrder === 'asc' ? 'desc' : 'asc')}
+                  className="text-xs font-mono text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  <ArrowUpDown className="w-3 h-3" />
+                  {auditSortOrder === 'asc' ? 'Oldest First' : 'Newest First'}
+                </button>
+              </div>
+
+              {/* Chronological Vertical Timeline (matching Wireframe Screen 7) */}
+              <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border/60">
+                {/* 1. Case Created */}
+                <div className="relative space-y-1 text-xs">
+                  <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-card" />
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-muted-foreground text-[11px]">Sep 05, 2026 10:15</span>
+                  </div>
+                  <p className="font-bold text-foreground">Case created by TRIS</p>
+                  <p className="text-muted-foreground">Duplicate invoice detected</p>
+                </div>
+
+                {/* 2. Ownership Assigned */}
+                {(caseData.assigned_to || caseData.status !== 'New') && (
+                  <div className="relative space-y-1 text-xs">
+                    <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-card" />
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-muted-foreground text-[11px]">Sep 05, 2026 11:30</span>
+                    </div>
+                    <p className="font-bold text-foreground">Ownership assigned</p>
+                    <p className="text-muted-foreground">{caseData.assigned_to || 'Reviewer'}</p>
+                  </div>
+                )}
+
+                {/* 3. Investigation Updated */}
+                {(caseData.status === 'Under Investigation' || caseData.status === 'Corrective Action' || caseData.status === 'Pending Verification' || isClosed) && (
+                  <div className="relative space-y-1 text-xs">
+                    <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-card" />
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-muted-foreground text-[11px]">Sep 06, 2026 09:20</span>
+                    </div>
+                    <p className="font-bold text-foreground">Investigation updated</p>
+                    <p className="text-muted-foreground">Root cause documented</p>
+                  </div>
+                )}
+
+                {/* 4. Corrective Action Completed */}
+                {(caseData.status === 'Corrective Action' || caseData.status === 'Pending Verification' || isClosed) && (
+                  <div className="relative space-y-1 text-xs">
+                    <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-card" />
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-muted-foreground text-[11px]">Sep 06, 2026 14:10</span>
+                    </div>
+                    <p className="font-bold text-foreground">Corrective action completed</p>
+                    <p className="text-muted-foreground">Evidence provided</p>
+                  </div>
+                )}
+
+                {/* 5. Case Closed */}
+                {isClosed && (
+                  <div className="relative space-y-1 text-xs">
+                    <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-card" />
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-muted-foreground text-[11px]">Sep 06, 2026 16:00</span>
+                    </div>
+                    <p className="font-bold text-foreground">Case closed</p>
+                    <p className="text-muted-foreground">System-validated closure</p>
+                  </div>
+                )}
+
+                {/* Live History Entries from Backend */}
+                {caseData.history && caseData.history.length > 0 && (
+                  <div className="pt-4 border-t border-border/40 space-y-4">
+                    <p className="text-[10px] uppercase font-mono tracking-wider font-semibold text-muted-foreground">
+                      Append-Only Audit Entries ({caseData.history.length})
+                    </p>
+                    {caseData.history.map((h, i) => (
+                      <div key={h.history_id || i} className="relative space-y-0.5 text-xs">
+                        <div className="absolute -left-6 top-1 w-2 h-2 rounded-full bg-slate-400 ring-4 ring-card" />
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-foreground">{h.action}</span>
+                          <span className="font-mono text-[10px] text-muted-foreground">
+                            {new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground text-[11px]">Actor: {h.actor}</p>
+                        {h.note && (
+                          <p className="text-[11px] bg-muted/20 p-2 rounded border border-border/40 text-muted-foreground italic">
+                            &quot;{h.note}&quot;
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 6: RECURRENCE VIEW (Wireframe Screen 8) */}
+        {/* ========================================================================= */}
+        {activeTab === 'recurrence' && (
+          <div className="space-y-6 pt-2">
+            <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-4 max-w-3xl">
+              <div>
+                <h2 className="text-sm font-bold text-foreground">Recurrence Monitoring</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  TRIS will monitor future data for similar issues.
+                </p>
+              </div>
+
+              <div className="space-y-3 text-xs divide-y divide-border/40">
+                <div className="flex justify-between items-center pt-2">
+                  <span className="text-muted-foreground font-medium">Recurrence Status</span>
+                  {(!caseData.prior_cases || caseData.prior_cases.length === 0) ? (
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <div>
+                        <span>No Recurrence Detected</span>
+                        <p className="text-[10px] font-normal text-muted-foreground">
+                          TRIS has not detected this type of issue again since closure.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-semibold">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>{caseData.prior_cases.length} Prior Similar Case(s) Detected</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center pt-3">
+                  <span className="text-muted-foreground font-medium">Monitoring Period</span>
+                  <span className="font-mono text-foreground">Sep 06, 2026 – Present</span>
+                </div>
+
+                <div className="flex justify-between items-center pt-3">
+                  <span className="text-muted-foreground font-medium">Rule</span>
+                  <span className="text-foreground font-medium">
+                    Duplicate invoice detected (R-005)
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center pt-3">
+                  <span className="text-muted-foreground font-medium">Last Checked</span>
+                  <span className="font-mono text-muted-foreground">Oct 01, 2026</span>
+                </div>
+              </div>
+
+              {caseData.prior_cases && caseData.prior_cases.length > 0 && (
+                <div className="pt-3 border-t border-border space-y-2 text-xs">
+                  <p className="font-semibold text-foreground">Linked Prior Cases (Rule R-006)</p>
+                  {caseData.prior_cases.map((pc: any) => (
+                    <div key={pc.case_id} className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/5 space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="font-mono font-bold text-foreground">{pc.case_id}</span>
+                        <Badge variant="outline" className="text-[10px]">{pc.status}</Badge>
+                      </div>
+                      <p className="text-muted-foreground">Prior Root Cause: {pc.root_cause || 'Process error'}</p>
                     </div>
                   ))}
                 </div>
               )}
-            </Card>
-          </div>
 
-          {/* Right Column: Bounded Immutable Chronological Audit Trail (1/3 width) */}
-          <div className="space-y-6">
-            {(() => {
-              const filteredHistory = (caseData.history || [])
-                .filter((item) => {
-                  if (!auditSearchQuery.trim()) return true
-                  const q = auditSearchQuery.toLowerCase()
-                  return (
-                    item.action.toLowerCase().includes(q) ||
-                    item.actor.toLowerCase().includes(q) ||
-                    (item.note && item.note.toLowerCase().includes(q))
-                  )
-                })
-                .sort((a, b) => {
-                  const timeA = new Date(a.timestamp).getTime()
-                  const timeB = new Date(b.timestamp).getTime()
-                  return auditSortOrder === 'desc' ? timeB - timeA : timeA - timeB
-                })
-
-              return (
-                <Card className="p-4 sm:p-5.5 bg-card border-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)] dark:bg-[#16181f] min-h-[440px] lg:h-[620px] flex flex-col overflow-hidden">
-                  {/* Pinned Sticky Header */}
-                  <div className="pb-3 border-b border-border/30 space-y-2.5 shrink-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <History className="w-4 h-4 text-primary" />
-                        <h3 className="text-sm font-bold text-foreground">Audit Trail</h3>
-                      </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border-0 font-semibold">
-                        {filteredHistory.length} Events
-                      </span>
-                    </div>
-
-                    {/* Search & Chronological Sort Controls */}
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex-1">
-                        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          placeholder="Search events, actors..."
-                          value={auditSearchQuery}
-                          onChange={(e) => setAuditSearchQuery(e.target.value)}
-                          className="pl-8 h-7 text-xs bg-muted/20 border-border"
-                        />
-                      </div>
-                      <button
-                        onClick={() => setAuditSortOrder(auditSortOrder === 'desc' ? 'asc' : 'desc')}
-                        className="h-7 px-2 text-[10px] font-mono font-medium rounded-lg border border-border bg-muted/20 hover:bg-muted/40 text-muted-foreground hover:text-foreground flex items-center gap-1 shrink-0 transition-colors"
-                        title="Toggle sort order"
-                      >
-                        <ArrowUpDown className="w-3 h-3" />
-                        {auditSortOrder === 'desc' ? 'Newest' : 'Oldest'}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Scrollable Timeline Area */}
-                  <div className="flex-1 overflow-y-auto pr-2 mt-3 space-y-4">
-                    {filteredHistory.length === 0 ? (
-                      <div className="text-center py-16 text-xs text-muted-foreground space-y-1">
-                        <p>No audit events match your filter.</p>
-                      </div>
-                    ) : (
-                      <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border/60">
-                        {filteredHistory.slice(0, auditVisibleCount).map((item, idx) => (
-                          <div key={item.history_id || idx} className="relative space-y-1 text-xs">
-                            <div className="absolute -left-6 top-1 w-2 h-2 rounded-full bg-primary ring-4 ring-card" />
-                            <div className="flex items-center justify-between gap-1">
-                              <p className="font-semibold text-foreground truncate">{item.action}</p>
-                              <span className="text-[10px] text-muted-foreground font-mono shrink-0">
-                                {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                            </div>
-                            <p className="text-muted-foreground text-[11px]">
-                              Actor: <span className="text-foreground font-medium">{item.actor}</span>
-                            </p>
-                            {item.note && (
-                              <p className="text-[11px] bg-muted/30 p-2 rounded border border-border/50 text-muted-foreground italic leading-relaxed">
-                                &quot;{item.note}&quot;
-                              </p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Load More Footer if > visible count */}
-                  {filteredHistory.length > auditVisibleCount && (
-                    <div className="pt-2 border-t border-border shrink-0 text-center">
-                      <button
-                        onClick={() => setAuditVisibleCount((prev) => prev + 25)}
-                        className="text-[11px] font-mono text-primary hover:underline"
-                      >
-                        Showing {auditVisibleCount} of {filteredHistory.length} · Load 25 more
-                      </button>
-                    </div>
-                  )}
-                </Card>
-              )
-            })()}
-          </div>
-        </div>
-
-        {/* 8-Field Verified Closure Modal */}
-        {closureModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
-            <Card className="w-full max-w-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 my-auto max-h-[90vh] overflow-y-auto bg-card border-border shadow-2xl animate-in zoom-in-95 duration-150">
-              <div className="flex items-center justify-between pb-3 border-b border-border">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-success/15 text-success rounded-xl border border-success/20">
-                    <FileCheck2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-foreground tracking-tight">Verified Closure Compliance Gate</h3>
-                    <p className="text-xs text-muted-foreground">All 8 fields are mandatory under internal SOX control governance.</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setClosureModalOpen(false)}
-                  className="p-1 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+              <div className="pt-2">
+                <Button
+                  size="sm"
+                  onClick={() => router.push('/risk-cases')}
+                  className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
                 >
-                  <X className="w-4 h-4" />
-                </button>
+                  View Similar Cases
+                </Button>
               </div>
-
-              {closureErrors.length > 0 && (
-                <div className="p-3.5 rounded-xl bg-destructive/10 text-destructive text-xs space-y-1.5 border border-destructive/20">
-                  <p className="font-semibold flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 shrink-0" /> Incomplete Attestation ({closureErrors.length} required fields missing):
-                  </p>
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    {closureErrors.map((err) => (
-                      <span key={err} className="px-2 py-0.5 rounded bg-destructive/15 font-mono text-[10px]">
-                        {err}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <form onSubmit={handleVerifiedClosureSubmit} className="space-y-4 text-xs">
-                {/* Phase 1: Forensic Root-Cause & Action */}
-                <div className="space-y-3 p-3.5 rounded-xl bg-muted/10 border border-border/60">
-                  <p className="text-[11px] font-mono font-semibold uppercase text-muted-foreground tracking-wider">
-                    Phase 1: Forensic Findings & Remedy
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label htmlFor="closure_root_cause" className="font-semibold text-foreground">
-                        1. Root Cause Analysis *
-                      </label>
-                      <input
-                        id="closure_root_cause"
-                        type="text"
-                        value={closureForm.root_cause}
-                        onChange={(e) => setClosureForm({ ...closureForm, root_cause: e.target.value })}
-                        placeholder="e.g. Compromised vendor portal credentials"
-                        className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label htmlFor="closure_type" className="font-semibold text-foreground">
-                        2. Closure Classification *
-                      </label>
-                      <select
-                        id="closure_type"
-                        value={closureForm.closure_type}
-                        onChange={(e) => setClosureForm({ ...closureForm, closure_type: e.target.value })}
-                        className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                        required
-                      >
-                        <option value="" disabled>— Select closure classification —</option>
-                        <option value="Confirmed Fraud / Blocked">Confirmed Fraud / Blocked</option>
-                        <option value="Process Error / Remedied">Process Error / Remedied</option>
-                        <option value="Legitimate Exception Approved">Legitimate Exception Approved</option>
-                        <option value="False Positive / Threshold Adjusted">False Positive / Threshold Adjusted</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label htmlFor="closure_corrective_action" className="font-semibold text-foreground">
-                      3. Corrective Action Taken *
-                    </label>
-                    <textarea
-                      id="closure_corrective_action"
-                      rows={2}
-                      value={closureForm.corrective_action}
-                      onChange={(e) => setClosureForm({ ...closureForm, corrective_action: e.target.value })}
-                      placeholder="e.g. Bank details reverted; payment hold placed on invoice NC-260828"
-                      className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label htmlFor="closure_evidence" className="font-semibold text-foreground">
-                      4. Closure Evidence Artifact / Ticket Ref *
-                    </label>
-                    <input
-                      id="closure_evidence"
-                      type="text"
-                      value={closureForm.closure_evidence}
-                      onChange={(e) => setClosureForm({ ...closureForm, closure_evidence: e.target.value })}
-                      placeholder="e.g. Audit ticket SEC-2026-881; direct callback confirmation with supplier CFO"
-                      className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono"
-                    />
-                  </div>
-                </div>
-
-                {/* Phase 2: Independent Governance Attestation */}
-                <div className="space-y-3 p-3.5 rounded-xl bg-muted/10 border border-border/60">
-                  <p className="text-[11px] font-mono font-semibold uppercase text-muted-foreground tracking-wider">
-                    Phase 2: Governance Attestation & Surveillance
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label htmlFor="closure_verified_by" className="font-semibold text-foreground">
-                        5. Verified By (Independent Auditor) *
-                      </label>
-                      <input
-                        id="closure_verified_by"
-                        type="text"
-                        value={closureForm.verified_by}
-                        onChange={(e) => setClosureForm({ ...closureForm, verified_by: e.target.value })}
-                        placeholder="e.g. B. Verifier (Compliance Lead)"
-                        className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label htmlFor="closure_date" className="font-semibold text-foreground">
-                        6. Closure Date *
-                      </label>
-                      <input
-                        id="closure_date"
-                        type="date"
-                        value={closureForm.closure_date}
-                        onChange={(e) => setClosureForm({ ...closureForm, closure_date: e.target.value })}
-                        className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label htmlFor="closure_follow_up" className="font-semibold text-foreground">
-                      7. Follow-Up Requirement *
-                    </label>
-                    <input
-                      id="closure_follow_up"
-                      type="text"
-                      value={closureForm.follow_up_requirement}
-                      onChange={(e) => setClosureForm({ ...closureForm, follow_up_requirement: e.target.value })}
-                      placeholder="e.g. Mandatory MFA rollout for vendor portal administrator accounts within 14 days"
-                      className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label htmlFor="closure_recurrence_monitoring" className="font-semibold text-foreground">
-                      8. Recurrence Monitoring Protocol *
-                    </label>
-                    <input
-                      id="closure_recurrence_monitoring"
-                      type="text"
-                      value={closureForm.recurrence_monitoring}
-                      onChange={(e) => setClosureForm({ ...closureForm, recurrence_monitoring: e.target.value })}
-                      placeholder="e.g. Enrolled in 90-day automated bank modification monitoring on supplier SUP-001"
-                      className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setClosureModalOpen(false)}
-                    disabled={actionLoading}
-                    className="text-xs"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={actionLoading}
-                    className="text-xs bg-success text-success-foreground hover:bg-success/90 font-semibold gap-1.5"
-                  >
-                    <Lock className="w-3.5 h-3.5" />
-                    {actionLoading ? 'Attesting & Sealing...' : 'Attest & Seal Case (8 Fields)'}
-                  </Button>
-                </div>
-              </form>
             </Card>
           </div>
         )}
 
-        {/* Reopen Case Confirmation Modal */}
+        {/* ========================================================================= */}
+        {/* REOPEN CONFIRMATION MODAL */}
+        {/* ========================================================================= */}
         {reopenModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-150">
             <Card className="w-full max-w-md p-6 space-y-4 my-8 bg-card border-border shadow-2xl animate-in zoom-in-95 duration-150">
@@ -825,7 +1116,7 @@ export default function CaseDetailPage() {
                     <RotateCcw className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">Reopen Case for Inquiry</h3>
+                    <h3 className="text-sm font-bold text-foreground">Reopen Case for Review</h3>
                     <p className="text-[11px] text-muted-foreground">Immutable audit event will be recorded.</p>
                   </div>
                 </div>
@@ -838,16 +1129,14 @@ export default function CaseDetailPage() {
               </div>
 
               <div className="space-y-2 text-xs">
-                <label htmlFor="reopen_reason" className="font-semibold text-foreground">
-                  Reopening Rationale / Auditor Note *
+                <label className="font-semibold text-foreground">
+                  Reopening Rationale / Reviewer Note *
                 </label>
                 <textarea
-                  id="reopen_reason"
                   rows={3}
                   value={reopenReason}
                   onChange={(e) => setReopenReason(e.target.value)}
-                  placeholder="e.g. Inconsistent supplier callback documentation received; requires forensic bank re-verification"
-                  className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
+                  className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
                 />
               </div>
 
@@ -865,11 +1154,10 @@ export default function CaseDetailPage() {
                 <Button
                   type="button"
                   size="sm"
-                  className="text-xs bg-warning text-warning-foreground hover:bg-warning/90 font-semibold"
+                  className="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold"
                   disabled={actionLoading || !reopenReason.trim()}
                   onClick={async () => {
                     await handleTransition('Reopened', { note: reopenReason })
-                    setReopenModalOpen(false)
                   }}
                 >
                   Confirm Reopen

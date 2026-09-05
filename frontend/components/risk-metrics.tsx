@@ -93,7 +93,7 @@ export function RiskMetrics() {
     {
       label: 'Active Detection Rules',
       value: `${stats.rulesCount} Active`,
-      subtext: 'Automated fraud and compliance detection rules',
+      subtext: 'Automated risk and compliance detection rules',
       badge: 'Active',
       badgeClass: 'bg-primary/10 text-primary border-primary/20',
       icon: <Cpu className="w-4 h-4" />,

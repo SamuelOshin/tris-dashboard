@@ -1,6 +1,6 @@
 # 🛡️ Trust & Risk Intelligence System (TRIS)
 
-**Enterprise Financial Fraud Detection, Supplier Risk Intelligence & Internal Control Auditing**
+**Enterprise Risk-Exception Prioritization, Supplier Risk Intelligence & Internal Control Auditing**
 
 [![Frontend Live](https://img.shields.io/badge/Frontend-Live%20on%20Vercel-black?style=for-the-badge&logo=vercel)](https://tris-sigma.vercel.app/)
 [![Backend API](https://img.shields.io/badge/Backend-FastAPI%20Cloud-009688?style=for-the-badge&logo=fastapi)](https://tris-backend.fastapicloud.dev/)
@@ -15,39 +15,36 @@
 
 | Resource | URL | Description |
 | :--- | :--- | :--- |
-| **🚀 Web Application** | **[`https://tris-sigma.vercel.app/`](https://tris-sigma.vercel.app/)** | Next.js 16 App Router UI with real-time risk intelligence dashboards, baseline visualizer, dynamic case detail workspaces, and 8-field verified closure modal. |
-| **⚡ Backend API Engine** | **[`https://tris-backend.fastapicloud.dev/`](https://tris-backend.fastapicloud.dev/)** | Asynchronous Python 3.12 FastAPI backend powered by SQLModel, Argon2id security, deterministic rule engine (R-001..R-006), and PostgreSQL immutability triggers. |
+| **🚀 Web Application** | **[`https://tris-sigma.vercel.app/`](https://tris-sigma.vercel.app/)** | Next.js 16 App Router UI with risk review dashboards, baseline visualizer, dynamic case detail workspaces, and 8-field system-validated closure modal. |
+| **⚡ Backend API Engine** | **[`https://tris-backend.fastapicloud.dev/`](https://tris-backend.fastapicloud.dev/)** | Asynchronous Python 3.12 FastAPI backend powered by SQLModel, Argon2id security, deterministic rule engine (R-001..R-006), and PostgreSQL append-only immutability triggers. |
 | **📑 Swagger Interactive Docs** | **[`https://tris-backend.fastapicloud.dev/docs`](https://tris-backend.fastapicloud.dev/docs)** | OpenAPI / Swagger interactive schema browser and live REST API test console. |
 | **📖 ReDoc API Reference** | **[`https://tris-backend.fastapicloud.dev/redoc`](https://tris-backend.fastapicloud.dev/redoc)** | Clean, formal OpenAPI documentation reference. |
 
 ---
 
-## 🔑 Demo Evaluation Personas & Credentials
+## 🔑 Primary Demo Evaluation Persona & Credentials
 
-The live deployment and local seed scripts provide four pre-configured evaluation accounts:
+The live deployment and local seed scripts provide a primary evaluation account for the Risk Reviewer journey:
 
 | Persona Role | User Name | Email Address | Password | Permissions & Operational Clearance |
 | :--- | :--- | :--- | :--- | :--- |
-| **Risk Reviewer** | `A. Reviewer` | `a.reviewer@tris.internal` | `Reviewer2026!` | Lead investigator; case assignment, deep forensic investigation, corrective actions, submit for verification. |
-| **Compliance Verifier** | `B. Verifier` | `b.verifier@tris.internal` | `Verifier2026!` | Independent compliance auditor; 8-field verified closure evaluation, case sealing, rejection & rework routing. |
-| **Compliance Officer** | `C. Officer` | `c.officer@tris.internal` | `Compliance2026!` | Cross-department compliance surveillance, audit exports, high-risk threshold override. |
-| **System Admin** | `Super Admin` | `admin@tris.internal` | `Admin2026!` | Full administrative clearance, rule configuration & versioning, multi-sheet workbook ingestion, telemetry override. |
+| **Risk Reviewer / Case Owner** | `A. Reviewer` | `reviewer@tris.internal` | `password123` | Primary evaluator; case assignment, investigation, root-cause documentation, corrective actions, and system-validated closure. |
 
 ---
 
 ## 📖 Overview
 
-The **Trust & Risk Intelligence System (TRIS)** is a specialized enterprise risk intelligence and financial fraud detection platform engineered for corporate finance teams, manufacturing supply chain managers, and internal audit leadership.
+The **Trust & Risk Intelligence System (TRIS)** is a specialized enterprise risk-exception prioritization and investigation platform engineered for corporate finance teams, manufacturing supply chain managers, and internal audit reviewers.
 
-Traditional fraud monitoring systems rely either on brittle, disconnected spreadsheet filters or opaque "black-box" AI models that output unexplainable confidence percentages (e.g., *"96.8% risk score"*). TRIS replaces these with **Explainability by Construction**: every alert, score, and investigation case is strictly backed by deterministic mathematical deviations, cross-vector data correlation, and an append-only immutable audit trail.
+Traditional monitoring systems rely either on brittle, disconnected spreadsheet filters or opaque "black-box" AI models that output unexplainable confidence percentages (e.g., *"96.8% risk score"*). TRIS replaces these with **Explainability by Construction**: each rule-based case records the triggering conditions, inputs, thresholds, and score contributions backed by deterministic calculations and an append-only audit trail.
 
 ### 🌟 Core Architectural Pillars
 
-1. **Zero Fake Metrics (Mathematical Explainability)**: Eliminates fabricated AI confidence percentages. Anomalies are mathematically proven against supplier historical baselines that strictly exclude the evaluated target transaction (e.g. `SUP-001` historical mean = **$30,471.43** vs target anomaly `TX-1999` = **$104,000.00** $\implies$ **3.41x deviation**).
-2. **Multi-Vector Telemetry Correlation**: Correlates four distinct enterprise domains in real time: Accounts Payable Invoices, Vendor Master Bank Modifications, Identity & Access Event Logs, and Hierarchical Approval Thresholds.
-3. **Deterministic Strategy Rule Engine**: Modular, version-tracked rule catalog (`R-001` through `R-006`) with runtime threshold adjustments, additive scoring ($35 + 25 + 25 + 15 = 100 \implies \text{High Priority}$), and JSONB evaluation snapshots.
-4. **Enforced Verified Closure Gatekeeper**: A governed state machine that strictly prohibits closing risk cases without 8 mandatory compliance fields (`root_cause`, `corrective_action`, `closure_type`, `closure_evidence`, `verified_by`, `closure_date`, `follow_up_requirement`, and `recurrence_monitoring`).
-5. **Database-Level Immutability**: PostgreSQL engine triggers prevent `UPDATE` or `DELETE` operations on the `case_history` audit table, guaranteeing regulatory compliance and non-repudiation.
+1. **Zero Fake Metrics (Mathematical Explainability)**: Eliminates fabricated AI confidence percentages. Anomalies are mathematically calculated against supplier historical baselines that strictly exclude the evaluated target transaction (e.g. `SUP-001` historical mean = **$30,471.43** vs target anomaly `TX-1999` = **$104,000.00** $\implies$ **3.41x deviation**).
+2. **Multi-Vector Telemetry Correlation**: Correlates four distinct enterprise domains: Accounts Payable Invoices, Vendor Master Bank Modifications, Identity & Access Event Logs, and Hierarchical Approval Thresholds.
+3. **Deterministic Strategy Rule Engine**: Modular, version-tracked rule catalog (`R-001` through `R-006`) with runtime threshold adjustments, additive scoring ($35 + 25 + 25 + 15 = 100 \implies \text{High Priority}$), and JSON evaluation snapshots.
+4. **Enforced System-Validated Closure Gatekeeper**: A governed state machine that strictly prohibits closing risk cases without 8 mandatory fields (`root_cause`, `corrective_action`, `closure_type`, `closure_evidence`, `verified_by`, `closure_date`, `follow_up_requirement`, and `recurrence_monitoring`).
+5. **Database-Level Immutability**: PostgreSQL engine triggers prevent `UPDATE` or `DELETE` operations on the `case_history` audit table, providing an append-only audit-history control.
 6. **Real-Time Notification Hub**: Multi-tier notification bus delivering user-specific, role-scoped, and broadcast alerts across case transitions and ingestion jobs.
 
 ---

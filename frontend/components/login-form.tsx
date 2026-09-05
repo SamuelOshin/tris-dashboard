@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { Button } from '@/components/ui/button'
@@ -17,13 +16,13 @@ import {
   ArrowRight,
   UserCheck,
   Building,
+  Building2,
   KeyRound,
   Eye,
   EyeOff,
   CheckCircle2,
-  Sparkles,
-  Cpu,
-  Fingerprint,
+  FileSpreadsheet,
+  ShieldAlert,
 } from 'lucide-react'
 
 interface DemoUser {
@@ -34,43 +33,13 @@ interface DemoUser {
   icon: React.ComponentType<{ className?: string }>
 }
 
-const DEMO_USERS: DemoUser[] = [
-  {
-    email: 'reviewer@tris.internal',
-    role: 'Risk Reviewer',
-    title: 'Financial Forensics Lead',
-    password: 'password123',
-    icon: UserCheck,
-  },
-  {
-    email: 'verifier@tris.internal',
-    role: 'Compliance Verifier',
-    title: 'Independent Controls Auditor',
-    password: 'password123',
-    icon: Shield,
-  },
-  {
-    email: 'sarah@company.com',
-    role: 'CFO',
-    title: 'Executive Financial Oversight',
-    password: 'password',
-    icon: Building,
-  },
-  {
-    email: 'james@company.com',
-    role: 'Procurement',
-    title: 'Supplier Resilience & Vendor Oversight',
-    password: 'password',
-    icon: Building,
-  },
-  {
-    email: 'admin@tris.internal',
-    role: 'System Administrator',
-    title: 'Full Platform Access & Engine',
-    password: 'admin123',
-    icon: KeyRound,
-  },
-]
+const PRIMARY_DEMO_USER: DemoUser = {
+  email: 'reviewer@tris.internal',
+  role: 'Risk Reviewer / Case Owner',
+  title: 'Primary Demo Persona',
+  password: 'password123',
+  icon: UserCheck,
+}
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
@@ -178,143 +147,67 @@ export function LoginForm() {
       {/* LEFT COLUMN: Cinematic Enterprise Visual Telemetry Enclave (Desktop 50%) */}
       {/* ========================================================================= */}
       <div className="hidden lg:flex lg:w-1/2 xl:w-[52%] relative bg-slate-950 overflow-hidden flex-col justify-between p-8 xl:p-12 border-r border-border/40 select-none">
-        {/* Background Visual Asset with Subtle Parallax Zoom & Vignette */}
+        {/* Ambient gradient background */}
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/auth-hero-portrait.jpg"
-            alt="TRIS Zero-Trust Risk Intelligence Operations"
-            fill
-            priority
-            className="object-cover object-center opacity-60 scale-100 hover:scale-105 transition-transform duration-1000 ease-out"
-          />
-          {/* Multilayer Cyber Gradients & Vignettes */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/40" />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/90" />
-          {/* Subtle Cyber Grid Matrix Pattern */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
           <div
-            className="absolute inset-0 opacity-[0.07] pointer-events-none"
+            className="absolute inset-0 opacity-[0.04] pointer-events-none"
             style={{
-              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.7) 1px, transparent 0)',
-              backgroundSize: '32px 32px',
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.8) 1px, transparent 0)',
+              backgroundSize: '28px 28px',
             }}
           />
         </div>
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Ambient Top Glow Orb */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary/25 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Header Branding Overlay */}
-        <div className="relative z-10 space-y-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
-                <Shield className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold font-mono text-white tracking-tight">TRIS</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/20 text-primary-foreground border border-primary/40 font-semibold tracking-wider">
-                    v1.3 STUDIO
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400 font-mono tracking-wide">
-                  RISK INTELLIGENCE PLATFORM
-                </p>
-              </div>
-            </Link>
-
-            {/* Status Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/60 backdrop-blur-md text-[11px] font-mono text-slate-300 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="tracking-wide">SOC 2 & FIPS 140-3 COMPLIANT</span>
+        {/* Header: TRIS brand */}
+        <div className="relative z-10">
+          <Link href="/" className="flex items-center gap-3 group w-fit">
+            <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
+              <Shield className="w-5 h-5" />
             </div>
-          </div>
+            <div>
+              <span className="text-xl font-bold font-mono text-white tracking-tight">TRIS</span>
+              <p className="text-[11px] text-slate-400 font-mono tracking-wide">Trust &amp; Risk Intelligence System</p>
+            </div>
+          </Link>
         </div>
 
-        {/* Centerpiece: Value Proposition & Telemetry Glass Bento Card */}
-        <div className="relative z-10 my-auto py-8 space-y-6 max-w-xl">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-mono font-medium">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>ENTERPRISE RISK INTELLIGENCE</span>
-            </div>
+        {/* Centerpiece: What TRIS Does */}
+        <div className="relative z-10 my-auto py-8 space-y-8 max-w-md">
+          <div className="space-y-4">
             <h2 className="text-3xl xl:text-4xl font-extrabold text-white tracking-tight leading-tight">
-              Continuous risk intelligence for enterprise procurement.
+              Connect risk signals.<br />
+              Prioritize exceptions.<br />
+              Track action to resolution.
             </h2>
-            <p className="text-sm xl:text-base text-slate-300 leading-relaxed">
-              Real-time analysis across SAP, Oracle, and invoice disbursement ledgers to prevent payment fraud and verify supplier integrity.
+            <p className="text-sm text-slate-300 leading-relaxed">
+              TRIS brings financial, supplier, approval, and access-related information into one review workflow so a reviewer can understand why an exception needs attention, investigate it, document corrective action, close it with evidence, and identify recurrence.
             </p>
           </div>
 
-          {/* Double-Bezel Telemetry HUD Card */}
-          <div className="rounded-2xl p-1 bg-gradient-to-b from-white/10 to-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
-            <div className="rounded-[calc(1rem-1px)] bg-slate-950/85 p-5 space-y-4 border border-white/5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-2 text-xs font-mono text-slate-300">
-                  <Cpu className="w-4 h-4 text-primary" />
-                  <span className="font-semibold text-white">Platform Performance</span>
+          {/* 4 category icons — matching wireframe */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: 'Financial Transactions', icon: FileSpreadsheet },
+              { label: 'Supplier Information', icon: Building2 },
+              { label: 'Approvals & Access', icon: CheckCircle2 },
+              { label: 'Risk Cases & Investigations', icon: ShieldAlert },
+            ].map(({ label, icon: Icon }) => (
+              <div key={label} className="flex items-center gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10">
+                <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <Icon className="w-4 h-4" />
                 </div>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                  SYNCED
-                </span>
+                <span className="text-xs text-slate-300 font-medium leading-tight">{label}</span>
               </div>
-
-              {/* 3 Metric Pillars */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <p className="text-[10px] font-mono text-slate-400 uppercase">Detection Precision</p>
-                  <p className="text-lg font-bold font-mono text-white mt-0.5">99.98%</p>
-                  <p className="text-[10px] text-emerald-400 font-mono flex items-center gap-1 mt-0.5">
-                    <span>↑</span> Zero false closures
-                  </p>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <p className="text-[10px] font-mono text-slate-400 uppercase">Analysis Latency</p>
-                  <p className="text-lg font-bold font-mono text-white mt-0.5">&lt; 12ms</p>
-                  <p className="text-[10px] text-slate-400 font-mono mt-0.5">Real-time stream</p>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <p className="text-[10px] font-mono text-slate-400 uppercase">Risk Mitigated</p>
-                  <p className="text-lg font-bold font-mono text-emerald-400 mt-0.5">$42.8M</p>
-                  <p className="text-[10px] text-slate-400 font-mono mt-0.5">Total risk prevented</p>
-                </div>
-              </div>
-
-              {/* Quote / Endorsement */}
-              <div className="pt-2 flex items-start gap-3 border-t border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-200 shrink-0">
-                  SC
-                </div>
-                <div>
-                  <p className="text-xs italic text-slate-300 leading-snug">
-                    &ldquo;TRIS replaced manual sampling with automated risk checks.
-                    Every supplier anomaly is verified before payment.&rdquo;
-                  </p>
-                  <p className="text-[11px] font-mono text-slate-400 mt-1">
-                    <span className="text-slate-200 font-semibold">Sarah Chen</span> · Chief Financial Officer & Oversight Lead
-                  </p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Footer Security Badges */}
-        <div className="relative z-10 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-slate-400">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> SOC 2 Type II
-            </span>
-            <span>·</span>
-            <span>256-bit AES Encryption</span>
-            <span>·</span>
-            <span>Role-Based Access</span>
-            <span>·</span>
-            <span>ISO 27001</span>
-          </div>
-          <p className="text-slate-400 text-[10px]">
-            Authorized Access Only
-          </p>
+        {/* Footer */}
+        <div className="relative z-10 pt-4 border-t border-slate-800/60 text-[11px] font-mono text-slate-500">
+          <p>Evaluation environment · Synthetic test data only</p>
         </div>
       </div>
 
@@ -477,127 +370,62 @@ export function LoginForm() {
             </Button>
           </form>
 
-          {/* Enterprise Single Sign-On (SSO) Section with Coming Soon Badges */}
-          <div className="space-y-3 pt-2">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-background px-3 text-xs text-muted-foreground font-medium">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handleSSOClick('Okta SAML')}
-                className="group relative p-2.5 rounded-xl border border-border bg-card/60 hover:bg-card hover:border-primary/40 text-center transition-all flex flex-col items-center justify-center gap-1"
-              >
-                <span className="text-xs font-semibold text-foreground">Okta</span>
-                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                  Coming Soon
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSSOClick('Microsoft Entra ID')}
-                className="group relative p-2.5 rounded-xl border border-border bg-card/60 hover:bg-card hover:border-primary/40 text-center transition-all flex flex-col items-center justify-center gap-1"
-              >
-                <span className="text-xs font-semibold text-foreground">Entra ID</span>
-                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                  Coming Soon
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSSOClick('Google SAML 2.0')}
-                className="group relative p-2.5 rounded-xl border border-border bg-card/60 hover:bg-card hover:border-primary/40 text-center transition-all flex flex-col items-center justify-center gap-1"
-              >
-                <span className="text-xs font-semibold text-foreground">Google SSO</span>
-                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                  Coming Soon
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* Demo Sandbox Persona Selector */}
+          {/* Evaluation Access Card - Single Primary Persona (Reviewer / Case Owner) */}
           <div className="rounded-2xl border border-border/70 bg-muted/20 p-3.5 sm:p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 <p className="text-xs font-semibold text-foreground">
-                  Demo Sandbox Personas
+                  Evaluation Access
                 </p>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
-                  Evaluation Mode
+                  Primary Persona
                 </span>
               </div>
               <span className="text-[10px] text-muted-foreground hidden sm:inline">Click to auto-fill</span>
             </div>
 
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Select any role to populate credentials and test segregation of duties:
+              Use the primary evaluation persona to experience the end-to-end exception review journey:
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {DEMO_USERS.map((demoUser) => {
-                const Icon = demoUser.icon
-                const isCurrent = activeDemoEmail === demoUser.email
-
-                return (
-                  <div
-                    key={demoUser.email}
-                    onClick={() => selectDemoUser(demoUser)}
-                    className={`group p-2.5 rounded-xl border transition-all text-xs flex items-center justify-between gap-2.5 cursor-pointer select-none ${
-                      isCurrent
-                        ? 'bg-primary/10 border-primary/50 text-foreground ring-1 ring-primary/30 shadow-xs'
-                        : 'bg-card/70 border-border/80 hover:bg-card hover:border-primary/40 text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                          isCurrent
-                            ? 'bg-primary/20 text-primary'
-                            : 'bg-muted/80 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <p className="font-semibold text-xs text-foreground truncate">
-                            {demoUser.role}
-                          </p>
-                          {isCurrent && (
-                            <span className="text-[8px] font-mono px-1 rounded bg-primary/20 text-primary font-bold">
-                              ACTIVE
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-muted-foreground truncate">{demoUser.title}</p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={(e) => quickLoginDemoUser(demoUser, e)}
-                      disabled={loading}
-                      title={`Instant sign in as ${demoUser.role}`}
-                      className="shrink-0 p-1.5 rounded-md hover:bg-primary/15 text-muted-foreground hover:text-primary transition-colors text-[10px] font-medium hidden group-hover:flex items-center gap-0.5"
-                    >
-                      <span>Sign in</span>
-                      <ArrowRight className="w-2.5 h-2.5" />
-                    </button>
+            <div
+              onClick={() => selectDemoUser(PRIMARY_DEMO_USER)}
+              className={`group p-3 rounded-xl border transition-all text-xs flex items-center justify-between gap-3 cursor-pointer select-none ${
+                activeDemoEmail === PRIMARY_DEMO_USER.email
+                  ? 'bg-primary/10 border-primary/50 text-foreground ring-1 ring-primary/30 shadow-xs'
+                  : 'bg-card/70 border-border/80 hover:bg-card hover:border-primary/40 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center text-primary shrink-0">
+                  <UserCheck className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-xs text-foreground">
+                      {PRIMARY_DEMO_USER.role}
+                    </p>
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/20 text-primary font-bold">
+                      ACTIVE
+                    </span>
                   </div>
-                )
-              })}
+                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                    {PRIMARY_DEMO_USER.email} · password123
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={(e) => quickLoginDemoUser(PRIMARY_DEMO_USER, e)}
+                disabled={loading}
+                title="Instant sign in as Risk Reviewer / Case Owner"
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium flex items-center gap-1 transition-colors"
+              >
+                <span>Sign in</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
             </div>
           </div>
         </div>
@@ -607,24 +435,24 @@ export function LoginForm() {
           <p>© 2026 TRIS Risk Intelligence Systems.</p>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => toast.info('Enterprise Security SLA: 99.99% with SOC 2 Type II attestation.')}
+              onClick={() => toast.info('Security policy documentation is available upon request.')}
               className="hover:text-foreground hover:underline"
             >
               Security Policy
             </button>
             <span>·</span>
             <button
-              onClick={() => toast.info('Deterministic Forensic Engine Documentation: v1.3.4')}
+              onClick={() => toast.info('Documentation available on request.')}
               className="hover:text-foreground hover:underline"
             >
-              Compliance Spec
+              Documentation
             </button>
             <span>·</span>
             <button
-              onClick={() => toast.info('Contact TRIS Support: security-desk@tris.internal')}
+              onClick={() => toast.info('Contact your system administrator for support.')}
               className="hover:text-foreground hover:underline"
             >
-              Support Desk
+              Support
             </button>
           </div>
         </div>
@@ -649,13 +477,11 @@ export function LoginForm() {
               </button>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              In accordance with Zero-Trust Security Policy, passwords cannot be reset via insecure channels.
-              Please contact your organizational System Administrator or submit a ticket to the Security Operations Center.
+              Please contact your system administrator to reset your password. For this evaluation environment, use the demo account credentials shown on the sign-in page.
             </p>
             <div className="p-3 rounded-xl bg-muted/30 border border-border text-xs font-mono space-y-1">
-              <p className="text-foreground font-semibold">Emergency SOC Desk:</p>
-              <p className="text-primary">security-operations@tris.internal</p>
-              <p className="text-muted-foreground">PGP Key ID: 0x9B42E7FA18C</p>
+              <p className="text-foreground font-semibold">Evaluation Access:</p>
+              <p className="text-muted-foreground">Use a demo account from the sign-in page to explore TRIS.</p>
             </div>
             <Button
               className="w-full text-xs"

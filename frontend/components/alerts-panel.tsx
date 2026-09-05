@@ -171,7 +171,7 @@ export function AlertsPanel() {
 
       {/* Bottom Full-Width Action Button (Just like "+ Create account" in the reference image!) */}
       <div className="pt-3 border-t border-border/40 shrink-0 space-y-2">
-        <Link href="/fraud-detection" className="block">
+        <Link href="/risk-cases" className="block">
           <Button
             variant="outline"
             className="w-full h-10 rounded-xl border-0 bg-muted/30 hover:bg-muted/60 text-xs font-semibold text-foreground flex items-center justify-center gap-2 shadow-xs transition-colors"

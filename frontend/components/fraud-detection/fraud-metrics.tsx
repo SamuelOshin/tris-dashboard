@@ -64,7 +64,7 @@ export function FraudMetrics() {
     {
       label: 'Active Rules',
       value: `${activeRulesCount || 6} Active`,
-      subtext: 'Automated fraud and compliance detection rules',
+      subtext: 'Automated risk and compliance detection rules',
       badge: 'Active',
       badgeClass: 'bg-primary/10 text-primary border-primary/20',
       icon: <Cpu className="w-4 h-4" />,
@@ -80,10 +80,10 @@ export function FraudMetrics() {
       iconColor: maxScore >= 70 ? 'text-destructive bg-destructive/10 border-destructive/20' : 'text-warning bg-warning/10 border-warning/20',
     },
     {
-      label: 'Verified Closures',
+      label: 'System-Validated Closures',
       value: `${closedCount} of ${cases.length}`,
-      subtext: 'Formal 8-field verified closures attested by auditors',
-      badge: 'Audit Verified',
+      subtext: 'Formal 8-field closures validated by system controls',
+      badge: 'System Validated',
       badgeClass: 'bg-success/10 text-success border-success/20',
       icon: <CheckCircle2 className="w-4 h-4" />,
       iconColor: 'text-success bg-success/10 border-success/20',

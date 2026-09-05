@@ -28,10 +28,10 @@ export function TRISNavigation() {
       description: 'Platform Overview & KPI Ledger',
     },
     {
-      name: 'Cases & Fraud',
-      href: '/fraud-detection',
+      name: 'Risk Cases',
+      href: '/risk-cases',
       icon: Shield,
-      description: 'Anomaly Intelligence & Cases',
+      description: 'Risk Cases & Investigations',
     },
     {
       name: 'Suppliers',
@@ -46,10 +46,10 @@ export function TRISNavigation() {
       description: 'Excel Relational Pipeline',
     },
     {
-      name: 'Zero-Trust Access',
+      name: 'Access Events',
       href: '/zero-trust',
       icon: Activity,
-      description: 'Access Telemetry & Off-Hours Events',
+      description: 'Access Context & Off-Hours Events',
     },
   ]
 

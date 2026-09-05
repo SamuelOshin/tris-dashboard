@@ -57,13 +57,13 @@ interface DashboardLayoutProps {
 
 const coreNavigation = [
   {
-    name: 'Executive Dashboard',
+    name: 'Dashboard',
     href: '/',
     icon: TrendingUp,
   },
   {
-    name: 'Cases & Fraud',
-    href: '/fraud-detection',
+    name: 'Risk Cases',
+    href: '/risk-cases',
     icon: ShieldAlert,
   },
   {
@@ -77,7 +77,7 @@ const coreNavigation = [
     icon: Database,
   },
   {
-    name: 'Zero-Trust Access',
+    name: 'Access Events',
     href: '/zero-trust',
     icon: Activity,
   },
@@ -96,14 +96,14 @@ function DefaultQuickActions() {
           Investigate
         </Button>
       </Link>
-      <Link href="/fraud-detection">
+      <Link href="/risk-cases">
         <Button
           variant="outline"
           size="sm"
           className="h-8.5 px-3.5 rounded-xl border-0 bg-card shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:bg-muted/60 text-xs font-medium flex items-center gap-1.5 transition-all"
         >
           <Search className="w-3.5 h-3.5 text-muted-foreground" />
-          Evaluate Rules
+          Risk Cases
         </Button>
       </Link>
       <Link href="/ingestion">
@@ -169,7 +169,7 @@ export function DashboardLayout({
   const defaultBreadcrumbs: BreadcrumbItem[] = [
     { label: 'TRIS Studio', href: '/' },
     ...(activeNav && activeNav.href !== '/' ? [{ label: activeNav.name, href: activeNav.href }] : []),
-    ...(pathname.startsWith('/cases/') ? [{ label: 'Cases', href: '/fraud-detection' }, { label: pathname.split('/')[2] || 'Case Detail' }] : []),
+    ...(pathname.startsWith('/cases/') ? [{ label: 'Risk Cases', href: '/risk-cases' }, { label: pathname.split('/')[2] || 'Case Detail' }] : []),
   ]
   const renderedBreadcrumbs = breadcrumbs || defaultBreadcrumbs
 

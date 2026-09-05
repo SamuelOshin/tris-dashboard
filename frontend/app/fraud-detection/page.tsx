@@ -2,15 +2,15 @@ import { DashboardLayout } from '@/components/dashboard-layout'
 import { FraudDetectionDashboard } from '@/components/fraud-detection/dashboard'
 
 export const metadata = {
-  title: 'Risk Detection & Anomaly Intelligence - TRIS',
-  description: 'Real-time anomaly detection and risk intelligence for enterprise procurement',
+  title: 'Risk Cases & Prioritization - TRIS',
+  description: 'Structured risk exception review and prioritized investigation',
 }
 
 export default function FraudDetectionPage() {
   return (
     <DashboardLayout
-      title="Risk Detection & Anomaly Intelligence"
-      description="Real-time anomaly detection and invoice risk analysis"
+      title="Risk Cases & Prioritization"
+      description="Structured risk exception review and prioritized investigation"
     >
       <FraudDetectionDashboard />
     </DashboardLayout>

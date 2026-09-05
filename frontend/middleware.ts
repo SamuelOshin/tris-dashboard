@@ -8,6 +8,7 @@ const PROTECTED_PREFIXES = [
   '/cases',
   '/compliance',
   '/fraud-detection',
+  '/risk-cases',
   '/zero-trust',
   '/ingestion',
   '/developer-tests',
