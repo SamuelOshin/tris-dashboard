@@ -123,12 +123,24 @@ export function NotificationsPopover() {
     }
   }, [])
 
-  // Poll unread count every 30 seconds
+  // Poll unread count every 30 seconds and listen for immediate action events
   useEffect(() => {
     fetchUnreadCount()
     const interval = setInterval(fetchUnreadCount, 30_000)
-    return () => clearInterval(interval)
-  }, [fetchUnreadCount])
+
+    const handleRefresh = () => {
+      fetchUnreadCount()
+      if (open) {
+        fetchNotifications()
+      }
+    }
+    window.addEventListener('tris-notification-refresh', handleRefresh)
+
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('tris-notification-refresh', handleRefresh)
+    }
+  }, [fetchUnreadCount, fetchNotifications, open])
 
   // When popover opens, fetch full notifications list
   const handleOpenChange = (isOpen: boolean) => {

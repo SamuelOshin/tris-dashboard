@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { api, RiskCase, CaseTransitionPayload, enrichSignal } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
+import { toast } from 'sonner'
 import {
   ShieldAlert,
   ArrowLeft,
@@ -285,6 +286,9 @@ export default function CaseDetailPage() {
       )
     }
     setSuccessMessage('Evaluation sample data loaded into form.')
+    toast.info('Evaluation Sample Loaded', {
+      description: 'Realistic investigation notes and root-cause details populated.',
+    })
   }
 
   const handleClearForm = () => {
@@ -303,6 +307,9 @@ export default function CaseDetailPage() {
       localStorage.removeItem(`tris_case_draft_${caseId}`)
     } catch (e) {}
     setSuccessMessage('Form fields cleared.')
+    toast.info('Form Fields Cleared', {
+      description: 'Investigation and corrective action inputs reset.',
+    })
   }
 
   const handleTransition = async (toStatus: string, extra: Partial<CaseTransitionPayload> = {}) => {
@@ -318,7 +325,8 @@ export default function CaseDetailPage() {
       }
       const updated = await api.transitionCase(caseId, payload)
       setCaseData(updated)
-      setSuccessMessage(`Case transitioned to ${toStatus} successfully.`)
+      const msg = `Case transitioned to ${toStatus} successfully.`
+      setSuccessMessage(msg)
       setClosureModalOpen(false)
       setReopenModalOpen(false)
       if (toStatus === 'Closed') {
@@ -326,8 +334,16 @@ export default function CaseDetailPage() {
           localStorage.removeItem(`tris_case_draft_${caseId}`)
         } catch (e) {}
       }
+      toast.success(toStatus === 'Closed' ? 'Case Sealed & Closed' : `Case Status: ${toStatus}`, {
+        description: extra.note || msg,
+      })
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('tris-notification-refresh'))
+      }
     } catch (err: any) {
-      setError(err.message || `Failed to transition case to ${toStatus}`)
+      const errMsg = err.message || `Failed to transition case to ${toStatus}`
+      setError(errMsg)
+      toast.error('Transition Failed', { description: errMsg })
     } finally {
       setActionLoading(false)
     }
@@ -362,10 +378,19 @@ export default function CaseDetailPage() {
           note: `Investigation saved. Root cause: ${rootCause || 'Under Review'} [Category: ${rootCauseCategory || 'Pending'}]`,
         })
       } else {
-        setSuccessMessage('Investigation details saved.')
+        const msg = 'Investigation details saved.'
+        setSuccessMessage(msg)
+        toast.success('Investigation Details Saved', {
+          description: rootCause ? `Root cause: ${rootCause}` : 'Draft saved to case workspace.',
+        })
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('tris-notification-refresh'))
+        }
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to save investigation')
+      const errMsg = err.message || 'Failed to save investigation'
+      setError(errMsg)
+      toast.error('Save Failed', { description: errMsg })
     } finally {
       setActionLoading(false)
     }
@@ -382,10 +407,19 @@ export default function CaseDetailPage() {
           note: `Corrective action recorded: ${actionTaken} | Responsible: ${responsiblePerson}`,
         })
       } else {
-        setSuccessMessage('Corrective action plan saved.')
+        const msg = 'Corrective action plan saved.'
+        setSuccessMessage(msg)
+        toast.success('Corrective Action Plan Saved', {
+          description: actionTaken ? `Plan: ${actionTaken}` : 'Remediation plan updated.',
+        })
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('tris-notification-refresh'))
+        }
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to save corrective action')
+      const errMsg = err.message || 'Failed to save corrective action'
+      setError(errMsg)
+      toast.error('Save Failed', { description: errMsg })
     } finally {
       setActionLoading(false)
     }
@@ -426,7 +460,11 @@ export default function CaseDetailPage() {
 
     if (missing.length > 0) {
       setClosureValidationErrors(missing)
-      setError(`Closure blocked: missing mandatory criteria`)
+      const errAlert = `Closure blocked: missing mandatory criteria [${missing.join(', ')}]`
+      setError(errAlert)
+      toast.error('Closure Blocked: Missing Requirements', {
+        description: `Please provide: ${missing.join(', ')}`,
+      })
       return
     }
 
@@ -451,8 +489,16 @@ export default function CaseDetailPage() {
         localStorage.removeItem(`tris_case_draft_${caseId}`)
       } catch (e) {}
       setSuccessMessage('Case successfully closed and verified by TRIS.')
+      toast.success('Case Closed & Verified', {
+        description: 'All 8 mandatory criteria confirmed. Audit seal recorded.',
+      })
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('tris-notification-refresh'))
+      }
     } catch (err: any) {
-      setError(err.message || 'System-validated closure failed')
+      const errMsg = err.message || 'System-validated closure failed'
+      setError(errMsg)
+      toast.error('Closure Failed', { description: errMsg })
     } finally {
       setActionLoading(false)
     }

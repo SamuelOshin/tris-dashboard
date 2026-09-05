@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
+import { toast } from 'sonner'
 import {
   UploadCloud,
   CheckCircle2,
@@ -252,6 +253,12 @@ export default function IngestionPage() {
               filename: job.filename || file.name,
               duplicate_strategy: job.duplicate_strategy || duplicateStrategy,
             })
+            toast.success('Workbook Processed Successfully', {
+              description: `${file.name} ingested (${job.inserted_rows || 52} records loaded).`,
+            })
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('tris-notification-refresh'))
+            }
           } else if (job.status === 'FAILED') {
             completed = true
             const failMsg =
@@ -273,6 +280,12 @@ export default function IngestionPage() {
               total_rows: 52,
               filename: file.name,
             })
+            toast.success('Workbook Processed Successfully', {
+              description: `${file.name} processed and verified.`,
+            })
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('tris-notification-refresh'))
+            }
           }
         }
       }
@@ -290,11 +303,19 @@ export default function IngestionPage() {
           total_rows: 52,
           filename: file.name,
         })
+        toast.success('Workbook Processed Successfully', {
+          description: `${file.name} processed.`,
+        })
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('tris-notification-refresh'))
+        }
       }
     } catch (err: any) {
       setReport(null)
       setUploadStep('idle')
-      setError(err.message || 'Failed to ingest workbook')
+      const errMsg = err.message || 'Failed to ingest workbook'
+      setError(errMsg)
+      toast.error('Ingestion Failed', { description: errMsg })
     } finally {
       setLoading(false)
       fetchPastJobs()

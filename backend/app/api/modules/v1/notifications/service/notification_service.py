@@ -23,11 +23,20 @@ class NotificationService:
     @staticmethod
     def _build_user_recipient_condition(user: User):
         """Build condition to match notifications for user, user's role, or global broadcast."""
-        return or_(
+        conditions = [
             Notification.recipient_user_id == user.user_id,
-            Notification.recipient_role == user.role,
-            Notification.recipient_user_id.is_(None) & Notification.recipient_role.is_(None),
-        )
+            Notification.recipient_user_id == user.username,
+            Notification.recipient_user_id == user.name,
+            func.lower(Notification.recipient_role) == func.lower(user.role),
+            (Notification.recipient_user_id.is_(None)) & (Notification.recipient_role.is_(None)),
+        ]
+        if user.role.lower() in ["reviewer", "verifier", "admin", "compliance"]:
+            conditions.append(
+                Notification.recipient_role.in_(
+                    ["compliance", "reviewer", "verifier", "Reviewer", "Verifier"]
+                )
+            )
+        return or_(*conditions)
 
     @classmethod
     async def get_user_notifications(

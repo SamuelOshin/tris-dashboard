@@ -218,11 +218,38 @@ class CaseService:
                 category="CASE_ALERT",
                 severity="INFO",
                 recipient_user_id=transition.assigned_to,
+                recipient_role="Reviewer",
                 link_url=f"/cases/{case.case_id}",
                 metadata_json={"case_id": case.case_id, "supplier_id": case.supplier_id},
             )
 
-        if target_status == "Pending Verification":
+        if target_status == "Under Investigation":
+            await NotificationService.emit(
+                db=session,
+                title=f"Case {case.case_id} Investigation Started",
+                message=(
+                    f"Investigation started for Case {case.case_id} by {transition.actor}."
+                ),
+                category="CASE_ALERT",
+                severity="INFO",
+                recipient_role="Reviewer",
+                link_url=f"/cases/{case.case_id}",
+                metadata_json={"case_id": case.case_id, "supplier_id": case.supplier_id},
+            )
+        elif target_status == "Corrective Action":
+            await NotificationService.emit(
+                db=session,
+                title=f"Case {case.case_id} Remediation Active",
+                message=(
+                    f"Corrective action plan recorded for Case {case.case_id} by {transition.actor}."
+                ),
+                category="CASE_ALERT",
+                severity="INFO",
+                recipient_role="Reviewer",
+                link_url=f"/cases/{case.case_id}",
+                metadata_json={"case_id": case.case_id, "supplier_id": case.supplier_id},
+            )
+        elif target_status == "Pending Verification":
             await NotificationService.emit(
                 db=session,
                 title=f"Case {case.case_id} Pending Verification",
@@ -232,7 +259,7 @@ class CaseService:
                 ),
                 category="CASE_ALERT",
                 severity="WARNING",
-                recipient_role="compliance",
+                recipient_role="Reviewer",
                 link_url=f"/cases/{case.case_id}",
                 metadata_json={"case_id": case.case_id, "supplier_id": case.supplier_id},
             )
@@ -247,9 +274,20 @@ class CaseService:
                 ),
                 category="CASE_ALERT",
                 severity="SUCCESS",
-                recipient_role="compliance",
+                recipient_role="Reviewer",
                 link_url=f"/cases/{case.case_id}",
                 metadata_json={"case_id": case.case_id, "verified_by": case.verified_by},
+            )
+        elif target_status == "Reopened":
+            await NotificationService.emit(
+                db=session,
+                title=f"Case {case.case_id} Reopened",
+                message=f"Case {case.case_id} was reopened by {transition.actor}.",
+                category="CASE_ALERT",
+                severity="WARNING",
+                recipient_role="Reviewer",
+                link_url=f"/cases/{case.case_id}",
+                metadata_json={"case_id": case.case_id},
             )
 
         # 6. Commit Transition
