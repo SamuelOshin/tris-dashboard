@@ -28,7 +28,8 @@ import {
   Wrench,
   RefreshCw,
   Upload,
-  Trash2,
+  Activity,
+  Cpu,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
@@ -59,8 +60,15 @@ export default function CaseDetailPage() {
 
   // Investigation form state
   const [investigationNotes, setInvestigationNotes] = useState(
-    'Reviewed both invoices in the system. Same invoice number and amount found for the same supplier. Checked approvals and posting dates.'
+    'Reviewed both invoices and related master records in the system. Verified posting dates, approval hierarchies, and vendor master changes.'
   )
+  const [evidenceReviewed, setEvidenceReviewed] = useState(
+    'Accounts payable invoice record, vendor master bank change audit log, approval threshold policy, and off-hours ERP access logs.'
+  )
+  const [findingDisposition, setFindingDisposition] = useState(
+    'Unusual transaction amount confirmed; invoice lacked required Tier-2 authorization following recent vendor bank routing update.'
+  )
+  const [rootCauseCategory, setRootCauseCategory] = useState('Process Error / Data Entry')
   const [rootCause, setRootCause] = useState(
     'Duplicate invoice was entered due to manual data entry error.'
   )
@@ -70,8 +78,9 @@ export default function CaseDetailPage() {
   const [actionTaken, setActionTaken] = useState(
     'Duplicate invoice removed. Payment blocked. Supplier account reviewed.'
   )
-  const [responsiblePerson, setResponsiblePerson] = useState('Reviewer')
-  const [targetCompletionDate, setTargetCompletionDate] = useState('2026-09-06')
+  const [responsiblePerson, setResponsiblePerson] = useState('Risk Reviewer / Case Owner')
+  const [targetCompletionDate, setTargetCompletionDate] = useState('2026-09-08')
+  const [completionDate, setCompletionDate] = useState('2026-09-06')
   const [evidenceOfAction, setEvidenceOfAction] = useState('supplier_update.png')
   const [actionStatus, setActionStatus] = useState('Completed')
   const [actionComments, setActionComments] = useState(
@@ -139,7 +148,7 @@ export default function CaseDetailPage() {
     try {
       const payload: CaseTransitionPayload = {
         to_status: toStatus,
-        actor: user?.name || 'Reviewer',
+        actor: user?.name || 'Risk Reviewer / Case Owner',
         note: `Status transition to ${toStatus}`,
         ...extra,
       }
@@ -157,7 +166,7 @@ export default function CaseDetailPage() {
 
   // Accept / Assign Case
   const handleAcceptCase = async () => {
-    const ownerName = user?.name || 'Reviewer'
+    const ownerName = user?.name || 'Risk Reviewer / Case Owner'
     await handleTransition('Assigned', {
       assigned_to: ownerName,
       note: `Ownership assigned to ${ownerName}`,
@@ -177,13 +186,11 @@ export default function CaseDetailPage() {
     setActionLoading(true)
     setSuccessMessage(null)
     try {
-      // Record in history and advance state if Assigned
       if (caseData?.status === 'Assigned') {
         await handleTransition('Under Investigation', {
-          note: `Investigation updated. Root cause: ${rootCause}`,
+          note: `Investigation saved. Root cause: ${rootCause} [Category: ${rootCauseCategory}]`,
         })
       } else {
-        // Provide immediate visual feedback
         setSuccessMessage('Investigation details saved successfully.')
       }
     } catch (err: any) {
@@ -223,7 +230,7 @@ export default function CaseDetailPage() {
       corrective_action: actionTaken.trim() || caseData?.corrective_action || '',
       closure_type: closureForm.closure_type || 'Process Error / Remedied',
       closure_evidence: (supportingEvidence.trim() || evidenceOfAction.trim()) || caseData?.closure_evidence || '',
-      verified_by: user?.name || 'Reviewer',
+      verified_by: user?.name || 'Risk Reviewer / Case Owner',
       closure_date: new Date().toISOString().split('T')[0],
       follow_up_requirement: closureForm.follow_up_requirement || 'Periodic invoice audit',
       recurrence_monitoring: 'Enrolled in 90-day monitoring under Rule R-006',
@@ -249,17 +256,15 @@ export default function CaseDetailPage() {
     try {
       setActionLoading(true)
       if (caseData?.status !== 'Pending Verification' && caseData?.status !== 'Closed') {
-        // Step to Pending Verification first if needed
         await api.transitionCase(caseId, {
           to_status: 'Pending Verification',
-          actor: user?.name || 'Reviewer',
+          actor: user?.name || 'Risk Reviewer / Case Owner',
           note: 'Submitted for system-validated closure',
         })
       }
-      // Now close with full payload
       const closed = await api.transitionCase(caseId, {
         to_status: 'Closed',
-        actor: user?.name || 'Reviewer',
+        actor: user?.name || 'Risk Reviewer / Case Owner',
         note: 'System-validated closure completed',
         ...payload,
       })
@@ -457,97 +462,173 @@ export default function CaseDetailPage() {
           <div className="space-y-6 pt-2">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left Column: Case Summary */}
-              <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-4">
-                <h2 className="text-sm font-bold text-foreground">Case Summary</h2>
+              <div className="space-y-4">
+                <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-4">
+                  <h2 className="text-sm font-bold text-foreground">Case Summary</h2>
 
-                <div className="space-y-2.5 text-xs divide-y divide-border/40">
-                  <div className="flex justify-between items-center pt-1">
-                    <span className="text-muted-foreground font-medium">Case ID</span>
-                    <span className="font-mono font-bold text-foreground">{caseData.case_id}</span>
+                  <div className="space-y-2.5 text-xs divide-y divide-border/40">
+                    <div className="flex justify-between items-center pt-1">
+                      <span className="text-muted-foreground font-medium">Case ID</span>
+                      <span className="font-mono font-bold text-foreground">{caseData.case_id}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Rule</span>
+                      <span className="text-foreground font-medium text-right">
+                        {primarySignal?.rule_name || (caseData as any).rule_description || 'Duplicate invoice detected'}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Priority</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${priorityBadgeColor}`}>
+                        {caseData.priority}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Status</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${statusBadgeColor}`}>
+                        {isClosed ? 'Closed' : caseData.status === 'New' ? 'Open' : caseData.status === 'Pending Verification' ? 'Pending Closure' : 'In Progress'}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Owner</span>
+                      <span className="text-foreground font-medium">
+                        {caseData.assigned_to || (
+                          <button
+                            onClick={handleAcceptCase}
+                            className="text-primary hover:underline font-semibold"
+                          >
+                            Assign to Me
+                          </button>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Date Created</span>
+                      <span className="font-mono text-muted-foreground">
+                        {caseData.created_at ? new Date(caseData.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'Sep 05, 2026'}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Due Date</span>
+                      <span className="font-mono text-muted-foreground">Sep 08, 2026</span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Supplier / Entity</span>
+                      <span className="font-mono font-semibold text-foreground">{caseData.supplier_id || 'SUP-001'}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Transaction Reference</span>
+                      <span className="font-mono text-foreground">{caseData.transaction_id || 'TX-1999'}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-muted-foreground font-medium">Last Updated</span>
+                      <span className="font-mono text-muted-foreground">
+                        {caseData.updated_at ? new Date(caseData.updated_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'Sep 06, 2026'}
+                      </span>
+                    </div>
                   </div>
+                </Card>
 
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Rule</span>
-                    <span className="text-foreground font-medium text-right">
-                      {primarySignal?.rule_name || (caseData as any).rule_description || 'Duplicate invoice detected'}
+                {/* Supplier Historical Baseline Card (Image 1 Requirement) */}
+                <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-primary" />
+                      Supplier Historical Baseline
+                    </h3>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold">
+                      Strict Exclusion Active
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Priority</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${priorityBadgeColor}`}>
-                      {caseData.priority}
-                    </span>
-                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Evaluated against historical baseline of supplier <span className="font-mono font-semibold text-foreground">{caseData.supplier_id || 'SUP-001'}</span> across prior transactions. Target transaction <span className="font-mono font-semibold text-foreground">{caseData.transaction_id || 'TX-1999'}</span> is strictly excluded from baseline calculation to eliminate bias.
+                  </p>
 
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Status</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${statusBadgeColor}`}>
-                      {isClosed ? 'Closed' : caseData.status === 'New' ? 'Open' : caseData.status === 'Pending Verification' ? 'Pending Closure' : 'In Progress'}
-                    </span>
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border/50 text-center font-mono">
+                    <div className="p-2 rounded-lg bg-muted/20 border border-border/40">
+                      <p className="text-[10px] text-muted-foreground uppercase">Historical Mean</p>
+                      <p className="text-xs font-bold text-foreground mt-0.5">$30,471.43</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/20 border border-border/40">
+                      <p className="text-[10px] text-muted-foreground uppercase">Evaluated Tx</p>
+                      <p className="text-xs font-bold text-foreground mt-0.5">$104,000.00</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive">
+                      <p className="text-[10px] uppercase font-bold">Deviation</p>
+                      <p className="text-xs font-bold mt-0.5">3.41x (&gt; 2.0x)</p>
+                    </div>
                   </div>
-
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Owner</span>
-                    <span className="text-foreground font-medium">
-                      {caseData.assigned_to || (
-                        <button
-                          onClick={handleAcceptCase}
-                          className="text-primary hover:underline font-semibold"
-                        >
-                          Assign to Me
-                        </button>
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Date Created</span>
-                    <span className="font-mono text-muted-foreground">
-                      {caseData.created_at ? new Date(caseData.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'Sep 05, 2026'}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Due Date</span>
-                    <span className="font-mono text-muted-foreground">Sep 08, 2026</span>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Supplier / Entity</span>
-                    <span className="font-mono font-semibold text-foreground">{caseData.supplier_id || 'SUP-001'}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Transaction Reference</span>
-                    <span className="font-mono text-foreground">{caseData.transaction_id || 'TX-1999'}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-muted-foreground font-medium">Last Updated</span>
-                    <span className="font-mono text-muted-foreground">
-                      {caseData.updated_at ? new Date(caseData.updated_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'Sep 06, 2026'}
-                    </span>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
 
               {/* Right Column: Why This Case Was Flagged */}
               <div className="space-y-4">
-                <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-3">
-                  <h2 className="text-sm font-bold text-foreground">Why This Case Was Flagged</h2>
+                <Card className="p-5 bg-card border border-border/80 rounded-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-bold text-foreground">Why This Case Was Flagged</h2>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-semibold">
+                      Additive Scoring Engine
+                    </span>
+                  </div>
 
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {primarySignal?.explanation ||
                       'Two invoices with the same invoice number and amount were detected for the same supplier within a short time period.'}
                   </p>
 
+                  {/* Multi-Signal Breakdown (Image 2 & 3: R-001 to R-004 breakdown) */}
+                  <div className="space-y-2 pt-2 border-t border-border/50">
+                    <p className="text-xs font-bold text-foreground">Triggered Detection Rules</p>
+                    <div className="space-y-2">
+                      {enrichedSignals && enrichedSignals.length > 0 ? (
+                        enrichedSignals.map((signal, idx) => (
+                          <div key={idx} className="p-2.5 rounded-lg border border-border/60 bg-muted/20 space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-bold text-foreground flex items-center gap-1.5">
+                                <Cpu className="w-3.5 h-3.5 text-primary" />
+                                {signal.rule_code}: {signal.rule_name}
+                              </span>
+                              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                +{signal.weight || signal.score} pts
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground leading-relaxed">
+                              {signal.explanation}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-2.5 rounded-lg border border-border/60 bg-muted/20 space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-foreground">R-005: Duplicate Invoice Detected</span>
+                            <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                              +50 pts
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Two invoices sharing identical invoice number and dollar amount detected for the same supplier within 30 days.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="pt-3 border-t border-border/50 space-y-2">
                     <h3 className="text-xs font-bold text-foreground">Potential Risk</h3>
                     <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc">
-                      <li>Duplicate payment</li>
-                      <li>Financial loss</li>
-                      <li>Control weakness</li>
+                      <li>Duplicate payment disbursement</li>
+                      <li>Financial loss exposure</li>
+                      <li>Internal control bypass</li>
                     </ul>
                   </div>
                 </Card>
@@ -600,11 +681,51 @@ export default function CaseDetailPage() {
               <div>
                 <h2 className="text-sm font-bold text-foreground">Investigation Details</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Record findings, identify root cause, and attach supporting documentation.
+                  Record findings, review evidence, classify root cause, and attach supporting documentation.
                 </p>
               </div>
 
               <div className="space-y-4 text-xs">
+                {/* Evidence Reviewed */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Evidence Reviewed</label>
+                  <textarea
+                    rows={2}
+                    value={evidenceReviewed}
+                    onChange={(e) => setEvidenceReviewed(e.target.value)}
+                    placeholder="Accounts payable invoice record, vendor master bank change audit log..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                  />
+                </div>
+
+                {/* Finding / Disposition */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Finding / Disposition</label>
+                  <textarea
+                    rows={2}
+                    value={findingDisposition}
+                    onChange={(e) => setFindingDisposition(e.target.value)}
+                    placeholder="Document forensic findings and disposition..."
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+                  />
+                </div>
+
+                {/* Root Cause Category */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground">Root-Cause Category</label>
+                  <select
+                    value={rootCauseCategory}
+                    onChange={(e) => setRootCauseCategory(e.target.value)}
+                    className="w-full h-9 px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="Process Error / Data Entry">Process Error / Data Entry</option>
+                    <option value="Internal Control Bypass">Internal Control Bypass</option>
+                    <option value="Unauthorized Vendor Master Change">Unauthorized Vendor Master Change</option>
+                    <option value="System Integration Glitch">System Integration Glitch</option>
+                    <option value="Supplier Account Compromise">Supplier Account Compromise</option>
+                  </select>
+                </div>
+
                 {/* Investigation Notes */}
                 <div className="space-y-1.5">
                   <label className="font-semibold text-foreground">Investigation Notes</label>
@@ -617,9 +738,9 @@ export default function CaseDetailPage() {
                   />
                 </div>
 
-                {/* Root Cause */}
+                {/* Root Cause Notes */}
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-foreground">Root Cause</label>
+                  <label className="font-semibold text-foreground">Root Cause Explanation</label>
                   <textarea
                     rows={2}
                     value={rootCause}
@@ -704,7 +825,7 @@ export default function CaseDetailPage() {
 
                 {/* Responsible Person */}
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-foreground">Responsible Person</label>
+                  <label className="font-semibold text-foreground">Responsible Person / Function</label>
                   <Input
                     value={responsiblePerson}
                     onChange={(e) => setResponsiblePerson(e.target.value)}
@@ -712,15 +833,28 @@ export default function CaseDetailPage() {
                   />
                 </div>
 
-                {/* Target Completion Date */}
-                <div className="space-y-1.5">
-                  <label className="font-semibold text-foreground">Target Completion Date</label>
-                  <Input
-                    type="date"
-                    value={targetCompletionDate}
-                    onChange={(e) => setTargetCompletionDate(e.target.value)}
-                    className="h-9 text-xs bg-card font-mono"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Target Completion Date */}
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-foreground">Target Completion Date</label>
+                    <Input
+                      type="date"
+                      value={targetCompletionDate}
+                      onChange={(e) => setTargetCompletionDate(e.target.value)}
+                      className="h-9 text-xs bg-card font-mono"
+                    />
+                  </div>
+
+                  {/* Actual Completion Date */}
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-foreground">Actual Completion Date</label>
+                    <Input
+                      type="date"
+                      value={completionDate}
+                      onChange={(e) => setCompletionDate(e.target.value)}
+                      className="h-9 text-xs bg-card font-mono"
+                    />
+                  </div>
                 </div>
 
                 {/* Evidence of Action */}
@@ -769,9 +903,9 @@ export default function CaseDetailPage() {
                   </select>
                 </div>
 
-                {/* Comments */}
+                {/* Outcome / Comments */}
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-foreground">Comments</label>
+                  <label className="font-semibold text-foreground">Outcome / Comments</label>
                   <textarea
                     rows={2}
                     value={actionComments}
@@ -954,7 +1088,7 @@ export default function CaseDetailPage() {
                       <span className="font-mono text-muted-foreground text-[11px]">Sep 05, 2026 11:30</span>
                     </div>
                     <p className="font-bold text-foreground">Ownership assigned</p>
-                    <p className="text-muted-foreground">{caseData.assigned_to || 'Reviewer'}</p>
+                    <p className="text-muted-foreground">{caseData.assigned_to || 'Risk Reviewer / Case Owner'}</p>
                   </div>
                 )}
 
