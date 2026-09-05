@@ -3,14 +3,11 @@ Transaction HTTP Gateway Routes.
 HTTP transport only — max 50 lines per handler, no business logic, no try-except.
 """
 
-from typing import Annotated, Optional
+from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Query, status
 
-from app.api.core.dependencies import get_current_user
-from app.api.db.database import get_db
-from app.api.modules.v1.auth.models.user import User
+from app.api.core.dependencies import AuthenticatedUser, DbSession
 from app.api.modules.v1.transactions.schemas.transaction_schemas import TransactionResponse
 from app.api.modules.v1.transactions.service.transaction_service import TransactionService
 from app.api.utils.response_payloads import success_response
@@ -23,8 +20,8 @@ async def list_transactions(
     supplier_id: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    current_user: Annotated[User, Depends(get_current_user)] = None,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: AuthenticatedUser = None,
+    db: DbSession = None,
 ):
     """
     Retrieve paginated transactions with optional supplier filtering.
@@ -47,8 +44,8 @@ async def list_transactions(
 @router.get("/{transaction_id}", response_model=None)
 async def get_transaction(
     transaction_id: str,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: AuthenticatedUser = None,
+    db: DbSession = None,
 ):
     """Retrieve single transaction by ID. Requires authenticated session."""
     tx = await TransactionService.get_transaction_by_id(

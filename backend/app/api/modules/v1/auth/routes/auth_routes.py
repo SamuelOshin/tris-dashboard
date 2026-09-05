@@ -3,15 +3,10 @@ Authentication HTTP Gateway Routes.
 HTTP transport only — max 50 lines per handler, no business logic, no try-except.
 """
 
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, Response, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Response, status
 
 from app.api.core.config import settings
-from app.api.core.dependencies import get_current_user
-from app.api.db.database import get_db
-from app.api.modules.v1.auth.models.user import User
+from app.api.core.dependencies import AuthenticatedUser, DbSession
 from app.api.modules.v1.auth.schemas.auth_schemas import LoginRequest, UserResponse
 from app.api.modules.v1.auth.service.auth_service import AuthService
 from app.api.utils.response_payloads import auth_response, success_response
@@ -23,7 +18,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 async def login(
     payload: LoginRequest,
     response: Response,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    db: DbSession = None,
 ):
     """
     Authenticate user and issue session.
@@ -53,7 +48,7 @@ async def login(
 
 
 @router.get("/me", response_model=None)
-async def get_me(current_user: Annotated[User, Depends(get_current_user)]):
+async def get_me(current_user: AuthenticatedUser):
     """Retrieve profile of currently authenticated user."""
     user_data = UserResponse.model_validate(current_user).model_dump()
     return success_response(

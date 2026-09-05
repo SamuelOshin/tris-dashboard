@@ -3,6 +3,7 @@ Shared FastAPI Dependencies.
 Includes authentication extraction and current user resolution.
 """
 
+from collections.abc import Sequence
 from typing import Annotated, Optional
 
 from fastapi import Depends, Request
@@ -13,6 +14,12 @@ from sqlmodel import select
 from app.api.core.custom_exceptions.exceptions import (
     AuthenticationError,
     PermissionDeniedError,
+)
+from app.api.core.permissions import (
+    PRIVILEGED_ROLES,
+    ROLE_LABELS,
+    WRITE_ROLES,
+    Role,
 )
 from app.api.core.security import decode_access_token
 from app.api.db.database import get_db
@@ -79,28 +86,24 @@ async def get_current_user_optional(
         return None
 
 
-def require_roles(allowed_roles: list[str]):
+def require_roles(allowed_roles: Sequence[Role | str]):
     """
     Dependency factory enforcing role-based access control (RBAC).
 
     Args:
-        allowed_roles: List of permitted role names (case-insensitive).
+        allowed_roles: List or tuple of permitted roles (Role enum or string).
     """
+    normalized_allowed = [str(r).lower() for r in allowed_roles]
 
     async def role_checker(
         current_user: Annotated[User, Depends(get_current_user)],
     ) -> User:
-        if current_user.role.lower() not in [r.lower() for r in allowed_roles]:
-            role_labels = {
-                "admin": "System Administrator",
-                "compliance": "Compliance Lead",
-                "reviewer": "Risk Reviewer",
-                "verifier": "Compliance Verifier",
-                "cfo": "Executive Leadership",
-                "security": "Security Analyst",
-                "procurement": "Procurement Specialist",
-            }
-            readable_roles = [role_labels.get(r.lower(), r.capitalize()) for r in allowed_roles]
+        user_role_str = current_user.role.lower()
+        if user_role_str not in normalized_allowed:
+            readable_roles = [
+                ROLE_LABELS.get(r, str(r).capitalize())  # type: ignore[arg-type]
+                for r in normalized_allowed
+            ]
             if len(readable_roles) == 1:
                 roles_str = readable_roles[0]
             elif len(readable_roles) == 2:
@@ -108,8 +111,9 @@ def require_roles(allowed_roles: list[str]):
             else:
                 roles_str = f"{', '.join(readable_roles[:-1])}, or {readable_roles[-1]}"
 
-            user_role_label = role_labels.get(
-                current_user.role.lower(), current_user.role.capitalize()
+            user_role_label = ROLE_LABELS.get(
+                user_role_str,
+                current_user.role.capitalize(),  # type: ignore[arg-type]
             )
             raise PermissionDeniedError(
                 f"Access restricted: Your account ({user_role_label}) "
@@ -119,3 +123,10 @@ def require_roles(allowed_roles: list[str]):
         return current_user
 
     return role_checker
+
+
+# ── Reusable Annotated Dependency Type Aliases ─────────────────────
+AuthenticatedUser = Annotated[User, Depends(get_current_user)]
+PrivilegedUser = Annotated[User, Depends(require_roles(PRIVILEGED_ROLES))]
+WriteUser = Annotated[User, Depends(require_roles(WRITE_ROLES))]
+DbSession = Annotated[AsyncSession, Depends(get_db)]

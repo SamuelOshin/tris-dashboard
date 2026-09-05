@@ -8,7 +8,7 @@ Pure business logic — raises domain exceptions directly.
 import asyncio
 import logging
 import re
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from io import BytesIO
 from typing import Any, ClassVar
 
@@ -16,10 +16,16 @@ import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import SQLModel, select
 
-from app.api.core.custom_exceptions.exceptions import IngestionError
+from app.api.core.custom_exceptions.exceptions import (
+    IngestionError,
+    NotFoundError,
+    PermissionDeniedError,
+)
+from app.api.core.permissions import PRIVILEGED_ROLES
 from app.api.db import database
 from app.api.modules.v1.access_events.models.access_event import AccessEvent
 from app.api.modules.v1.approvals.models.approval import Approval
+from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.cases.models.risk_case import CaseHistory, RiskCase
 from app.api.modules.v1.ingestion.models.ingestion_job import IngestionJob
 from app.api.modules.v1.rules.models.rule_config import RuleConfig
@@ -1126,3 +1132,72 @@ class IngestionService:
             counts["inserted_rows"] += 1
 
         report["cases_loaded"] = inserted_cases
+
+    @staticmethod
+    async def list_jobs_for_user(
+        session: AsyncSession,
+        user: User,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> list[IngestionJob]:
+        """
+        List historical ingestion jobs with pagination.
+        Privileged roles (admin, compliance) view all jobs; others see their own.
+        """
+        stmt = select(IngestionJob).order_by(IngestionJob.created_at.desc())
+        is_privileged = user.role.lower() in [r.value for r in PRIVILEGED_ROLES]
+        if not is_privileged:
+            stmt = stmt.where(IngestionJob.uploaded_by == user.user_id)
+
+        stmt = stmt.limit(limit).offset(offset)
+        result = await session.execute(stmt)
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def get_job_for_user(
+        session: AsyncSession,
+        user: User,
+        job_id: str,
+        timeout_minutes: int = 10,
+    ) -> IngestionJob:
+        """
+        Telemetry and audit query for an ingestion job with ownership enforcement.
+        Privileged roles (admin, compliance) or job owners have access.
+        Applies lightweight staleness guard.
+        """
+        job = await session.get(IngestionJob, job_id)
+        if not job:
+            raise NotFoundError(f"Ingestion job '{job_id}' was not found.")
+
+        is_owner = user.user_id == job.uploaded_by
+        is_privileged = user.role.lower() in [r.value for r in PRIVILEGED_ROLES]
+        if not (is_owner or is_privileged):
+            raise PermissionDeniedError(
+                f"You do not have permission to view telemetry for ingestion job '{job_id}'."
+            )
+
+        # Lightweight staleness guard (D8)
+        if job.status == "PROCESSING" and job.started_at:
+            now = datetime.now(UTC)
+            started = (
+                job.started_at if job.started_at.tzinfo else job.started_at.replace(tzinfo=UTC)
+            )
+            if now - started > timedelta(minutes=timeout_minutes):
+                job.status = "FAILED"
+                job.completed_at = now
+                job.error_log.append(
+                    {
+                        "sheet": "General",
+                        "row": -1,
+                        "field": "timeout",
+                        "error": (
+                            f"Job processing exceeded maximum allowed timeout of "
+                            f"{timeout_minutes} minutes."
+                        ),
+                        "raw_value": {},
+                    }
+                )
+                session.add(job)
+                await session.flush()
+
+        return job

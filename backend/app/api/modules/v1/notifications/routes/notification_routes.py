@@ -3,14 +3,9 @@ Notification Gateway Routes.
 HTTP transport only - max 50 lines per handler, no business logic, no try-except.
 """
 
-from typing import Annotated
+from fastapi import APIRouter, Query, status
 
-from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.api.core.dependencies import get_current_user
-from app.api.db.database import get_db
-from app.api.modules.v1.auth.models.user import User
+from app.api.core.dependencies import AuthenticatedUser, DbSession, PrivilegedUser
 from app.api.modules.v1.notifications.schemas.notification_schemas import (
     NotificationCreateRequest,
     NotificationResponse,
@@ -23,8 +18,8 @@ router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 @router.get("", response_model=None)
 async def list_notifications(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
     limit: int = Query(default=50, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     unread_only: bool = Query(default=False),
@@ -53,8 +48,8 @@ async def list_notifications(
 
 @router.get("/unread-count", response_model=None)
 async def get_unread_count(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
 ):
     """Retrieve lightweight count of unread notifications for header badge."""
     count_data = await NotificationService.get_unread_count(db=db, user=current_user)
@@ -68,8 +63,8 @@ async def get_unread_count(
 @router.patch("/{notification_id}/read", response_model=None)
 async def mark_notification_read(
     notification_id: str,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
 ):
     """Mark a specific notification as read."""
     notif = await NotificationService.mark_as_read(
@@ -85,8 +80,8 @@ async def mark_notification_read(
 
 @router.post("/mark-all-read", response_model=None)
 async def mark_all_notifications_read(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
 ):
     """Mark all unread notifications for current user as read."""
     updated_count = await NotificationService.mark_all_as_read(db=db, user=current_user)
@@ -100,8 +95,8 @@ async def mark_all_notifications_read(
 @router.post("", response_model=None, status_code=status.HTTP_201_CREATED)
 async def create_notification(
     payload: NotificationCreateRequest,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: PrivilegedUser,
+    db: DbSession,
 ):
     """Manually emit a notification (internal/admin use)."""
     notif = await NotificationService.emit(

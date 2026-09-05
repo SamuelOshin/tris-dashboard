@@ -6,10 +6,9 @@ HTTP transport only — max 50 lines per handler, no business logic, no try-exce
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.core.dependencies import require_roles
-from app.api.db.database import get_db
+from app.api.core.dependencies import DbSession, require_roles
+from app.api.core.permissions import CASE_READ_ROLES, CASE_TRANSITION_ROLES
 from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.cases.schemas.case_schemas import (
     CaseResponse,
@@ -20,11 +19,6 @@ from app.api.utils.response_payloads import success_response
 
 router = APIRouter(prefix="/cases", tags=["Cases"])
 
-# Roles permitted to read case data
-_READ_ROLES = ["reviewer", "verifier", "admin", "compliance", "cfo", "security", "procurement"]
-# Roles permitted to transition case status
-_TRANSITION_ROLES = ["reviewer", "verifier", "admin", "compliance"]
-
 
 @router.get("", response_model=None)
 async def list_cases(
@@ -33,8 +27,8 @@ async def list_cases(
     supplier_id: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    current_user: Annotated[User, Depends(require_roles(_READ_ROLES))] = None,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: Annotated[User, Depends(require_roles(CASE_READ_ROLES))] = None,
+    db: DbSession = None,
 ):
     """Retrieve filtered list of risk cases. Requires authenticated session."""
     cases = await CaseService.get_all_cases(
@@ -56,8 +50,8 @@ async def list_cases(
 @router.get("/{case_id}", response_model=None)
 async def get_case(
     case_id: str,
-    current_user: Annotated[User, Depends(require_roles(_READ_ROLES))] = None,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: Annotated[User, Depends(require_roles(CASE_READ_ROLES))] = None,
+    db: DbSession = None,
 ):
     """Retrieve case with chronological immutable audit history. Requires authenticated session."""
     case_data = await CaseService.get_case_by_id(case_id=case_id, session=db)
@@ -73,8 +67,8 @@ async def get_case(
 async def transition_case(
     case_id: str,
     payload: CaseTransitionRequest,
-    current_user: Annotated[User, Depends(require_roles(_TRANSITION_ROLES))],
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: Annotated[User, Depends(require_roles(CASE_TRANSITION_ROLES))],
+    db: DbSession = None,
 ):
     """Execute governed case state transition with verified closure validation."""
     payload.actor = current_user.name or current_user.username

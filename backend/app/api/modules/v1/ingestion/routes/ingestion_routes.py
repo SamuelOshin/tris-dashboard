@@ -3,22 +3,13 @@ Ingestion HTTP Gateway Routes (Revision 2.2).
 HTTP transport only — max 50 lines per handler, no business logic, no try-except.
 """
 
-from datetime import UTC, datetime, timedelta
 from typing import Annotated
 from uuid import uuid4
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Query, UploadFile, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from fastapi import APIRouter, BackgroundTasks, File, Query, UploadFile, status
 
-from app.api.core.custom_exceptions.exceptions import (
-    IngestionError,
-    NotFoundError,
-    PermissionDeniedError,
-)
-from app.api.core.dependencies import get_current_user, require_roles
-from app.api.db.database import get_db
-from app.api.modules.v1.auth.models.user import User
+from app.api.core.custom_exceptions.exceptions import IngestionError
+from app.api.core.dependencies import AuthenticatedUser, DbSession, WriteUser
 from app.api.modules.v1.ingestion.models.ingestion_job import IngestionJob
 from app.api.modules.v1.ingestion.schemas.ingestion_schemas import (
     IngestionJobResponse,
@@ -30,15 +21,14 @@ from app.api.utils.response_payloads import success_response
 router = APIRouter(prefix="/ingest", tags=["Ingestion"])
 
 MAX_INGEST_FILE_SIZE = 25 * 1024 * 1024  # 25 MB limit to protect from OOM/DoS
-INGEST_ROLES = ["admin", "compliance", "reviewer"]
 JOB_TIMEOUT_MINUTES = 10
 
 
 @router.post("/upload", response_model=None, status_code=status.HTTP_202_ACCEPTED)
 async def upload_workbook(
     file: Annotated[UploadFile, File(...)],
-    current_user: Annotated[User, Depends(require_roles(INGEST_ROLES))],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: WriteUser,
+    db: DbSession,
     background_tasks: BackgroundTasks,
     duplicate_strategy: str = Query(default="skip", pattern="^(skip|update|fail)$"),
 ):
@@ -92,8 +82,8 @@ async def upload_workbook(
 
 @router.get("/jobs", response_model=None)
 async def list_ingestion_jobs(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
 ):
@@ -101,13 +91,12 @@ async def list_ingestion_jobs(
     List historical ingestion jobs with pagination.
     Privileged roles (admin, compliance) view all jobs; others see their own.
     """
-    stmt = select(IngestionJob).order_by(IngestionJob.created_at.desc())
-    if current_user.role.lower() not in ("admin", "compliance"):
-        stmt = stmt.where(IngestionJob.uploaded_by == current_user.user_id)
-
-    stmt = stmt.limit(limit).offset(offset)
-    result = await db.execute(stmt)
-    jobs = result.scalars().all()
+    jobs = await IngestionService.list_jobs_for_user(
+        session=db,
+        user=current_user,
+        limit=limit,
+        offset=offset,
+    )
 
     items = [
         IngestionJobResponse(
@@ -141,46 +130,19 @@ async def list_ingestion_jobs(
 @router.get("/jobs/{job_id}", response_model=None)
 async def get_ingestion_job(
     job_id: str,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
 ):
     """
     Telemetry and audit query endpoint for an ingestion job.
     Enforces ownership or admin/compliance role (D1).
     """
-    job = await db.get(IngestionJob, job_id)
-    if not job:
-        raise NotFoundError(f"Ingestion job '{job_id}' was not found.")
-
-    # Enforce job ownership or privileged role (D1)
-    is_owner = current_user.user_id == job.uploaded_by
-    is_privileged = current_user.role.lower() in ("admin", "compliance")
-    if not (is_owner or is_privileged):
-        raise PermissionDeniedError(
-            f"You do not have permission to view telemetry for ingestion job '{job_id}'."
-        )
-
-    # Lightweight staleness guard (D8)
-    if job.status == "PROCESSING" and job.started_at:
-        now = datetime.now(UTC)
-        started = job.started_at if job.started_at.tzinfo else job.started_at.replace(tzinfo=UTC)
-        if now - started > timedelta(minutes=JOB_TIMEOUT_MINUTES):
-            job.status = "FAILED"
-            job.completed_at = now
-            job.error_log.append(
-                {
-                    "sheet": "General",
-                    "row": -1,
-                    "field": "timeout",
-                    "error": (
-                        f"Job processing exceeded maximum allowed timeout of "
-                        f"{JOB_TIMEOUT_MINUTES} minutes."
-                    ),
-                    "raw_value": {},
-                }
-            )
-            db.add(job)
-            await db.flush()
+    job = await IngestionService.get_job_for_user(
+        session=db,
+        user=current_user,
+        job_id=job_id,
+        timeout_minutes=JOB_TIMEOUT_MINUTES,
+    )
 
     dto = IngestionJobResponse(
         job_id=job.job_id,

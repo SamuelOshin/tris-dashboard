@@ -3,14 +3,9 @@ Rule Engine HTTP Gateway Routes.
 HTTP transport only — max 50 lines per handler, no business logic, no try-except.
 """
 
-from typing import Annotated
+from fastapi import APIRouter, status
 
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.api.core.dependencies import get_current_user, require_roles
-from app.api.db.database import get_db
-from app.api.modules.v1.auth.models.user import User
+from app.api.core.dependencies import AuthenticatedUser, DbSession, PrivilegedUser
 from app.api.modules.v1.rules.schemas.rule_schemas import (
     EvaluationResult,
     RuleConfigResponse,
@@ -24,8 +19,8 @@ router = APIRouter(prefix="/rules", tags=["Rules"])
 
 @router.get("", response_model=None)
 async def list_rules(
-    current_user: Annotated[User, Depends(get_current_user)] = None,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: AuthenticatedUser = None,
+    db: DbSession = None,
 ):
     """Retrieve all detection rule configurations. Requires authenticated session."""
     rules = await RuleEngineService.get_all_rules(session=db)
@@ -40,8 +35,8 @@ async def list_rules(
 @router.get("/{rule_code}", response_model=None)
 async def get_rule(
     rule_code: str,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: AuthenticatedUser = None,
+    db: DbSession = None,
 ):
     """Retrieve configuration for a specific rule code. Requires authenticated session."""
     rule = await RuleEngineService.get_rule_by_code(rule_code=rule_code, session=db)
@@ -57,8 +52,8 @@ async def get_rule(
 async def update_rule(
     rule_code: str,
     payload: RuleConfigUpdate,
-    current_user: Annotated[User, Depends(require_roles(["admin", "compliance"]))],
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: PrivilegedUser,
+    db: DbSession = None,
 ):
     """
     Update rule thresholds or weights (increments rule_version).
@@ -80,8 +75,8 @@ async def update_rule(
 @router.post("/evaluate/{transaction_id}", response_model=None)
 async def evaluate_transaction(
     transaction_id: str,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: AuthenticatedUser,
+    db: DbSession = None,
 ):
     """Execute active detection rules against a transaction and consolidate signals."""
     result = await RuleEngineService.evaluate_transaction(

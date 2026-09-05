@@ -3,18 +3,13 @@ Access Events HTTP Gateway Routes.
 HTTP transport only - max 50 lines per handler, no business logic, no try-except.
 """
 
-from typing import Annotated
+from fastapi import APIRouter, Query, status
 
-from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.api.core.dependencies import get_current_user
-from app.api.db.database import get_db
+from app.api.core.dependencies import AuthenticatedUser, DbSession
 from app.api.modules.v1.access_events.schemas.access_event_schemas import (
     AccessEventResponse,
 )
 from app.api.modules.v1.access_events.service.access_event_service import AccessEventService
-from app.api.modules.v1.auth.models.user import User
 from app.api.utils.response_payloads import success_response
 
 router = APIRouter(prefix="/access-events", tags=["Zero-Trust Access Events"])
@@ -22,8 +17,8 @@ router = APIRouter(prefix="/access-events", tags=["Zero-Trust Access Events"])
 
 @router.get("", response_model=None)
 async def list_access_events(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
     is_off_hours: bool | None = Query(default=None),
@@ -51,8 +46,8 @@ async def list_access_events(
 
 @router.get("/stats", response_model=None)
 async def get_access_event_stats(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
 ):
     """Get zero-trust access event summary statistics."""
     stats = await AccessEventService.get_access_event_stats(db=db)
@@ -66,8 +61,8 @@ async def get_access_event_stats(
 @router.get("/{event_id}", response_model=None)
 async def get_access_event(
     event_id: str,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: AuthenticatedUser,
+    db: DbSession,
 ):
     """Retrieve single access event details by ID."""
     event = await AccessEventService.get_access_event_by_id(db=db, event_id=event_id)
