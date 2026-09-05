@@ -205,7 +205,11 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+export interface RequestOptions extends RequestInit {
+  silent?: boolean
+}
+
+async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const headers = new Headers(options.headers || {})
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')
@@ -226,6 +230,12 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     // Non-JSON response body (e.g. proxy HTML 502/504)
   }
 
+  // Session probe check: unauthenticated response from /auth/me is an expected state,
+  // never an error that should be toasted to the user.
+  const isAuthProbe =
+    endpoint.startsWith('/auth/me') &&
+    (response.status === 401 || json?.status_code === 401 || json?.error_code === 'AUTHENTICATION_FAILED')
+
   if (!response.ok || (json && json.status === 'ERROR')) {
     let errorMsg =
       json?.message ||
@@ -245,15 +255,18 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       }
     }
 
-    // Surface every failed request globally so no failure ever goes unnoticed,
-    // even if a component fails to render its own error state.
-    toast.error(errorMsg)
+    // Surface failed requests globally unless explicitly silenced or probing authentication state
+    if (!options.silent && !isAuthProbe) {
+      toast.error(errorMsg)
+    }
     throw new ApiError(errorMsg, json?.error_code, json?.status_code || response.status, json?.errors)
   }
 
   if (!json) {
     const msg = 'Invalid response received from server'
-    toast.error(msg)
+    if (!options.silent && !isAuthProbe) {
+      toast.error(msg)
+    }
     throw new ApiError(msg, 'INVALID_RESPONSE', response.status)
   }
 
@@ -274,6 +287,7 @@ export const api = {
     }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password }),
+      silent: true,
     })
     const user: User = {
       user_id: data.user_id,
@@ -290,12 +304,12 @@ export const api = {
   },
 
   getMe: async (): Promise<User> => {
-    return request<User>('/auth/me')
+    return request<User>('/auth/me', { silent: true })
   },
 
   logout: async (): Promise<void> => {
     try {
-      await request('/auth/logout', { method: 'POST' })
+      await request('/auth/logout', { method: 'POST', silent: true })
     } finally {
       // Server deletes the HttpOnly cookie via delete_cookie().
       // No localStorage to clear.

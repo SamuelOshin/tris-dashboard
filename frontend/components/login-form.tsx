@@ -131,9 +131,6 @@ export function LoginForm() {
     } catch (err: any) {
       const authError = resolveAuthError(err, 'Sign in failed')
       setError(authError)
-      toast.error(authError.title, {
-        description: authError.message,
-      })
     } finally {
       setLoading(false)
     }
@@ -164,9 +161,6 @@ export function LoginForm() {
     } catch (err: any) {
       const authError = resolveAuthError(err, 'Sign in failed')
       setError(authError)
-      toast.error(authError.title, {
-        description: authError.message,
-      })
     } finally {
       setLoading(false)
     }
@@ -382,7 +376,10 @@ export function LoginForm() {
                   type="email"
                   placeholder="name@company.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    if (error) setError(null)
+                  }}
                   disabled={loading}
                   autoFocus
                   className="h-11 text-xs sm:text-sm bg-card border-border pr-10 focus-visible:ring-primary"
@@ -411,7 +408,10 @@ export function LoginForm() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    if (error) setError(null)
+                  }}
                   disabled={loading}
                   className="h-11 text-xs sm:text-sm bg-card border-border pr-10 focus-visible:ring-primary"
                   required

@@ -44,7 +44,7 @@ async def get_current_user(
         token = request.cookies["access_token"]
 
     if not token:
-        raise AuthenticationError("Missing authentication token. Please log in.")
+        raise AuthenticationError("Authentication required. Please sign in.")
 
     payload = decode_access_token(token)
     user_id = payload.get("sub")
