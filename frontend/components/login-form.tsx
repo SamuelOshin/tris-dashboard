@@ -365,6 +365,21 @@ export function LoginForm() {
 
           {/* Authentication Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Error Message Box */}
+            {error && (
+              <div
+                role="alert"
+                aria-live="polite"
+                className="p-3.5 rounded-xl bg-destructive/10 border border-destructive/25 flex items-start gap-2.5 text-xs text-destructive animate-in fade-in slide-in-from-top-1 duration-200"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <p className="font-semibold">{error.title}</p>
+                  <p>{error.message}</p>
+                </div>
+              </div>
+            )}
+
             {/* Email Field */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
@@ -439,17 +454,6 @@ export function LoginForm() {
                 <span>Remember me</span>
               </label>
             </div>
-
-            {/* Error Message Box */}
-            {error && (
-              <div className="p-3.5 rounded-xl bg-destructive/10 border border-destructive/25 flex items-start gap-2.5 text-xs text-destructive">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <div className="space-y-0.5">
-                  <p className="font-semibold">{error.title}</p>
-                  <p>{error.message}</p>
-                </div>
-              </div>
-            )}
 
             {/* Primary Submit Button */}
             <Button
