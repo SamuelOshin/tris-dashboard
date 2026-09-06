@@ -102,6 +102,23 @@ modules/v1/<module>/
 
 ---
 
+## 4b. Frontend Clean Architecture & Component Decomposition Rules
+
+Every frontend feature workspace (e.g. `cases`, `suppliers`, `compliance`) must strictly adhere to modular separation and avoid junior monolithic anti-patterns:
+
+- **Hard File Limit**: Maximum 250–300 lines per file. Never dump multiple tabs, forms, modals, and API logic into one monolithic "god file".
+- **Feature-Folder Pattern**: Co-locate subcomponents under `components/<feature>/`:
+  - `tabs/`: Independent presentation tab components (<150–200 lines each).
+  - `modals/`: Dedicated dialog components.
+  - `hooks/`: Custom orchestrator hook (`use<Feature>Workspace.ts`) managing API calls, state transitions, drafts, and toast events.
+  - `<feature>-workflow-guards.ts`: Pure domain functions for workflow predicates and styling mappers.
+  - `types.ts`: Strictly typed interfaces, form DTOs, and TabId definitions.
+- **Page as Conductor (<100–150 lines)**: Page route files (`app/**/page.tsx`) must only handle route parameters, layout mounting, and delegating to subcomponents.
+- **State Isolation & Re-renders**: Form input state must be localized to the active tab or custom hook to prevent typing from re-rendering the entire page tree.
+- **Pure Domain Guards**: Business checks (`isLocked`, `canClose`) must be pure functions testable without DOM rendering.
+
+---
+
 ## 5. Response & Error Standardization
 
 ### Standard Response Payloads (`app/api/utils/response_payloads.py`)
@@ -153,6 +170,8 @@ return auth_response(
 - ❌ **NEVER** expose backend implementation details, database names, or internal packages in user-facing UI or toasts (e.g. "PostgreSQL", "Live Postgres", "/api/v1/rules", "RFC Gateway", "Local Enclave", "SQLModel", `uv run...`).
 - ❌ **NEVER** invent pseudo-technical jargon for standard UX patterns (e.g. use "Sign in", not "Authenticate Session"; use "Signing in...", not "Verifying Cryptographic Tokens"; use "Remember me", not "Trust this browser for 30 days"). Always follow Jakob's Law.
 - ❌ **NEVER** add developer disclosure banners (e.g. "Live Postgres vs Sandbox Enclave") into end-user pages. Use simple `Coming Soon` badges for roadmap features.
+- ❌ **NEVER** write monolithic "god components" or single files exceeding 250–300 lines — decompose into feature directories (`components/<feature>/tabs/`, `hooks/`, etc.).
+- ❌ **NEVER** declare 10+ `useState` variables at the root of a page component — isolate form states into their respective feature tabs or custom hooks to prevent whole-tree re-renders on keystroke.
 
 ---
 
