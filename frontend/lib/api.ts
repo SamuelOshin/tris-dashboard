@@ -134,6 +134,7 @@ export interface RiskCase {
   assigned_to?: string
   trigger_signals: RuleSignal[]
   evaluation_snapshot: Record<string, any>
+  rule_description?: string
 
   // 8 Mandatory Closure Fields
   root_cause?: string
