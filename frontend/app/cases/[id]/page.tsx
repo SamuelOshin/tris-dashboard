@@ -226,6 +226,11 @@ export default function CaseDetailPage() {
   const primarySignal = enrichedSignals[0]
   const isClosed = caseData?.status === 'Closed'
 
+  // Stage-based field locking (Option A: Clean lock states with prerequisite CTAs)
+  const isInvestigationLocked = caseData?.status === 'New' || isClosed
+  const isCorrectiveLocked = caseData?.status === 'New' || caseData?.status === 'Assigned' || isClosed
+  const isClosureLocked = !['Pending Verification', 'Closed'].includes(caseData?.status || '')
+
   // Autofill evaluation sample data based on triggered signal context
   const handleAutofillSample = () => {
     const primaryRule = primarySignal?.rule_code || 'R-005'
@@ -914,8 +919,9 @@ export default function CaseDetailPage() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      disabled={isInvestigationLocked}
                       onClick={handleClearForm}
-                      className="text-xs text-muted-foreground hover:text-foreground h-8 px-2"
+                      className="text-xs text-muted-foreground hover:text-foreground h-8 px-2 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <Trash2 className="w-3.5 h-3.5 mr-1" />
                       Clear
@@ -923,8 +929,9 @@ export default function CaseDetailPage() {
                     <Button
                       variant="outline"
                       size="sm"
+                      disabled={isInvestigationLocked}
                       onClick={handleAutofillSample}
-                      className="text-xs h-8 text-primary border-primary/30 hover:bg-primary/10"
+                      className="text-xs h-8 text-primary border-primary/30 hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
                       Autofill Sample
@@ -933,22 +940,26 @@ export default function CaseDetailPage() {
                 )}
               </div>
 
-              {/* Lifecycle Stage Alert */}
+              {/* Lifecycle Stage Alert / Lock State */}
               {caseData.status === 'New' && (
-                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                    <span>
-                      <strong>Case Unassigned:</strong> Accept ownership in the Overview tab or click &quot;Accept Case&quot; to assign yourself before proceeding.
-                    </span>
+                <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Lock className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <div>
+                      <p className="font-bold">Investigation Locked — Ownership Required</p>
+                      <p className="text-[11px] text-amber-700/80 dark:text-amber-300/80 mt-0.5">
+                        You must accept ownership of this case before documenting investigation findings and root cause.
+                      </p>
+                    </div>
                   </div>
                   <Button
                     size="sm"
                     onClick={handleAcceptCase}
                     disabled={actionLoading}
-                    className="text-xs bg-amber-600 hover:bg-amber-700 text-white shrink-0 font-medium"
+                    className="text-xs bg-amber-600 hover:bg-amber-700 text-white shrink-0 font-semibold"
                   >
-                    Accept Case
+                    <UserCheck className="w-3.5 h-3.5 mr-1" />
+                    Accept Case to Unlock
                   </Button>
                 </div>
               )}
@@ -978,7 +989,7 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={evidenceReviewed}
-                    disabled={isClosed}
+                    disabled={isInvestigationLocked}
                     onChange={(e) => {
                       setEvidenceReviewed(e.target.value)
                       saveDraftLocally()
@@ -994,7 +1005,7 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={findingDisposition}
-                    disabled={isClosed}
+                    disabled={isInvestigationLocked}
                     onChange={(e) => {
                       setFindingDisposition(e.target.value)
                       saveDraftLocally()
@@ -1009,7 +1020,7 @@ export default function CaseDetailPage() {
                   <label className="font-semibold text-foreground">Root-Cause Category</label>
                   <select
                     value={rootCauseCategory}
-                    disabled={isClosed}
+                    disabled={isInvestigationLocked}
                     onChange={(e) => {
                       setRootCauseCategory(e.target.value)
                       saveDraftLocally()
@@ -1033,7 +1044,7 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={rootCause}
-                    disabled={isClosed}
+                    disabled={isInvestigationLocked}
                     onChange={(e) => {
                       setRootCause(e.target.value)
                       saveDraftLocally()
@@ -1073,9 +1084,13 @@ export default function CaseDetailPage() {
                     </div>
                   ) : (
                     <div
-                      className="p-4 border-2 border-dashed border-border rounded-lg text-center space-y-1 cursor-pointer hover:border-primary/50 transition-colors"
+                      className={`p-4 border-2 border-dashed rounded-lg text-center space-y-1 transition-colors ${
+                        isInvestigationLocked
+                          ? 'border-border/40 opacity-50 cursor-not-allowed bg-muted/10'
+                          : 'border-border cursor-pointer hover:border-primary/50'
+                      }`}
                       onClick={() => {
-                        if (!isClosed) {
+                        if (!isInvestigationLocked) {
                           setSupportingEvidence('invoice_comparison.png')
                           saveDraftLocally()
                         }
@@ -1095,7 +1110,7 @@ export default function CaseDetailPage() {
                     <Button
                       size="sm"
                       onClick={handleSaveInvestigation}
-                      disabled={actionLoading}
+                      disabled={actionLoading || isInvestigationLocked}
                       className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
                     >
                       {actionLoading ? 'Saving...' : caseData.status === 'Assigned' ? 'Save & Begin Investigation' : 'Save Changes'}
@@ -1125,8 +1140,9 @@ export default function CaseDetailPage() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      disabled={isCorrectiveLocked}
                       onClick={handleClearForm}
-                      className="text-xs text-muted-foreground hover:text-foreground h-8 px-2"
+                      className="text-xs text-muted-foreground hover:text-foreground h-8 px-2 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <Trash2 className="w-3.5 h-3.5 mr-1" />
                       Clear
@@ -1134,8 +1150,9 @@ export default function CaseDetailPage() {
                     <Button
                       variant="outline"
                       size="sm"
+                      disabled={isCorrectiveLocked}
                       onClick={handleAutofillSample}
-                      className="text-xs h-8 text-primary border-primary/30 hover:bg-primary/10"
+                      className="text-xs h-8 text-primary border-primary/30 hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
                       Autofill Sample
@@ -1144,13 +1161,25 @@ export default function CaseDetailPage() {
                 )}
               </div>
 
-              {/* Lifecycle Stage Alert */}
+              {/* Lifecycle Stage Alert / Option A Locked State */}
               {(caseData.status === 'New' || caseData.status === 'Assigned') && (
-                <div className="p-3.5 rounded-xl bg-slate-500/10 border border-border text-xs text-muted-foreground flex items-center gap-2">
-                  <Clock className="w-4 h-4 shrink-0" />
-                  <span>
-                    <strong>Pending Investigation:</strong> Complete the initial investigation and root-cause classification before formulating corrective action.
-                  </span>
+                <div className="p-4 rounded-xl bg-slate-500/10 border border-border text-xs text-muted-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Lock className="w-4 h-4 shrink-0 text-muted-foreground" />
+                    <div>
+                      <p className="font-bold text-foreground">Corrective Action Locked — Investigation Required</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Corrective actions can only be formulated after the initial investigation and root-cause analysis are documented.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => setActiveTab('investigation')}
+                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white shrink-0 font-medium"
+                  >
+                    Go to Investigation Tab →
+                  </Button>
                 </div>
               )}
 
@@ -1223,7 +1252,7 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={actionTaken}
-                    disabled={isClosed}
+                    disabled={isCorrectiveLocked}
                     onChange={(e) => {
                       setActionTaken(e.target.value)
                       saveDraftLocally()
@@ -1238,7 +1267,7 @@ export default function CaseDetailPage() {
                   <label className="font-semibold text-foreground">Responsible Person / Function</label>
                   <Input
                     value={responsiblePerson}
-                    disabled={isClosed}
+                    disabled={isCorrectiveLocked}
                     placeholder="e.g. Risk Reviewer / Case Owner"
                     onChange={(e) => {
                       setResponsiblePerson(e.target.value)
@@ -1255,7 +1284,7 @@ export default function CaseDetailPage() {
                     <Input
                       type="date"
                       value={targetCompletionDate}
-                      disabled={isClosed}
+                      disabled={isCorrectiveLocked}
                       onChange={(e) => {
                         setTargetCompletionDate(e.target.value)
                         saveDraftLocally()
@@ -1270,7 +1299,7 @@ export default function CaseDetailPage() {
                     <Input
                       type="date"
                       value={completionDate}
-                      disabled={isClosed}
+                      disabled={isCorrectiveLocked}
                       onChange={(e) => {
                         setCompletionDate(e.target.value)
                         saveDraftLocally()
@@ -1310,9 +1339,13 @@ export default function CaseDetailPage() {
                     </div>
                   ) : (
                     <div
-                      className="p-4 border-2 border-dashed border-border rounded-lg text-center space-y-1 cursor-pointer hover:border-primary/50 transition-colors"
+                      className={`p-4 border-2 border-dashed rounded-lg text-center space-y-1 transition-colors ${
+                        isCorrectiveLocked
+                          ? 'border-border/40 opacity-50 cursor-not-allowed bg-muted/10'
+                          : 'border-border cursor-pointer hover:border-primary/50'
+                      }`}
                       onClick={() => {
-                        if (!isClosed) {
+                        if (!isCorrectiveLocked) {
                           setEvidenceOfAction('supplier_update.png')
                           saveDraftLocally()
                         }
@@ -1331,7 +1364,7 @@ export default function CaseDetailPage() {
                   <label className="font-semibold text-foreground">Current Status</label>
                   <select
                     value={actionStatus}
-                    disabled={isClosed}
+                    disabled={isCorrectiveLocked}
                     onChange={(e) => {
                       setActionStatus(e.target.value)
                       saveDraftLocally()
@@ -1350,7 +1383,7 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={actionComments}
-                    disabled={isClosed}
+                    disabled={isCorrectiveLocked}
                     onChange={(e) => {
                       setActionComments(e.target.value)
                       saveDraftLocally()
@@ -1365,7 +1398,7 @@ export default function CaseDetailPage() {
                     <Button
                       size="sm"
                       onClick={handleSaveCorrectiveAction}
-                      disabled={actionLoading}
+                      disabled={actionLoading || isCorrectiveLocked}
                       className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
                     >
                       {actionLoading ? 'Saving...' : caseData.status === 'Under Investigation' ? 'Save & Advance to Corrective Action' : 'Save Changes'}
@@ -1389,6 +1422,64 @@ export default function CaseDetailPage() {
                   TRIS enforces system-validated closure. All mandatory criteria must be satisfied.
                 </p>
               </div>
+
+              {/* Stage-based Lock State for Closure Tab */}
+              {isClosureLocked && (
+                <div className="p-4 rounded-xl bg-slate-500/10 border border-border text-xs text-muted-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Lock className="w-4 h-4 shrink-0 text-muted-foreground" />
+                    <div>
+                      <p className="font-bold text-foreground">Closure Locked — Workflow Progression Required</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {caseData.status === 'New' || caseData.status === 'Assigned'
+                          ? 'This case must be investigated and remediated before closure verification can be requested.'
+                          : caseData.status === 'Under Investigation'
+                            ? 'Investigation in progress. Document the corrective action plan to advance toward closure.'
+                            : 'Remediation plan active. Advance the case to Pending Verification to unlock final sign-off.'}
+                      </p>
+                    </div>
+                  </div>
+                  {caseData.status === 'New' || caseData.status === 'Assigned' ? (
+                    <Button
+                      size="sm"
+                      onClick={() => setActiveTab('investigation')}
+                      className="text-xs bg-blue-600 hover:bg-blue-700 text-white shrink-0 font-medium"
+                    >
+                      Go to Investigation Tab →
+                    </Button>
+                  ) : caseData.status === 'Under Investigation' ? (
+                    <Button
+                      size="sm"
+                      onClick={() => setActiveTab('corrective-action')}
+                      className="text-xs bg-blue-600 hover:bg-blue-700 text-white shrink-0 font-medium"
+                    >
+                      Go to Corrective Action →
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      onClick={async () => {
+                        await handleTransition('Pending Verification', {
+                          note: 'Remediation completed. Advanced to Pending Verification.',
+                        })
+                      }}
+                      disabled={actionLoading || !hasCorrectiveAction}
+                      className="text-xs bg-purple-600 hover:bg-purple-700 text-white shrink-0 font-medium"
+                    >
+                      Advance to Verification →
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {caseData.status === 'Pending Verification' && (
+                <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-800 dark:text-sky-300 text-xs flex items-center gap-2">
+                  <FileCheck2 className="w-4 h-4 shrink-0 text-sky-600 dark:text-sky-400" />
+                  <span>
+                    <strong>Verification Gate Active:</strong> All 8 mandatory criteria are unlocked for final review. Confirm closure notes below and mark as closed.
+                  </span>
+                </div>
+              )}
 
               {/* Closure Validation Errors Alert */}
               {closureValidationErrors.length > 0 && (
@@ -1516,7 +1607,7 @@ export default function CaseDetailPage() {
                   <textarea
                     rows={2}
                     value={closureNotes}
-                    disabled={isClosed}
+                    disabled={isClosureLocked}
                     onChange={(e) => {
                       setClosureNotes(e.target.value)
                       saveDraftLocally()
