@@ -241,7 +241,7 @@ class CaseService:
                 db=session,
                 title=f"Case {case.case_id} Remediation Active",
                 message=(
-                    f"Corrective action plan recorded for Case {case.case_id} by {transition.actor}."
+                    f"Corrective action recorded for Case {case.case_id} by {transition.actor}."
                 ),
                 category="CASE_ALERT",
                 severity="INFO",

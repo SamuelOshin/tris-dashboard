@@ -7,7 +7,11 @@ from fastapi import APIRouter, Response, status
 
 from app.api.core.config import settings
 from app.api.core.dependencies import AuthenticatedUser, DbSession
-from app.api.modules.v1.auth.schemas.auth_schemas import LoginRequest, UserResponse
+from app.api.modules.v1.auth.schemas.auth_schemas import (
+    LoginRequest,
+    UserProfileUpdate,
+    UserResponse,
+)
 from app.api.modules.v1.auth.service.auth_service import AuthService
 from app.api.utils.response_payloads import auth_response, success_response
 
@@ -54,6 +58,26 @@ async def get_me(current_user: AuthenticatedUser):
     return success_response(
         status_code=status.HTTP_200_OK,
         message="User profile retrieved successfully",
+        data=user_data,
+    )
+
+
+@router.patch("/me", response_model=None)
+async def update_me(
+    payload: UserProfileUpdate,
+    current_user: AuthenticatedUser,
+    db: DbSession = None,
+):
+    """Update profile details for currently authenticated user."""
+    updated_user = await AuthService.update_profile(
+        user_id=current_user.user_id,
+        update_data=payload,
+        session=db,
+    )
+    user_data = UserResponse.model_validate(updated_user).model_dump()
+    return success_response(
+        status_code=status.HTTP_200_OK,
+        message="Profile updated successfully",
         data=user_data,
     )
 

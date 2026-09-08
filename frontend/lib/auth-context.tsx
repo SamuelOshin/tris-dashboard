@@ -20,6 +20,7 @@ interface AuthContextType {
   login: (emailOrUsername: string, password: string) => Promise<void>
   logout: () => void
   hasPermission: (roles: UserRole[]) => boolean
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -74,8 +75,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return user ? roles.includes(user.role) : false
   }
 
+  const refreshUser = async () => {
+    try {
+      const beUser = await api.getMe()
+      setUser(mapBackendUser(beUser))
+    } catch {
+      setUser(null)
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, hasPermission }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, hasPermission, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

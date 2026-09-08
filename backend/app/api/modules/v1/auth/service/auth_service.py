@@ -9,9 +9,10 @@ from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import or_, select
 
-from app.api.core.custom_exceptions.exceptions import AuthenticationError
+from app.api.core.custom_exceptions.exceptions import AuthenticationError, NotFoundError
 from app.api.core.security import create_access_token, verify_password
 from app.api.modules.v1.auth.models.user import User
+from app.api.modules.v1.auth.schemas.auth_schemas import UserProfileUpdate
 
 
 class AuthService:
@@ -58,3 +59,29 @@ class AuthService:
             }
         )
         return user, token
+
+    @staticmethod
+    async def update_profile(
+        user_id: str,
+        update_data: UserProfileUpdate,
+        session: AsyncSession,
+    ) -> User:
+        """
+        Updates profile fields for the authenticated user.
+
+        Raises:
+            NotFoundError: If user does not exist.
+        """
+        user = await session.get(User, user_id)
+        if not user:
+            raise NotFoundError(f"User with ID '{user_id}' not found")
+
+        if update_data.name is not None:
+            user.name = update_data.name.strip()
+        if update_data.department is not None:
+            user.department = update_data.department.strip()
+
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+        return user

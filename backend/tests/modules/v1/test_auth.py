@@ -138,3 +138,32 @@ async def test_cookie_security_attributes_in_dev_and_production(async_client: As
         assert "secure" in prod_cookie_header
     finally:
         settings.ENVIRONMENT = original_env
+
+
+@pytest.mark.asyncio
+async def test_update_me_profile(async_client: AsyncClient):
+    """Verify PATCH /api/v1/auth/me updates user name and department in database."""
+    login_res = await async_client.post(
+        "/api/v1/auth/login",
+        json={"username": "reviewer", "password": "reviewer123"},
+    )
+    token = login_res.cookies.get("access_token")
+
+    update_res = await async_client.patch(
+        "/api/v1/auth/me",
+        json={"name": "Alex Reviewer Lead", "department": "Senior Risk Oversight"},
+        cookies={"access_token": token},
+    )
+    assert update_res.status_code == 200
+    updated_data = update_res.json()["data"]
+    assert updated_data["name"] == "Alex Reviewer Lead"
+    assert updated_data["department"] == "Senior Risk Oversight"
+
+    # Verify persistence by calling GET /auth/me
+    me_res = await async_client.get(
+        "/api/v1/auth/me",
+        cookies={"access_token": token},
+    )
+    assert me_res.status_code == 200
+    assert me_res.json()["data"]["name"] == "Alex Reviewer Lead"
+    assert me_res.json()["data"]["department"] == "Senior Risk Oversight"

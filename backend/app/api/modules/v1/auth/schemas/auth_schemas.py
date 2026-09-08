@@ -3,7 +3,9 @@ Authentication Pydantic DTO Schemas.
 Pure request/response serialization — no business logic.
 """
 
-from pydantic import BaseModel, ConfigDict
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class LoginRequest(BaseModel):
@@ -11,6 +13,13 @@ class LoginRequest(BaseModel):
 
     username: str
     password: str
+
+
+class UserProfileUpdate(BaseModel):
+    """User profile update request payload."""
+
+    name: Optional[str] = Field(None, max_length=200)
+    department: Optional[str] = Field(None, max_length=100)
 
 
 class UserResponse(BaseModel):

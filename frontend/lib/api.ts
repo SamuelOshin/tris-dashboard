@@ -308,6 +308,13 @@ export const api = {
     return request<User>('/auth/me', { silent: true })
   },
 
+  updateProfile: async (payload: { name?: string; department?: string }): Promise<User> => {
+    return request<User>('/auth/me', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+  },
+
   logout: async (): Promise<void> => {
     try {
       await request('/auth/logout', { method: 'POST', silent: true })
