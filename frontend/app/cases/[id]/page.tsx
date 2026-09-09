@@ -173,6 +173,8 @@ export default function CaseDetailPage() {
             hasRootCause={hasRootCause}
             hasCorrectiveAction={hasCorrectiveAction}
             hasEvidence={hasEvidence}
+            supportingEvidence={investigationForm.supportingEvidence}
+            evidenceOfAction={correctiveForm.evidenceOfAction}
             closureValidationErrors={closureValidationErrors}
             onGoToInvestigation={() => setActiveTab('investigation')}
             onGoToCorrectiveAction={() => setActiveTab('corrective-action')}

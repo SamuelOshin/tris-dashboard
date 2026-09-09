@@ -444,7 +444,12 @@ export function useCaseWorkspace(caseId: string) {
     // All values must come from the DB record (set by prior transitions) or the current closure form
     const resolvedRootCause = caseData?.root_cause || ''
     const resolvedAction = caseData?.corrective_action || ''
-    const resolvedEvidence = closureForm.closureEvidence.trim() || caseData?.closure_evidence || ''
+    const resolvedEvidence =
+      closureForm.closureEvidence.trim() ||
+      caseData?.closure_evidence ||
+      correctiveForm.evidenceOfAction.trim() ||
+      investigationForm.supportingEvidence.trim() ||
+      ''
     const resolvedClosureType = closureForm.closureType
     const resolvedFollowUp = closureForm.followUpRequirement.trim()
     const resolvedRecurrence = closureForm.recurrenceMonitoring.trim()
@@ -613,12 +618,14 @@ export function useCaseWorkspace(caseId: string) {
   const enrichedSignals = (caseData?.trigger_signals || []).map((s) => enrichSignal(s))
   const primarySignal = enrichedSignals[0]
 
-  // Closure readiness — based purely on what is persisted in the DB record
-  // Frontend local-form state must NOT influence these guards (it isn't validated by the server)
+  // Closure readiness — based on database and inherited workflow evidence
   const hasRootCause = Boolean(caseData?.root_cause)
   const hasCorrectiveAction = Boolean(caseData?.corrective_action)
   const hasEvidence = Boolean(
-    caseData?.closure_evidence || closureForm.closureEvidence.trim()
+    caseData?.closure_evidence ||
+      closureForm.closureEvidence.trim() ||
+      correctiveForm.evidenceOfAction.trim() ||
+      investigationForm.supportingEvidence.trim()
   )
 
   const updateClosureField = (field: keyof typeof closureForm, value: string) => {

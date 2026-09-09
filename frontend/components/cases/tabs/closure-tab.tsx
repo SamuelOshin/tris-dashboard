@@ -1,12 +1,15 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Lock,
   FileCheck2,
   AlertTriangle,
   CheckCircle2,
   CalendarDays,
+  FileText,
+  Upload,
+  RotateCcw,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -38,6 +41,8 @@ interface ClosureTabProps {
   hasRootCause: boolean
   hasCorrectiveAction: boolean
   hasEvidence: boolean
+  supportingEvidence?: string
+  evidenceOfAction?: string
   closureValidationErrors: string[]
   onGoToInvestigation: () => void
   onGoToCorrectiveAction: () => void
@@ -55,6 +60,8 @@ export function ClosureTab({
   hasRootCause,
   hasCorrectiveAction,
   hasEvidence,
+  supportingEvidence,
+  evidenceOfAction,
   closureValidationErrors,
   onGoToInvestigation,
   onGoToCorrectiveAction,
@@ -62,22 +69,33 @@ export function ClosureTab({
   onExecuteClosure,
   isActionLoading,
 }: ClosureTabProps) {
+  const [isEditingEvidence, setIsEditingEvidence] = useState(false)
+
   const isClosed = caseData.status === 'Closed'
   const isLocked = isClosureLocked(caseData)
   const isPendingOrClosed =
     caseData.status === 'Pending Verification' || isClosed
+
+  // Automatically pull forward evidence from database, remediation, or investigation
+  const effectiveEvidence =
+    closureForm.closureEvidence.trim() ||
+    caseData.closure_evidence ||
+    evidenceOfAction ||
+    supportingEvidence ||
+    ''
 
   const hasClosureType = Boolean(closureForm.closureType)
   const hasFollowUp = Boolean(closureForm.followUpRequirement.trim())
   const hasRecurrence = Boolean(closureForm.recurrenceMonitoring.trim())
   const hasVerifiedBy = Boolean(closureForm.verifiedBy.trim())
   const hasClosureDate = Boolean(closureForm.closureDate)
+  const effectiveHasEvidence = Boolean(effectiveEvidence)
 
   // All 8 criteria
   const satisfiedCount = [
     hasRootCause,
     hasCorrectiveAction,
-    hasEvidence,
+    effectiveHasEvidence,
     isPendingOrClosed,
     hasClosureType,
     hasFollowUp,
@@ -149,7 +167,7 @@ export function ClosureTab({
           <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-800 dark:text-sky-300 text-xs flex items-center gap-2">
             <FileCheck2 className="w-4 h-4 shrink-0 text-sky-600 dark:text-sky-400" />
             <span>
-              <strong>Verification Gate Active:</strong> Complete the closure fields below, then submit for final system-validated sign-off.
+              <strong>Verification Gate Active:</strong> Review the inherited findings, complete the sign-off criteria below, and seal the case.
             </span>
           </div>
         )}
@@ -198,11 +216,15 @@ export function ClosureTab({
               ) : <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Action Recorded</span>,
             },
             {
-              checked: hasEvidence,
+              checked: effectiveHasEvidence,
               label: 'Closure evidence provided',
-              action: hasEvidence
-                ? <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Attached</span>
-                : <span className="text-muted-foreground">Enter below</span>,
+              action: effectiveHasEvidence ? (
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold truncate max-w-[170px] inline-block">
+                  ✓ {effectiveEvidence}
+                </span>
+              ) : (
+                <span className="text-muted-foreground">Attachment required</span>
+              ),
             },
             {
               checked: isPendingOrClosed,
@@ -277,19 +299,83 @@ export function ClosureTab({
             </select>
           </div>
 
-          {/* Row 2: Closure Evidence */}
+          {/* Row 2: Closure Evidence (Inherited + Override Option) */}
           <div className="space-y-1.5">
-            <label className="font-semibold text-foreground">
-              Closure Evidence <span className="text-destructive">*</span>
-            </label>
-            <input
-              type="text"
-              value={closureForm.closureEvidence}
-              disabled={!isEditable}
-              onChange={(e) => onChangeClosureField('closureEvidence', e.target.value)}
-              placeholder="e.g. invoice_audit_log.pdf, cfo_signoff.pdf"
-              className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-75 disabled:bg-muted/20"
-            />
+            <div className="flex items-center justify-between">
+              <label className="font-semibold text-foreground">
+                Closure Evidence <span className="text-destructive">*</span>
+              </label>
+              {effectiveEvidence && !isClosed && (
+                <span className="text-[10px] text-muted-foreground font-mono">
+                  {caseData.closure_evidence
+                    ? 'Verified from database'
+                    : 'Inherited from investigation/remediation'}
+                </span>
+              )}
+            </div>
+
+            {effectiveEvidence && !isEditingEvidence ? (
+              <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium font-mono text-foreground truncate">{effectiveEvidence}</p>
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                      ✓ Evidence document attached and verified
+                    </p>
+                  </div>
+                </div>
+                {isEditable && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsEditingEvidence(true)}
+                    className="text-xs text-muted-foreground hover:text-foreground h-7 px-2.5 shrink-0"
+                  >
+                    Change File
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={closureForm.closureEvidence}
+                    disabled={!isEditable}
+                    onChange={(e) => onChangeClosureField('closureEvidence', e.target.value)}
+                    placeholder="e.g. invoice_audit_log.pdf, cfo_signoff.pdf"
+                    className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-75 disabled:bg-muted/20 font-mono"
+                  />
+                  {effectiveEvidence && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingEvidence(false)}
+                      className="text-xs shrink-0 h-9"
+                    >
+                      Use Inherited
+                    </Button>
+                  )}
+                </div>
+                {isEditable && !closureForm.closureEvidence && (
+                  <div
+                    className="p-3 border border-dashed rounded-lg text-center cursor-pointer hover:border-primary/50 transition-colors bg-muted/10"
+                    onClick={() => {
+                      onChangeClosureField('closureEvidence', 'closure_audit_signoff.pdf')
+                      setIsEditingEvidence(false)
+                    }}
+                  >
+                    <Upload className="w-3.5 h-3.5 mx-auto text-muted-foreground mb-1" />
+                    <p className="text-[11px] text-muted-foreground">
+                      Click to attach new closure verification sign-off (e.g. closure_audit_signoff.pdf)
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Row 3: Follow-up Requirement */}
@@ -373,7 +459,7 @@ export function ClosureTab({
                 {isClosed
                   ? 'Case has completed system-validated closure.'
                   : caseData.status === 'Pending Verification'
-                    ? 'Complete all 8 criteria above, then submit for final sign-off.'
+                    ? 'Review the 8 criteria above, then submit for final sign-off.'
                     : caseData.status === 'Corrective Action'
                       ? 'Advance case to Pending Verification once remediation is completed.'
                       : 'Case must progress through investigation and corrective action before closing.'}
@@ -384,7 +470,7 @@ export function ClosureTab({
               {isClosed ? (
                 <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20 text-xs flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  Case Closed & Verified
+                  Case Closed &amp; Verified
                 </span>
               ) : caseData.status === 'Pending Verification' ? (
                 <Button
