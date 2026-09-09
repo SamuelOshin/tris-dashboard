@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect } from 'react'
-import { api, User as BackendUser } from './api'
+import { api, User as BackendUser, resetSessionRedirectFlag } from './api'
 
 export type UserRole = 'cfo' | 'procurement' | 'compliance' | 'security' | 'admin' | 'reviewer' | 'verifier'
 
@@ -61,12 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // If the backend rejects credentials (401) or is unreachable, the error
     // propagates to the caller and the login form displays it to the user.
     const { user: beUser } = await api.login(emailOrUsername, password)
+    resetSessionRedirectFlag()
     setUser(mapBackendUser(beUser))
     // Token is stored in the HttpOnly cookie set by the server response.
     // No localStorage storage. No document.cookie token write.
   }
 
   const logout = () => {
+    resetSessionRedirectFlag()
     api.logout().catch(() => {})
     setUser(null)
   }
