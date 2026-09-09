@@ -191,3 +191,31 @@ async def test_verified_closure_8_field_validation(async_client: AsyncClient):
         "Pending Verification",
         "Closed",
     ]
+
+
+@pytest.mark.asyncio
+async def test_patch_case_updates_investigation_and_corrective_fields(
+    async_client: AsyncClient,
+):
+    """Verify PATCH /cases/{id} persists root_cause, corrective_action, and evidence."""
+    case_id = "TEST-CASE-001"
+
+    # Update root_cause and evidence via PATCH
+    res = await async_client.patch(
+        f"/api/v1/cases/{case_id}",
+        json={
+            "root_cause": "Supplier accounts payable configuration mismatch",
+            "closure_evidence": "invoice_comparison_audit.pdf",
+            "note": "Investigation notes updated by reviewer",
+        },
+    )
+    assert res.status_code == 200
+    data = res.json()["data"]
+    assert data["root_cause"] == "Supplier accounts payable configuration mismatch"
+    assert data["closure_evidence"] == "invoice_comparison_audit.pdf"
+
+    # Verify history audit trail captured the update
+    assert len(data["history"]) >= 2
+    latest_history = data["history"][-1]
+    assert "Case Details Updated" in latest_history["action"]
+

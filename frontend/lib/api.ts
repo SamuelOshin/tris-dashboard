@@ -410,6 +410,13 @@ export const api = {
     })
   },
 
+  updateCase: async (id: string, payload: Partial<RiskCase> & { note?: string }): Promise<RiskCase> => {
+    return request<RiskCase>(`/cases/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+  },
+
   // Zero-Trust Access Telemetry
   getAccessEvents: async (filters: {
     limit?: number

@@ -17,7 +17,10 @@ from app.api.core.custom_exceptions.exceptions import (
     WorkflowPreConditionError,
 )
 from app.api.modules.v1.cases.models.risk_case import CaseHistory, RiskCase
-from app.api.modules.v1.cases.schemas.case_schemas import CaseTransitionRequest
+from app.api.modules.v1.cases.schemas.case_schemas import (
+    CaseTransitionRequest,
+    CaseUpdateRequest,
+)
 
 # Governed State Transition Matrix
 VALID_TRANSITIONS: Dict[str, List[str]] = {
@@ -340,3 +343,81 @@ class CaseService:
         await session.refresh(case)
 
         return await CaseService.get_case_by_id(case_id, session)
+
+    @staticmethod
+    async def update_case(
+        case_id: str,
+        update_data: CaseUpdateRequest,
+        actor: str,
+        session: AsyncSession,
+    ) -> Dict[str, Any]:
+        """
+        Updates case fields and records an audit history entry.
+
+        Raises:
+            NotFoundError: If case does not exist.
+            WorkflowPreConditionError: If attempting to edit a closed case.
+        """
+        case = await session.get(RiskCase, case_id)
+        if not case:
+            raise NotFoundError(f"Case '{case_id}' not found")
+
+        if case.status == "Closed":
+            raise WorkflowPreConditionError(
+                "Closed cases cannot be modified. Reopen the case to make changes."
+            )
+
+        updated_fields: List[str] = []
+        if update_data.root_cause is not None:
+            case.root_cause = update_data.root_cause.strip() or None
+            updated_fields.append("root_cause")
+        if update_data.corrective_action is not None:
+            case.corrective_action = update_data.corrective_action.strip() or None
+            updated_fields.append("corrective_action")
+        if update_data.closure_type is not None:
+            case.closure_type = update_data.closure_type
+            updated_fields.append("closure_type")
+        if update_data.closure_evidence is not None:
+            case.closure_evidence = update_data.closure_evidence.strip() or None
+            updated_fields.append("closure_evidence")
+        if update_data.verified_by is not None:
+            case.verified_by = update_data.verified_by.strip() or None
+            updated_fields.append("verified_by")
+        if update_data.closure_date is not None:
+            case.closure_date = update_data.closure_date
+            updated_fields.append("closure_date")
+        if update_data.follow_up_requirement is not None:
+            case.follow_up_requirement = update_data.follow_up_requirement.strip() or None
+            updated_fields.append("follow_up_requirement")
+        if update_data.recurrence_monitoring is not None:
+            case.recurrence_monitoring = update_data.recurrence_monitoring.strip() or None
+            updated_fields.append("recurrence_monitoring")
+        if update_data.assigned_to is not None:
+            case.assigned_to = update_data.assigned_to.strip() or None
+            updated_fields.append("assigned_to")
+        if update_data.department is not None:
+            case.department = update_data.department.strip() or None
+            updated_fields.append("department")
+        if update_data.priority is not None:
+            case.priority = update_data.priority
+            updated_fields.append("priority")
+
+        case.updated_at = datetime.now(timezone.utc)
+
+        audit_note = update_data.note or f"Updated fields: {', '.join(updated_fields)}"
+        history = CaseHistory(
+            case_id=case.case_id,
+            actor=actor,
+            action=f"Case Details Updated ({case.status})",
+            previous_status=case.status,
+            new_status=case.status,
+            note=audit_note,
+            timestamp=datetime.now(timezone.utc),
+        )
+        session.add(history)
+        session.add(case)
+        await session.commit()
+        await session.refresh(case)
+
+        return await CaseService.get_case_by_id(case_id, session)
+

@@ -341,7 +341,7 @@ export function useCaseWorkspace(caseId: string) {
     if (!investigationForm.rootCause.trim()) {
       setError('Please provide a Root Cause Explanation before saving.')
       toast.error('Root Cause Missing', {
-        description: 'A documented root cause is required to advance the case.',
+        description: 'A documented root cause is required.',
       })
       return
     }
@@ -353,22 +353,36 @@ export function useCaseWorkspace(caseId: string) {
       return
     }
 
-    saveDraftLocally()
+    setActionLoading(true)
+    setError(null)
+    try {
+      saveDraftLocally()
 
-    if (caseData?.status === 'Assigned') {
-      await handleTransition('Under Investigation', {
-        note: `Investigation documented: ${investigationForm.findingDisposition}. Root Cause: ${investigationForm.rootCause}`,
+      // Real network call: Persist root_cause and evidence to the database
+      let updated = await api.updateCase(caseId, {
+        root_cause: investigationForm.rootCause.trim(),
+        closure_evidence: investigationForm.supportingEvidence.trim() || undefined,
+        note: `Investigation updated: ${investigationForm.findingDisposition.trim()}`,
       })
-    } else if (caseData?.status === 'Under Investigation') {
-      // Advance to Corrective Action — backend requires root_cause in payload to persist it
-      await handleTransition('Corrective Action', {
-        root_cause: investigationForm.rootCause,
-        note: `Root cause documented: ${investigationForm.rootCause}. Finding: ${investigationForm.findingDisposition}`,
-      })
-    } else {
-      toast.success('Investigation Draft Saved', {
-        description: 'Investigation findings saved to your workspace.',
-      })
+
+      if (caseData?.status === 'Assigned') {
+        updated = await handleTransition('Under Investigation', {
+          note: `Investigation documented: ${investigationForm.findingDisposition}. Root Cause: ${investigationForm.rootCause}`,
+        })
+      } else {
+        setCaseData(updated)
+        toast.success('Investigation Saved', {
+          description: 'Root cause and investigation findings persisted to database.',
+        })
+      }
+      return updated
+    } catch (err: any) {
+      const msg = err.message || 'Failed to save investigation findings'
+      setError(msg)
+      toast.error('Save Failed', { description: msg })
+      throw err
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -381,18 +395,30 @@ export function useCaseWorkspace(caseId: string) {
       return
     }
 
-    saveDraftLocally()
+    setActionLoading(true)
+    setError(null)
+    try {
+      saveDraftLocally()
 
-    if (caseData?.status === 'Corrective Action') {
-      // Advance to Pending Verification — backend requires corrective_action in payload
-      await handleTransition('Pending Verification', {
-        corrective_action: correctiveForm.actionTaken,
-        note: `Remediation documented: ${correctiveForm.actionTaken} (Assigned to: ${correctiveForm.responsiblePerson})`,
+      // Real network call: Persist corrective_action to the database
+      const updated = await api.updateCase(caseId, {
+        corrective_action: correctiveForm.actionTaken.trim(),
+        closure_evidence: correctiveForm.evidenceOfAction.trim() || undefined,
+        note: `Corrective action updated: ${correctiveForm.actionTaken.trim()}`,
       })
-    } else {
+      setCaseData(updated)
+
       toast.success('Corrective Action Saved', {
-        description: 'Remediation plan saved to your workspace.',
+        description: 'Remediation plan persisted to database.',
       })
+      return updated
+    } catch (err: any) {
+      const msg = err.message || 'Failed to save corrective action'
+      setError(msg)
+      toast.error('Save Failed', { description: msg })
+      throw err
+    } finally {
+      setActionLoading(false)
     }
   }
 

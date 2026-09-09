@@ -13,6 +13,7 @@ from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.cases.schemas.case_schemas import (
     CaseResponse,
     CaseTransitionRequest,
+    CaseUpdateRequest,
 )
 from app.api.modules.v1.cases.service.case_service import CaseService
 from app.api.utils.response_payloads import success_response
@@ -84,3 +85,27 @@ async def transition_case(
         message=f"Case transitioned to '{payload.to_status}' successfully",
         data=data,
     )
+
+
+@router.patch("/{case_id}", response_model=None)
+async def update_case(
+    case_id: str,
+    payload: CaseUpdateRequest,
+    current_user: Annotated[User, Depends(require_roles(CASE_TRANSITION_ROLES))],
+    db: DbSession = None,
+):
+    """Update case fields (investigation notes, root cause) without changing status."""
+    actor = current_user.name or current_user.username
+    updated = await CaseService.update_case(
+        case_id=case_id,
+        update_data=payload,
+        actor=actor,
+        session=db,
+    )
+    data = CaseResponse.model_validate(updated).model_dump()
+    return success_response(
+        status_code=status.HTTP_200_OK,
+        message="Case updated successfully",
+        data=data,
+    )
+

@@ -81,3 +81,21 @@ class CaseTransitionRequest(BaseModel):
     closure_date: Optional[date] = None
     follow_up_requirement: Optional[str] = None
     recurrence_monitoring: Optional[str] = None
+
+
+class CaseUpdateRequest(BaseModel):
+    """Request payload for updating case details without mandatory state transition."""
+
+    root_cause: Optional[str] = None
+    corrective_action: Optional[str] = None
+    closure_type: Optional[str] = None
+    closure_evidence: Optional[str] = None
+    verified_by: Optional[str] = None
+    closure_date: Optional[date] = None
+    follow_up_requirement: Optional[str] = None
+    recurrence_monitoring: Optional[str] = None
+    assigned_to: Optional[str] = None
+    department: Optional[str] = None
+    priority: Optional[str] = None
+    note: Optional[str] = None
+
