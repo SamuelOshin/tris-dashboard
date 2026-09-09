@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { Button } from '@/components/ui/button'
@@ -53,6 +53,8 @@ export function LoginForm() {
 
   const { login } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTarget = searchParams.get('redirect') || '/'
 
   const resolveAuthError = (err: any, fallbackTitle = 'Sign in failed') => {
     const isServerError =
@@ -96,7 +98,7 @@ export function LoginForm() {
       toast.success('Signed in successfully', {
         description: 'Redirecting to your dashboard...',
       })
-      router.push('/')
+      router.push(redirectTarget)
     } catch (err: any) {
       const authError = resolveAuthError(err, 'Sign in failed')
       setError(authError)
@@ -126,7 +128,7 @@ export function LoginForm() {
     try {
       await login(demoUser.email, demoUser.password)
       toast.success(`Signed in as ${demoUser.role}`)
-      router.push('/')
+      router.push(redirectTarget)
     } catch (err: any) {
       const authError = resolveAuthError(err, 'Sign in failed')
       setError(authError)

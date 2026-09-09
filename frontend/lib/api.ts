@@ -210,6 +210,12 @@ export interface RequestOptions extends RequestInit {
   silent?: boolean
 }
 
+let isSessionExpiredRedirecting = false
+
+export function resetSessionRedirectFlag() {
+  isSessionExpiredRedirecting = false
+}
+
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const headers = new Headers(options.headers || {})
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
@@ -231,11 +237,39 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     // Non-JSON response body (e.g. proxy HTML 502/504)
   }
 
-  // Session probe check: unauthenticated response from /auth/me is an expected state,
-  // never an error that should be toasted to the user.
+  // Session probe check: unauthenticated response from /auth/me is an expected initial state,
+  // never an error that should be toasted to the user or trigger redirect.
   const isAuthProbe =
     endpoint.startsWith('/auth/me') &&
     (response.status === 401 || json?.status_code === 401 || json?.error_code === 'AUTHENTICATION_FAILED')
+
+  const isSessionExpired =
+    (response.status === 401 || json?.status_code === 401 || json?.error_code === 'AUTHENTICATION_FAILED') &&
+    !isAuthProbe
+
+  if (isSessionExpired) {
+    if (typeof window !== 'undefined' && !isSessionExpiredRedirecting) {
+      isSessionExpiredRedirecting = true
+      const currentPath = window.location.pathname + window.location.search
+      const isAlreadyOnLogin = window.location.pathname === '/login'
+
+      if (!isAlreadyOnLogin) {
+        toast.error('Session Expired', {
+          description: 'Your session has timed out. Redirecting to sign in...',
+          duration: 3000,
+        })
+        setTimeout(() => {
+          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
+        }, 700)
+      }
+    }
+    throw new ApiError(
+      json?.message || 'Session has expired. Please log in again.',
+      'AUTHENTICATION_FAILED',
+      401,
+      json?.errors
+    )
+  }
 
   if (!response.ok || (json && json.status === 'ERROR')) {
     let errorMsg =
