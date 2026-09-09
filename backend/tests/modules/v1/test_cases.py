@@ -86,21 +86,51 @@ async def test_verified_closure_8_field_validation(async_client: AsyncClient):
     assert r2.status_code == 200
     assert r2.json()["data"]["status"] == "Under Investigation"
 
-    # Step 3: Under Investigation -> Corrective Action
-    r3 = await async_client.post(
+    # Step 3a: Under Investigation -> Corrective Action WITHOUT root_cause -> MUST FAIL (422)
+    r3_fail = await async_client.post(
         f"/api/v1/cases/{case_id}/transition",
         json={"to_status": "Corrective Action", "actor": "investigator_alice"},
     )
+    assert r3_fail.status_code == 422
+    assert r3_fail.json()["error_code"] == "WORKFLOW_PRECONDITION_ERROR"
+
+    # Step 3b: Under Investigation -> Corrective Action WITH root_cause -> SUCCESS (200)
+    r3 = await async_client.post(
+        f"/api/v1/cases/{case_id}/transition",
+        json={
+            "to_status": "Corrective Action",
+            "actor": "investigator_alice",
+            "root_cause": (
+                "Compromised vendor portal credentials used for off-hours bank detail change"
+            ),
+        },
+    )
     assert r3.status_code == 200
     assert r3.json()["data"]["status"] == "Corrective Action"
+    assert r3.json()["data"]["root_cause"] is not None
 
-    # Step 4: Corrective Action -> Pending Verification
-    r4 = await async_client.post(
+    # Step 4a: Corrective Action -> Pending Verification (no corrective_action) -> FAIL (422)
+    r4_fail = await async_client.post(
         f"/api/v1/cases/{case_id}/transition",
         json={"to_status": "Pending Verification", "actor": "investigator_alice"},
     )
+    assert r4_fail.status_code == 422
+    assert r4_fail.json()["error_code"] == "WORKFLOW_PRECONDITION_ERROR"
+
+    # Step 4b: Corrective Action -> Pending Verification WITH corrective_action -> SUCCESS (200)
+    r4 = await async_client.post(
+        f"/api/v1/cases/{case_id}/transition",
+        json={
+            "to_status": "Pending Verification",
+            "actor": "investigator_alice",
+            "corrective_action": (
+                "Vendor bank details restored to primary account; payment hold placed on NC-260828"
+            ),
+        },
+    )
     assert r4.status_code == 200
     assert r4.json()["data"]["status"] == "Pending Verification"
+    assert r4.json()["data"]["corrective_action"] is not None
 
     # Step 5: Attempt closure with INCOMPLETE fields (only 3 of 8 fields provided)
     r5_fail = await async_client.post(

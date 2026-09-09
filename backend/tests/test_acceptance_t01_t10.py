@@ -189,11 +189,19 @@ async def test_t09_verified_closure_gatekeeper_validation(async_client: AsyncCli
     )
     await async_client.post(
         f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Corrective Action", "actor": "auditor"},
+        json={
+            "to_status": "Corrective Action",
+            "actor": "auditor",
+            "root_cause": "Compromised vendor portal account",
+        },
     )
     await async_client.post(
         f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Pending Verification", "actor": "auditor"},
+        json={
+            "to_status": "Pending Verification",
+            "actor": "auditor",
+            "corrective_action": "Bank details reverted; payment hold placed",
+        },
     )
 
     # Incomplete closure attempt (only 2 fields) -> MUST return 422
@@ -404,11 +412,21 @@ async def test_workbook_t07_recurrence_detection_and_prior_case_surfacing(
     )
     await async_client.post(
         f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Corrective Action", "actor": "auditor"},
+        json={
+            "to_status": "Corrective Action",
+            "actor": "auditor",
+            "root_cause": "Supplier bank-change verification workflow not completed",
+        },
     )
     await async_client.post(
         f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Pending Verification", "actor": "auditor"},
+        json={
+            "to_status": "Pending Verification",
+            "actor": "auditor",
+            "corrective_action": (
+                "Require independent verification of supplier banking change and second approval"
+            ),
+        },
     )
 
     closure_payload = {

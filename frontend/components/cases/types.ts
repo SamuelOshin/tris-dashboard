@@ -61,4 +61,10 @@ export interface CaseDraft {
   actionStatus?: string
   actionComments?: string
   closureNotes?: string
+  closureType?: string
+  closureEvidence?: string
+  followUpRequirement?: string
+  recurrenceMonitoring?: string
+  verifiedBy?: string
+  closureDate?: string
 }

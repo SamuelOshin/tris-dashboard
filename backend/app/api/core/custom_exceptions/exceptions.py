@@ -96,6 +96,18 @@ class InvalidStateTransitionError(CustomDomainException):
         )
 
 
+class WorkflowPreConditionError(CustomDomainException):
+    """Raised when a required field is missing before a workflow stage transition."""
+
+    def __init__(self, message: str, missing_field: str | None = None):
+        super().__init__(
+            message=message,
+            code="WORKFLOW_PRECONDITION_ERROR",
+            field_errors={"field": [missing_field]} if missing_field else {},
+            missing_field=missing_field,
+        )
+
+
 class AuthenticationError(CustomDomainException):
     """Raised when authentication credentials or tokens are invalid or expired."""
 

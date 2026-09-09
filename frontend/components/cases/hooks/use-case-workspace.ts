@@ -47,6 +47,14 @@ export function useCaseWorkspace(caseId: string) {
 
   // Closure state
   const [closureNotes, setClosureNotes] = useState('')
+  const [closureForm, setClosureForm] = useState({
+    closureType: '' as string,
+    closureEvidence: '',
+    followUpRequirement: '',
+    recurrenceMonitoring: '',
+    verifiedBy: '',
+    closureDate: new Date().toISOString().split('T')[0],
+  })
   const [closureValidationErrors, setClosureValidationErrors] = useState<string[]>([])
 
   // Audit trail sort order
@@ -63,6 +71,12 @@ export function useCaseWorkspace(caseId: string) {
           ...investigationForm,
           ...correctiveForm,
           closureNotes,
+          closureType: closureForm.closureType,
+          closureEvidence: closureForm.closureEvidence,
+          followUpRequirement: closureForm.followUpRequirement,
+          recurrenceMonitoring: closureForm.recurrenceMonitoring,
+          verifiedBy: closureForm.verifiedBy,
+          closureDate: closureForm.closureDate,
           ...customDraft,
         }
         localStorage.setItem(draftKey, JSON.stringify(draft))
@@ -70,7 +84,7 @@ export function useCaseWorkspace(caseId: string) {
         // Ignore localStorage quota errors
       }
     },
-    [caseData, draftKey, investigationForm, correctiveForm, closureNotes]
+    [caseData, draftKey, investigationForm, correctiveForm, closureNotes, closureForm]
   )
 
   const clearDraft = useCallback(() => {
@@ -116,6 +130,15 @@ export function useCaseWorkspace(caseId: string) {
           actionComments: data.corrective_action || 'Remediation completed. Payment stopped/reconciled.',
         })
 
+        setClosureForm({
+          closureType: data.closure_type || '',
+          closureEvidence: data.closure_evidence || '',
+          followUpRequirement: data.follow_up_requirement || '',
+          recurrenceMonitoring: data.recurrence_monitoring || '',
+          verifiedBy: data.verified_by || '',
+          closureDate: data.closure_date ? data.closure_date.split('T')[0] : new Date().toISOString().split('T')[0],
+        })
+
         setClosureNotes(
           `System-validated closure completed by ${data.verified_by || 'Reviewer'}. Monitoring active.`
         )
@@ -143,6 +166,14 @@ export function useCaseWorkspace(caseId: string) {
               actionStatus: draft.actionStatus || 'In Progress',
               actionComments: draft.actionComments || '',
             })
+            setClosureForm({
+              closureType: draft.closureType || data.closure_type || '',
+              closureEvidence: draft.closureEvidence || data.closure_evidence || '',
+              followUpRequirement: draft.followUpRequirement || data.follow_up_requirement || '',
+              recurrenceMonitoring: draft.recurrenceMonitoring || data.recurrence_monitoring || '',
+              verifiedBy: draft.verifiedBy || data.verified_by || user?.name || '',
+              closureDate: draft.closureDate || (data.closure_date ? data.closure_date.split('T')[0] : new Date().toISOString().split('T')[0]),
+            })
             if (draft.closureNotes) setClosureNotes(draft.closureNotes)
           } else {
             // Seed defaults from case record
@@ -152,19 +183,16 @@ export function useCaseWorkspace(caseId: string) {
             if (data.corrective_action) {
               setCorrectiveForm((prev) => ({ ...prev, actionTaken: data.corrective_action || '' }))
             }
-            if (data.closure_evidence) {
-              setInvestigationForm((prev) => ({
-                ...prev,
-                supportingEvidence: data.closure_evidence || '',
-              }))
-              setCorrectiveForm((prev) => ({
-                ...prev,
-                evidenceOfAction: data.closure_evidence || '',
-              }))
-            }
             setCorrectiveForm((prev) => ({
               ...prev,
               responsiblePerson: data.assigned_to || user?.name || 'Risk Reviewer / Case Owner',
+            }))
+            setClosureForm((prev) => ({
+              ...prev,
+              closureEvidence: data.closure_evidence || prev.closureEvidence,
+              followUpRequirement: data.follow_up_requirement || prev.followUpRequirement,
+              recurrenceMonitoring: data.recurrence_monitoring || prev.recurrenceMonitoring,
+              verifiedBy: data.verified_by || user?.name || prev.verifiedBy,
             }))
           }
         } catch (e) {
@@ -331,9 +359,15 @@ export function useCaseWorkspace(caseId: string) {
       await handleTransition('Under Investigation', {
         note: `Investigation documented: ${investigationForm.findingDisposition}. Root Cause: ${investigationForm.rootCause}`,
       })
+    } else if (caseData?.status === 'Under Investigation') {
+      // Advance to Corrective Action — backend requires root_cause in payload to persist it
+      await handleTransition('Corrective Action', {
+        root_cause: investigationForm.rootCause,
+        note: `Root cause documented: ${investigationForm.rootCause}. Finding: ${investigationForm.findingDisposition}`,
+      })
     } else {
       toast.success('Investigation Draft Saved', {
-        description: 'Investigation findings preserved in local workspace session.',
+        description: 'Investigation findings saved to your workspace.',
       })
     }
   }
@@ -349,19 +383,28 @@ export function useCaseWorkspace(caseId: string) {
 
     saveDraftLocally()
 
-    if (caseData?.status === 'Under Investigation') {
-      await handleTransition('Corrective Action', {
-        note: `Remediation plan documented: ${correctiveForm.actionTaken} (Assigned to: ${correctiveForm.responsiblePerson})`,
+    if (caseData?.status === 'Corrective Action') {
+      // Advance to Pending Verification — backend requires corrective_action in payload
+      await handleTransition('Pending Verification', {
+        corrective_action: correctiveForm.actionTaken,
+        note: `Remediation documented: ${correctiveForm.actionTaken} (Assigned to: ${correctiveForm.responsiblePerson})`,
       })
     } else {
       toast.success('Corrective Action Saved', {
-        description: 'Remediation plan and target dates saved in workspace session.',
+        description: 'Remediation plan saved to your workspace.',
       })
     }
   }
 
   const handleAdvanceToVerification = async () => {
+    if (!correctiveForm.actionTaken.trim() && !caseData?.corrective_action) {
+      toast.error('Corrective Action Required', {
+        description: 'Document the corrective action taken before advancing.',
+      })
+      return
+    }
     return await handleTransition('Pending Verification', {
+      corrective_action: correctiveForm.actionTaken || caseData?.corrective_action || '',
       note: 'Remediation completed. Advanced to Pending Verification.',
     })
   }
@@ -371,29 +414,30 @@ export function useCaseWorkspace(caseId: string) {
     setError(null)
 
     const errors: string[] = []
-    const resolvedRootCause =
-      caseData?.root_cause || investigationForm.rootCause.trim()
-    const resolvedAction =
-      caseData?.corrective_action || correctiveForm.actionTaken.trim()
-    const resolvedEvidence =
-      caseData?.closure_evidence ||
-      investigationForm.supportingEvidence.trim() ||
-      correctiveForm.evidenceOfAction.trim()
 
-    if (!resolvedRootCause) {
-      errors.push('Root cause explanation is required.')
-    }
-    if (!resolvedAction) {
-      errors.push('Corrective action plan is required.')
-    }
-    if (!resolvedEvidence) {
-      errors.push('Closure evidence attachment or reference is required.')
-    }
+    // All values must come from the DB record (set by prior transitions) or the current closure form
+    const resolvedRootCause = caseData?.root_cause || ''
+    const resolvedAction = caseData?.corrective_action || ''
+    const resolvedEvidence = closureForm.closureEvidence.trim() || caseData?.closure_evidence || ''
+    const resolvedClosureType = closureForm.closureType
+    const resolvedFollowUp = closureForm.followUpRequirement.trim()
+    const resolvedRecurrence = closureForm.recurrenceMonitoring.trim()
+    const resolvedVerifiedBy = closureForm.verifiedBy.trim() || user?.name || ''
+    const resolvedClosureDate = closureForm.closureDate
+
+    if (!resolvedRootCause) errors.push('Root cause explanation is required (complete Investigation tab).')
+    if (!resolvedAction) errors.push('Corrective action plan is required (complete Corrective Action tab).')
+    if (!resolvedEvidence) errors.push('Closure evidence attachment or reference is required.')
+    if (!resolvedClosureType) errors.push('Closure type must be selected.')
+    if (!resolvedFollowUp) errors.push('Follow-up requirement must be specified.')
+    if (!resolvedRecurrence) errors.push('Recurrence monitoring plan must be specified.')
+    if (!resolvedVerifiedBy) errors.push('Verified by (reviewer name) is required.')
+    if (!resolvedClosureDate) errors.push('Closure date is required.')
 
     if (errors.length > 0) {
       setClosureValidationErrors(errors)
-      toast.error('Validation Incomplete', {
-        description: 'Please satisfy all 8 closure criteria before closing.',
+      toast.error('Closure Incomplete', {
+        description: `${errors.length} required field(s) must be completed before closing.`,
       })
       return
     }
@@ -406,14 +450,12 @@ export function useCaseWorkspace(caseId: string) {
         note: closureNotes.trim() || 'System-validated closure completed successfully.',
         root_cause: resolvedRootCause,
         corrective_action: resolvedAction,
-        closure_type: investigationForm.rootCauseCategory || 'Process Error / Data Entry',
+        closure_type: resolvedClosureType as any,
         closure_evidence: resolvedEvidence,
-        verified_by: user?.name ? `${user.name} (Risk Reviewer)` : 'Risk Reviewer / Case Owner',
-        closure_date: new Date().toISOString().split('T')[0],
-        follow_up_requirement:
-          'None — supplier account reconciled and continuous monitoring active.',
-        recurrence_monitoring:
-          'Enrolled in 90-day automated recurrence monitoring (Rule R-006).',
+        verified_by: resolvedVerifiedBy,
+        closure_date: resolvedClosureDate,
+        follow_up_requirement: resolvedFollowUp,
+        recurrence_monitoring: resolvedRecurrence,
       }
 
       const updated = await api.transitionCase(caseId, closurePayload)
@@ -545,18 +587,21 @@ export function useCaseWorkspace(caseId: string) {
   const enrichedSignals = (caseData?.trigger_signals || []).map((s) => enrichSignal(s))
   const primarySignal = enrichedSignals[0]
 
-  // Dynamic closure readiness checks
-  const hasRootCause = Boolean(
-    caseData?.root_cause || investigationForm.rootCause.trim()
-  )
-  const hasCorrectiveAction = Boolean(
-    caseData?.corrective_action || correctiveForm.actionTaken.trim()
-  )
+  // Closure readiness — based purely on what is persisted in the DB record
+  // Frontend local-form state must NOT influence these guards (it isn't validated by the server)
+  const hasRootCause = Boolean(caseData?.root_cause)
+  const hasCorrectiveAction = Boolean(caseData?.corrective_action)
   const hasEvidence = Boolean(
-    caseData?.closure_evidence ||
-      investigationForm.supportingEvidence.trim() ||
-      correctiveForm.evidenceOfAction.trim()
+    caseData?.closure_evidence || closureForm.closureEvidence.trim()
   )
+
+  const updateClosureField = (field: keyof typeof closureForm, value: string) => {
+    setClosureForm((prev) => {
+      const next = { ...prev, [field]: value }
+      saveDraftLocally({ [field]: value })
+      return next
+    })
+  }
 
   return {
     caseData,
@@ -569,6 +614,7 @@ export function useCaseWorkspace(caseId: string) {
     investigationForm,
     correctiveForm,
     closureNotes,
+    closureForm,
     closureValidationErrors,
     auditSortOrder,
     hasRootCause,
@@ -578,6 +624,7 @@ export function useCaseWorkspace(caseId: string) {
       updateInvestigationField,
       updateCorrectiveField,
       updateClosureNotes,
+      updateClosureField,
       handleClearInvestigationForm,
       handleClearCorrectiveForm,
       handleAutofillSample,

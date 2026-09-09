@@ -14,6 +14,7 @@ from app.api.core.custom_exceptions.exceptions import (
     InvalidStateTransitionError,
     NotFoundError,
     VerifiedClosureValidationError,
+    WorkflowPreConditionError,
 )
 from app.api.modules.v1.cases.models.risk_case import CaseHistory, RiskCase
 from app.api.modules.v1.cases.schemas.case_schemas import CaseTransitionRequest
@@ -147,31 +148,72 @@ class CaseService:
                 allowed_transitions=allowed_targets,
             )
 
-        # 2. Enforce 8-Field Verified Closure Gatekeeper
+        # 2a. Enforce root_cause before advancing to Corrective Action
+        if target_status == "Corrective Action":
+            root_cause_value = (transition.root_cause or "").strip()
+            if not root_cause_value:
+                raise WorkflowPreConditionError(
+                    message=(
+                        "Root cause explanation is required before advancing to Corrective Action. "
+                        "Document your finding in the Investigation tab first."
+                    ),
+                    missing_field="root_cause",
+                )
+            case.root_cause = root_cause_value
+
+        # 2b. Enforce corrective_action before advancing to Pending Verification
+        if target_status == "Pending Verification":
+            corrective_action_value = (transition.corrective_action or "").strip()
+            if not corrective_action_value:
+                raise WorkflowPreConditionError(
+                    message=(
+                        "Corrective action plan is required before advancing to"
+                        " Pending Verification. Document your remediation first."
+                    ),
+                    missing_field="corrective_action",
+                )
+            case.corrective_action = corrective_action_value
+
+        # 2c. Enforce all 8 closure fields on final closure transition
         if target_status == "Closed":
-            missing_fields: List[str] = []
-            transition_data = transition.model_dump()
+            # Resolve fields: prefer payload value, fall back to what's already on the case record
+            def _resolve(payload_val: str | None, case_val: str | None) -> str | None:
+                v = (payload_val or "").strip()
+                return v if v else (case_val or "").strip() or None
 
-            for field in MANDATORY_CLOSURE_FIELDS:
-                val = transition_data.get(field)
-                if val is None or (isinstance(val, str) and not val.strip()):
-                    missing_fields.append(field)
+            resolved = {
+                "root_cause": _resolve(transition.root_cause, case.root_cause),
+                "corrective_action": _resolve(transition.corrective_action, case.corrective_action),
+                "closure_type": _resolve(transition.closure_type, case.closure_type),
+                "closure_evidence": _resolve(transition.closure_evidence, case.closure_evidence),
+                "verified_by": _resolve(transition.verified_by, case.verified_by),
+                "closure_date": transition.closure_date or case.closure_date,
+                "follow_up_requirement": _resolve(
+                    transition.follow_up_requirement, case.follow_up_requirement
+                ),
+                "recurrence_monitoring": _resolve(
+                    transition.recurrence_monitoring, case.recurrence_monitoring
+                ),
+            }
 
+            missing_fields = [
+                field for field, val in resolved.items() if not val
+            ]
             if missing_fields:
                 raise VerifiedClosureValidationError(
                     message=f"Verified closure failed: missing mandatory fields {missing_fields}",
                     missing_fields=missing_fields,
                 )
 
-            # Populate 8 closure fields onto the case model
-            case.root_cause = transition.root_cause
-            case.corrective_action = transition.corrective_action
-            case.closure_type = transition.closure_type
-            case.closure_evidence = transition.closure_evidence
-            case.verified_by = transition.verified_by
-            case.closure_date = transition.closure_date
-            case.follow_up_requirement = transition.follow_up_requirement
-            case.recurrence_monitoring = transition.recurrence_monitoring
+            # Persist all 8 closure fields
+            case.root_cause = resolved["root_cause"]
+            case.corrective_action = resolved["corrective_action"]
+            case.closure_type = resolved["closure_type"]
+            case.closure_evidence = resolved["closure_evidence"]
+            case.verified_by = resolved["verified_by"]
+            case.closure_date = resolved["closure_date"]
+            case.follow_up_requirement = resolved["follow_up_requirement"]
+            case.recurrence_monitoring = resolved["recurrence_monitoring"]
 
         # 3. Handle Assignment & Department Update
         if transition.assigned_to:

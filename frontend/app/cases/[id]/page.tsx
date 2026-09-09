@@ -38,6 +38,7 @@ export default function CaseDetailPage() {
     investigationForm,
     correctiveForm,
     closureNotes,
+    closureForm,
     closureValidationErrors,
     auditSortOrder,
     hasRootCause,
@@ -167,11 +168,11 @@ export default function CaseDetailPage() {
             caseData={caseData}
             closureNotes={closureNotes}
             onChangeClosureNotes={actions.updateClosureNotes}
+            closureForm={closureForm}
+            onChangeClosureField={actions.updateClosureField}
             hasRootCause={hasRootCause}
             hasCorrectiveAction={hasCorrectiveAction}
             hasEvidence={hasEvidence}
-            supportingEvidence={investigationForm.supportingEvidence}
-            evidenceOfAction={correctiveForm.evidenceOfAction}
             closureValidationErrors={closureValidationErrors}
             onGoToInvestigation={() => setActiveTab('investigation')}
             onGoToCorrectiveAction={() => setActiveTab('corrective-action')}
