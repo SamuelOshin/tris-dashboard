@@ -1,7 +1,7 @@
 import React from 'react'
 import { RuleConfig } from '@/lib/api'
 
-export type SettingsTabId = 'rules' | 'profile'
+export type SettingsTabId = 'rules' | 'profile' | 'integrations'
 
 export interface SettingsTabConfig {
   id: SettingsTabId

@@ -1,12 +1,13 @@
 'use client'
 
 import React from 'react'
-import { Sliders, UserCheck } from 'lucide-react'
+import { Sliders, UserCheck, Database } from 'lucide-react'
 import { SettingsTabId, SettingsTabConfig } from './types'
 
 export const SETTINGS_TABS: SettingsTabConfig[] = [
   { id: 'rules', label: 'Detection Rules & Weights', icon: Sliders, badge: 'Live API' },
   { id: 'profile', label: 'Account Profile', icon: UserCheck, badge: 'Active' },
+  { id: 'integrations', label: 'Integrations', icon: Database, badge: 'Roadmap' },
 ]
 
 interface SettingsTabNavProps {
