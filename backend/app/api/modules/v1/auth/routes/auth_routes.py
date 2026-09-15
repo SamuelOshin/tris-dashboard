@@ -122,4 +122,3 @@ async def change_password(
         message="Password changed successfully",
         data=None,
     )
-

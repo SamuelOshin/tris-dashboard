@@ -230,6 +230,7 @@ async def ingest_workbook_data(data_file_path: str | Path) -> dict:
     logger.info(f"Ingesting database using Excel workbook: {file_path}")
     async with async_session_factory() as session:
         report = await IngestionService.ingest_excel_workbook(file_path, session)
+        await session.commit()
         logger.info("   -> Ingestion Complete:")
         for key, value in report.items():
             logger.info(f"      - {key}: {value}")
@@ -245,6 +246,7 @@ async def ingest_temporal_fixture_data() -> dict:
     logger.info("Ingesting v1.4 temporal fixture (SUP-TEMP-001 / TX-TEMP-001)...")
     async with async_session_factory() as session:
         report = await TemporalFixtureService.ingest_temporal_fixture(session)
+        await session.commit()
         logger.info("   -> Temporal Ingestion Complete:")
         for key, value in report.items():
             logger.info(f"      - {key}: {value}")
@@ -256,9 +258,10 @@ async def main(
     users_only: bool = False,
     ingest_only: bool = False,
     temporal_fixture: bool = False,
+    temporal_fixture_only: bool = False,
 ):
     """Orchestrates database seeding and/or ingestion."""
-    if temporal_fixture:
+    if temporal_fixture_only:
         await ingest_temporal_fixture_data()
         return
 
@@ -268,11 +271,15 @@ async def main(
 
     if ingest_only:
         await ingest_workbook_data(data_file_path)
+        if temporal_fixture:
+            await ingest_temporal_fixture_data()
         return
 
     # Default: Run both (users + triggers + workbook ingestion)
     await seed_users_and_triggers()
     await ingest_workbook_data(data_file_path)
+    if temporal_fixture:
+        await ingest_temporal_fixture_data()
     logger.info("TRIS Database Seeding & Ingestion Succeeded!")
 
 
@@ -288,6 +295,11 @@ if __name__ == "__main__":
         default="../test data.xlsx",
         help="Path to test data.xlsx file",
     )
+    parser.add_argument(
+        "--temporal-fixture",
+        action="store_true",
+        help="Ingest v1.4 temporal fixture (SUP-TEMP-001 / TX-TEMP-001)",
+    )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "--users-only",
@@ -300,9 +312,9 @@ if __name__ == "__main__":
         help="Only ingest the Excel workbook (assumes tables/users exist)",
     )
     group.add_argument(
-        "--temporal-fixture",
+        "--temporal-fixture-only",
         action="store_true",
-        help="Ingest v1.4 temporal fixture (SUP-TEMP-001 / TX-TEMP-001)",
+        help="Only ingest v1.4 temporal fixture (SUP-TEMP-001 / TX-TEMP-001)",
     )
     args = parser.parse_args()
     asyncio.run(
@@ -311,5 +323,6 @@ if __name__ == "__main__":
             users_only=args.users_only,
             ingest_only=args.ingest_only,
             temporal_fixture=args.temporal_fixture,
+            temporal_fixture_only=args.temporal_fixture_only,
         )
     )

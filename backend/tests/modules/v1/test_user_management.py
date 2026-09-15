@@ -118,9 +118,7 @@ async def test_admin_creates_user_and_new_user_can_login(
     assert login_res.json()["data"]["username"] == "sconnor"
 
     # Verify USER_CREATED audit log
-    audit_stmt = select(SecurityAuditLog).where(
-        SecurityAuditLog.event_type == "USER_CREATED"
-    )
+    audit_stmt = select(SecurityAuditLog).where(SecurityAuditLog.event_type == "USER_CREATED")
     audit_res = await db_session.execute(audit_stmt)
     audit_logs = audit_res.scalars().all()
     assert any("sconnor" in str(log_entry.detail) for log_entry in audit_logs)

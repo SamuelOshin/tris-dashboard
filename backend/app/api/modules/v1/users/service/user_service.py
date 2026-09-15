@@ -221,9 +221,7 @@ class UserService:
         is_self = user.user_id == actor.user_id
 
         if is_self and payload.is_active is False:
-            raise ValidationError(
-                "Administrators cannot deactivate their own active account."
-            )
+            raise ValidationError("Administrators cannot deactivate their own active account.")
 
         if payload.role is not None:
             normalized_role = payload.role.strip().lower()
@@ -233,9 +231,7 @@ class UserService:
                     f"Role '{payload.role}' is invalid. Allowed roles: {', '.join(valid_roles)}."
                 )
             if is_self and normalized_role != Role.ADMIN:
-                raise ValidationError(
-                    "Administrators cannot revoke their own administrator role."
-                )
+                raise ValidationError("Administrators cannot revoke their own administrator role.")
 
             if normalized_role != user.role.lower():
                 old_role = user.role

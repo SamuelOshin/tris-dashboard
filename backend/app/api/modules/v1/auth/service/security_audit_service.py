@@ -276,4 +276,3 @@ class SecurityAuditService:
         )
         session.add(entry)
         await session.commit()
-
