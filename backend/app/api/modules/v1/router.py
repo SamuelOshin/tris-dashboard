@@ -16,6 +16,12 @@ from app.api.modules.v1.ingestion.routes.ingestion_routes import (
 from app.api.modules.v1.notifications.routes.notification_routes import (
     router as notifications_router,
 )
+from app.api.modules.v1.reconstruction.routes.reconstruction_routes import (
+    router as reconstruction_router,
+)
+from app.api.modules.v1.remediation.routes.remediation_routes import (
+    router as remediation_router,
+)
 from app.api.modules.v1.rules.routes.rule_routes import router as rules_router
 from app.api.modules.v1.suppliers.routes.supplier_routes import (
     router as suppliers_router,
@@ -23,11 +29,13 @@ from app.api.modules.v1.suppliers.routes.supplier_routes import (
 from app.api.modules.v1.transactions.routes.transaction_routes import (
     router as transactions_router,
 )
+from app.api.modules.v1.users.routes.user_routes import router as users_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 
 # Register domain module routers
 api_v1_router.include_router(auth_router)
+api_v1_router.include_router(users_router)
 api_v1_router.include_router(ingestion_router)
 api_v1_router.include_router(suppliers_router)
 api_v1_router.include_router(transactions_router)
@@ -35,9 +43,11 @@ api_v1_router.include_router(rules_router)
 api_v1_router.include_router(cases_router)
 api_v1_router.include_router(access_events_router)
 api_v1_router.include_router(notifications_router)
+api_v1_router.include_router(reconstruction_router)
+api_v1_router.include_router(remediation_router)
 
 
 @api_v1_router.get("/health", tags=["Health"])
 async def api_health():
     """V1 API health check endpoint."""
-    return {"status": "HEALTHY", "version": "1.3.0"}
+    return {"status": "HEALTHY", "version": "1.4.0"}

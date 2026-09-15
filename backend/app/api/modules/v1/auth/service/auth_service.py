@@ -13,6 +13,7 @@ from app.api.core.custom_exceptions.exceptions import AuthenticationError, NotFo
 from app.api.core.security import create_access_token, verify_password
 from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.auth.schemas.auth_schemas import UserProfileUpdate
+from app.api.modules.v1.auth.service.security_audit_service import SecurityAuditService
 
 
 class AuthService:
@@ -23,9 +24,17 @@ class AuthService:
         username: str,
         password: str,
         session: AsyncSession,
+        ip_address: str | None = None,
     ) -> Tuple[User, str]:
         """
         Authenticates credentials against Argon2id hash and issues JWT bearer token.
+        Writes a SecurityAuditLog entry for both success and failure.
+
+        Args:
+            username: Username or email identifier.
+            password: Plaintext password for verification.
+            session: Async database session.
+            ip_address: Originating client IP (optional, for audit log).
 
         Raises:
             AuthenticationError: If credentials fail or user is disabled.
@@ -41,9 +50,19 @@ class AuthService:
         user = result.scalar_one_or_none()
 
         if not user:
+            await SecurityAuditService.log_login_failure(
+                session=session,
+                actor_username=cleaned_identifier,
+                ip_address=ip_address,
+            )
             raise AuthenticationError("Invalid username or password")
 
         if not verify_password(password, user.hashed_password):
+            await SecurityAuditService.log_login_failure(
+                session=session,
+                actor_username=cleaned_identifier,
+                ip_address=ip_address,
+            )
             raise AuthenticationError("Invalid username or password")
 
         if not user.is_active:
@@ -58,6 +77,15 @@ class AuthService:
                 "email": user.email,
             }
         )
+
+        await SecurityAuditService.log_login_success(
+            session=session,
+            actor_id=user.user_id,
+            actor_username=user.username,
+            actor_role=user.role,
+            ip_address=ip_address,
+        )
+
         return user, token
 
     @staticmethod
@@ -68,6 +96,11 @@ class AuthService:
     ) -> User:
         """
         Updates profile fields for the authenticated user.
+
+        Args:
+            user_id: Primary key of the user to update.
+            update_data: Fields to update.
+            session: Async database session.
 
         Raises:
             NotFoundError: If user does not exist.

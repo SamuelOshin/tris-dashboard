@@ -21,7 +21,47 @@ export interface User {
   role: string
   department: string
   is_active: boolean
+  created_at?: string
 }
+
+export interface UserAdminRecord {
+  user_id: string
+  username: string
+  name: string
+  email: string
+  role: string
+  department: string
+  is_active: boolean
+  created_at: string
+}
+
+export interface UserCreatePayload {
+  name: string
+  email: string
+  username?: string
+  role: string
+  department?: string
+  temporary_password?: string
+}
+
+export interface UserCreatedResult extends UserAdminRecord {
+  temporary_password: string
+}
+
+export interface UserUpdatePayload {
+  name?: string
+  role?: string
+  department?: string
+  is_active?: boolean
+}
+
+export interface PasswordResetResult {
+  user_id: string
+  username: string
+  temporary_password: string
+  message: string
+}
+
 
 export interface Supplier {
   supplier_id: string
@@ -188,6 +228,152 @@ export interface NotificationFilters {
   unread_only?: boolean
   category?: string
   severity?: string
+}
+
+// ---------------------------------------------------------------------------
+// Historical Reconstruction & Remediation Replay Interfaces
+// ---------------------------------------------------------------------------
+
+export interface ProvenanceFact {
+  field: string
+  value: any
+  source_record_id: string
+  source_table: string
+  effective_from?: string | null
+  recorded_at?: string | null
+}
+
+export interface SupplierStateAtEvent {
+  supplier_id: string
+  name: string | null
+  category: string | null
+  risk_tier: string | null
+  bank_change_date: string | null
+  bank_changed_within_7_days: boolean
+  provenance: ProvenanceFact[]
+}
+
+export interface ApprovalItem {
+  approval_id: string
+  required_level?: string
+  approver_name?: string | null
+  approver_role?: string
+  approval_status?: string
+  approval_date?: string | null
+  exclusion_reason?: string
+  notes?: string | null
+}
+
+export interface ApprovalStateAtEvent {
+  effective_approvals: ApprovalItem[]
+  excluded_late_approvals: ApprovalItem[]
+  highest_effective_level?: string | null
+  provenance: ProvenanceFact[]
+}
+
+export interface AccessStateAtEvent {
+  elevated_access_active: boolean
+  active_access_events: Array<{
+    event_id: string
+    user_id: string
+    action: string
+    resource: string
+    event_time?: string | null
+    system: string
+  }>
+  provenance: ProvenanceFact[]
+}
+
+export interface TransactionStateAtEvent {
+  transaction_id: string
+  amount: number
+  currency: string
+  invoice_date: string
+  approval_required: boolean
+  approval_status_at_event: string
+  provenance: ProvenanceFact[]
+}
+
+export interface ApplicableRuleAtEvent {
+  rule_code: string
+  rule_name: string
+  rule_version: number
+  threshold_params: Record<string, any>
+  provenance: ProvenanceFact[]
+}
+
+export interface EvidenceCompleteness {
+  supplier_state: string
+  approval_state: string
+  access_state: string
+  transaction_state: string
+  rule_version: string
+  overall: string
+}
+
+export interface ReconstructionResult {
+  transaction_id: string
+  case_id?: string | null
+  event_timestamp: string
+  outcome: 'PASS' | 'FAIL' | 'UNKNOWN'
+  explanation: string
+  supplier_state?: SupplierStateAtEvent | null
+  approval_state?: ApprovalStateAtEvent | null
+  access_state?: AccessStateAtEvent | null
+  transaction_state?: TransactionStateAtEvent | null
+  applicable_rule?: ApplicableRuleAtEvent | null
+  evidence_completeness: EvidenceCompleteness
+  snapshot_id?: number | null
+}
+
+export interface ProposedControl {
+  control_id: string
+  name: string
+  description: string
+  amount_threshold: number
+  bank_change_window_days: number
+  required_approval_level: string
+  action_policy: 'BLOCK/PREVENT' | 'ESCALATE/HOLD' | 'ALLOW'
+  version: number
+  is_active: boolean
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface RemediationReplayResult {
+  replay_id?: number | null
+  control_id: string
+  transaction_id: string
+  case_id?: string | null
+  event_timestamp: string
+  replay_determination: 'ALLOW' | 'ESCALATE/HOLD' | 'BLOCK/PREVENT' | 'NOT DETERMINABLE'
+  original_outcome: string
+  proposed_control_outcome: string
+  explanation: string
+  driving_facts: {
+    amount: number
+    amount_threshold: number
+    amount_exceeded: boolean
+    supplier_id: string
+    bank_change_date: string | null
+    bank_changed_within_window: boolean
+    window_days: number
+    days_since_bank_change: number | null
+    requires_independent_verification: boolean
+    required_approval_level: string
+    effective_highest_approval_level: string | null
+    effective_approvals_count: number
+    effective_approval_ids: string[]
+    independent_verification_present: boolean
+    excluded_late_approvals_count: number
+    excluded_late_approval_ids: string[]
+    action_policy: string
+  }
+  replay_payload: Record<string, any>
+  reconstruction_snapshot_id?: number | null
+  executed_by?: string | null
+  created_at: string
 }
 
 const API_BASE = '/api/v1'
@@ -498,6 +684,93 @@ export const api = {
   markAllNotificationsRead: async (): Promise<{ updated_count: number }> => {
     return request<{ updated_count: number }>('/notifications/mark-all-read', {
       method: 'POST',
+    })
+  },
+
+  // Historical Reconstruction (Ticket 7)
+  getHistoricalReconstruction: async (
+    transactionId: string,
+    eventTimestamp?: string,
+    caseId?: string
+  ): Promise<ReconstructionResult> => {
+    if (eventTimestamp) {
+      return request<ReconstructionResult>('/reconstruction/reconstruct', {
+        method: 'POST',
+        body: JSON.stringify({
+          transaction_id: transactionId,
+          event_timestamp: eventTimestamp,
+          case_id: caseId,
+        }),
+      })
+    }
+    return request<ReconstructionResult>(`/reconstruction/reconstruct/${encodeURIComponent(transactionId)}`)
+  },
+
+  // Remediation Replay (Ticket 8)
+  getProposedControls: async (): Promise<ProposedControl[]> => {
+    return request<ProposedControl[]>('/remediation/controls')
+  },
+
+  getReplays: async (filters: { transaction_id?: string; case_id?: string } = {}): Promise<RemediationReplayResult[]> => {
+    const params = new URLSearchParams()
+    if (filters.transaction_id) params.append('transaction_id', filters.transaction_id)
+    if (filters.case_id) params.append('case_id', filters.case_id)
+    const qs = params.toString() ? `?${params.toString()}` : ''
+    return request<RemediationReplayResult[]>(`/remediation/replays${qs}`)
+  },
+
+  runRemediationReplay: async (payload: {
+    transaction_id: string
+    control_id?: string
+    event_timestamp?: string
+    case_id?: string
+  }): Promise<RemediationReplayResult> => {
+    return request<RemediationReplayResult>('/remediation/replay', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  // ── User Management (Admin) ──────────────────────────────────────────
+  getUsers: async (params?: {
+    role?: string
+    department?: string
+    is_active?: boolean
+    search?: string
+  }): Promise<UserAdminRecord[]> => {
+    const query = new URLSearchParams()
+    if (params?.role) query.set('role', params.role)
+    if (params?.department) query.set('department', params.department)
+    if (params?.is_active !== undefined) query.set('is_active', String(params.is_active))
+    if (params?.search) query.set('search', params.search)
+    const qs = query.toString() ? `?${query.toString()}` : ''
+    return request<UserAdminRecord[]>(`/users${qs}`)
+  },
+
+  createUser: async (payload: UserCreatePayload): Promise<UserCreatedResult> => {
+    return request<UserCreatedResult>('/users', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  updateUser: async (userId: string, payload: UserUpdatePayload): Promise<UserAdminRecord> => {
+    return request<UserAdminRecord>(`/users/${userId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  resetUserPassword: async (userId: string): Promise<PasswordResetResult> => {
+    return request<PasswordResetResult>(`/users/${userId}/reset-password`, {
+      method: 'POST',
+    })
+  },
+
+  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
+    return request<void>('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
     })
   },
 }

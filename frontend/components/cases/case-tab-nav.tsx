@@ -9,6 +9,7 @@ import {
   History,
   RefreshCw,
   Lock,
+  RotateCcw,
 } from 'lucide-react'
 import { TabId, TabConfig } from './types'
 import { RiskCase } from '@/lib/api'
@@ -23,6 +24,7 @@ export const WORKSPACE_TABS: TabConfig[] = [
   { id: 'investigation', label: 'Investigation', icon: Search },
   { id: 'corrective-action', label: 'Corrective Action', icon: Wrench },
   { id: 'closure', label: 'Closure', icon: FileCheck2 },
+  { id: 'reconstruction', label: 'Historical Replay', icon: RotateCcw },
   { id: 'history', label: 'History', icon: History },
   { id: 'recurrence', label: 'Recurrence', icon: RefreshCw },
 ]

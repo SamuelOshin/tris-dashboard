@@ -82,8 +82,10 @@ def test_live_ui_full_system_walkthrough():
         expect(page.locator("text=Sign in failed").first).to_be_visible()
         print("[PASS] Negative test: Invalid credentials rejected cleanly (toast & banner)")
 
-        # Test quick role switcher: click 'Risk Reviewer' demo card
-        page.locator('button:has-text("Risk Reviewer")').first.click()
+        # Authenticate using standard credentials via login form
+        page.locator('input[type="email"]').fill("reviewer@tris.internal")
+        page.locator('input[type="password"]').fill("password123")
+        page.locator('button[type="submit"]').click()
         page.wait_for_timeout(500)
         page.screenshot(path=str(SCREENSHOTS_DIR / "02_login_role_switcher.png"))
 

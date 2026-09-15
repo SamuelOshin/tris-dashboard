@@ -28,7 +28,7 @@ const regulations: Regulation[] = [
     nextAudit: '2025-02-01'
   },
   {
-    name: 'ISO 27001',
+    name: 'Information Security Controls',
     framework: 'Information Security',
     status: 'warning',
     lastAudit: '2024-09-20',

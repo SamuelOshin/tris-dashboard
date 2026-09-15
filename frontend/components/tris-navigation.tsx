@@ -63,9 +63,6 @@ export function TRISNavigation() {
               <Shield className="w-5 h-5" />
             </div>
             <span>TRIS</span>
-            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground ml-1">
-              v1.3
-            </span>
           </Link>
 
           {/* Desktop Navigation */}

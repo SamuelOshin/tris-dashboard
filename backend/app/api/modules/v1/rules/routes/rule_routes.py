@@ -3,9 +3,10 @@ Rule Engine HTTP Gateway Routes.
 HTTP transport only — max 50 lines per handler, no business logic, no try-except.
 """
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 
 from app.api.core.dependencies import AuthenticatedUser, DbSession, PrivilegedUser
+from app.api.modules.v1.auth.service.security_audit_service import SecurityAuditService
 from app.api.modules.v1.rules.schemas.rule_schemas import (
     EvaluationResult,
     RuleConfigResponse,
@@ -53,16 +54,27 @@ async def update_rule(
     rule_code: str,
     payload: RuleConfigUpdate,
     current_user: PrivilegedUser,
+    request: Request,
     db: DbSession = None,
 ):
     """
     Update rule thresholds or weights (increments rule_version).
-    Requires admin or compliance role.
+    Requires admin or compliance role. Writes a security audit log entry.
     """
     updated = await RuleEngineService.update_rule(
         rule_code=rule_code,
         update_data=payload,
         session=db,
+    )
+    ip = request.client.host if request.client else None
+    await SecurityAuditService.log_rule_config_edit(
+        session=db,
+        actor_id=current_user.user_id,
+        actor_username=current_user.username,
+        actor_role=current_user.role,
+        rule_code=rule_code,
+        new_version=updated.rule_version,
+        ip_address=ip,
     )
     data = RuleConfigResponse.model_validate(updated).model_dump()
     return success_response(

@@ -151,3 +151,15 @@ class DatabaseIntegrityError(CustomDomainException):
 
     def __init__(self, message: str = "Database constraint violation"):
         super().__init__(message=message, code="DATABASE_INTEGRITY_ERROR")
+
+
+class SeparationOfDutiesViolationError(CustomDomainException):
+    """Raised when an actor who investigated a case attempts to independently verify or close it."""
+
+    def __init__(
+        self,
+        message: str = (
+            "This user investigated this case and cannot independently verify or close it."
+        ),
+    ):
+        super().__init__(message=message, code="SEPARATION_OF_DUTIES_VIOLATION")

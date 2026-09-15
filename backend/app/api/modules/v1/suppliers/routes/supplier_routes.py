@@ -8,14 +8,27 @@ from typing import Optional
 from fastapi import APIRouter, Query, status
 
 from app.api.core.dependencies import AuthenticatedUser, DbSession
+from app.api.core.permissions import PRIVILEGED_ROLES
 from app.api.modules.v1.suppliers.schemas.supplier_schemas import (
     BaselineStatsResponse,
     SupplierResponse,
+    SupplierResponseMasked,
 )
 from app.api.modules.v1.suppliers.service.baseline_service import BaselineService
 from app.api.utils.response_payloads import success_response
 
 router = APIRouter(prefix="/suppliers", tags=["Suppliers"])
+
+
+def _serialise_supplier(supplier: object, current_user: object) -> dict:
+    """Return full or masked supplier dict based on the requesting user's role."""
+    if (
+        current_user
+        and hasattr(current_user, "role")
+        and current_user.role.lower() in [r.value for r in PRIVILEGED_ROLES]
+    ):
+        return SupplierResponse.model_validate(supplier).model_dump()
+    return SupplierResponseMasked.from_supplier(supplier).model_dump()
 
 
 @router.get("", response_model=None)
@@ -25,9 +38,12 @@ async def list_suppliers(
     current_user: AuthenticatedUser = None,
     db: DbSession = None,
 ):
-    """Retrieve list of suppliers. Requires authenticated session."""
+    """
+    Retrieve list of suppliers.
+    Sensitive financial fields are masked for non-privileged roles.
+    """
     suppliers = await BaselineService.get_all_suppliers(session=db, skip=skip, limit=limit)
-    data = [SupplierResponse.model_validate(s).model_dump() for s in suppliers]
+    data = [_serialise_supplier(s, current_user) for s in suppliers]
     return success_response(
         status_code=status.HTTP_200_OK,
         message="Suppliers retrieved successfully",
@@ -41,9 +57,12 @@ async def get_supplier(
     current_user: AuthenticatedUser = None,
     db: DbSession = None,
 ):
-    """Retrieve a single supplier by unique ID. Requires authenticated session."""
+    """
+    Retrieve a single supplier by unique ID.
+    Sensitive financial fields are masked for non-privileged roles.
+    """
     supplier = await BaselineService.get_supplier_by_id(supplier_id=supplier_id, session=db)
-    data = SupplierResponse.model_validate(supplier).model_dump()
+    data = _serialise_supplier(supplier, current_user)
     return success_response(
         status_code=status.HTTP_200_OK,
         message="Supplier details retrieved successfully",

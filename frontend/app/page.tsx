@@ -30,11 +30,14 @@ export default function Home() {
   }
 
   const roleDescriptions: Record<string, string> = {
+    admin: 'System Administration · Multi-Tenant Risk Intelligence · Engine Metrics',
+    reviewer: 'Risk Review & Anomaly Investigation · Operational Workflows · Case Escalation',
+    verifier: 'Independent Verification · 8-Field Closure Gates · SOX Compliance Governance',
+    process_owner: 'Departmental Risk Oversight · Corrective Action Execution · Control Proposals',
     cfo: 'Executive Risk Oversight · Forensic Ingestion Ledger · Additive Scoring Engine',
     procurement: 'Supplier Resilience Monitoring · Variance Baselines · Bank Surveillance',
     compliance: 'Immutable Audit Trails · SOX Framework Governance · 8-Field Closure Gates',
     security: 'Zero-Trust Telemetry · Off-Hours Access Surveillance · Heuristic Evaluation',
-    admin: 'Multi-Tenant Risk Studio Administration · Engine Metrics · Acceptance Gates',
   }
 
   return (

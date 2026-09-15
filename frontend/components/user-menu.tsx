@@ -35,11 +35,11 @@ export function UserMenu() {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem onClick={() => router.push('/dashboard/settings')} className="cursor-pointer">
           <User className="w-4 h-4 mr-2" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem onClick={() => router.push('/dashboard/settings')} className="cursor-pointer">
           <Settings className="w-4 h-4 mr-2" />
           <span>Settings</span>
         </DropdownMenuItem>

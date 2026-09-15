@@ -6,6 +6,7 @@ import { SettingsHeader } from '@/components/settings/settings-header'
 import { SettingsTabNav } from '@/components/settings/settings-tab-nav'
 import { DetectionRulesTab } from '@/components/settings/tabs/detection-rules-tab'
 import { ProfileTab } from '@/components/settings/tabs/profile-tab'
+import { UserManagementTab } from '@/components/settings/tabs/user-management-tab'
 import { IntegrationsTab } from '@/components/settings/tabs/integrations-tab'
 import { useSettingsWorkspace } from '@/components/settings/hooks/use-settings-workspace'
 import { SettingsTabId } from '@/components/settings/types'
@@ -56,7 +57,10 @@ export default function SettingsPage() {
         {/* Tab 2: Account Profile (Connected to GET/PATCH /api/v1/auth/me) */}
         {activeTab === 'profile' && <ProfileTab />}
 
-        {/* Tab 3: Future Ecosystem Integrations (Roadmap with Coming Soon badges) */}
+        {/* Tab 3: User Administration (Admin only, GET/POST/PATCH /api/v1/users) */}
+        {activeTab === 'users' && <UserManagementTab />}
+
+        {/* Tab 4: Future Ecosystem Integrations (Roadmap with Coming Soon badges) */}
         {activeTab === 'integrations' && <IntegrationsTab />}
       </div>
     </DashboardLayout>

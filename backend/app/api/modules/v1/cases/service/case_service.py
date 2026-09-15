@@ -13,9 +13,12 @@ from sqlmodel import select
 from app.api.core.custom_exceptions.exceptions import (
     InvalidStateTransitionError,
     NotFoundError,
+    PermissionDeniedError,
     VerifiedClosureValidationError,
     WorkflowPreConditionError,
 )
+from app.api.core.permissions import CASE_VERIFICATION_ROLES
+from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.cases.models.risk_case import CaseHistory, RiskCase
 from app.api.modules.v1.cases.schemas.case_schemas import (
     CaseTransitionRequest,
@@ -126,6 +129,7 @@ class CaseService:
         case_id: str,
         transition: CaseTransitionRequest,
         session: AsyncSession,
+        current_user: Optional[User] = None,
     ) -> Dict[str, Any]:
         """
         Executes a governed state transition.
@@ -133,6 +137,7 @@ class CaseService:
         Raises:
             NotFoundError: If case does not exist.
             InvalidStateTransitionError: If transition is not allowed by state matrix.
+            PermissionDeniedError: If non-verifier/admin role attempts closure.
             VerifiedClosureValidationError: If closing without all 8 mandatory fields.
         """
         case = await session.get(RiskCase, case_id)
@@ -151,7 +156,29 @@ class CaseService:
                 allowed_transitions=allowed_targets,
             )
 
-        # 2a. Enforce root_cause before advancing to Corrective Action
+        # 2. Role-based closure authorization (only independent Verifier or Admin)
+        if target_status == "Closed":
+            if (
+                current_user is not None
+                and hasattr(current_user, "role")
+                and current_user.role.lower() not in [r.value for r in CASE_VERIFICATION_ROLES]
+            ):
+                raise PermissionDeniedError(
+                    "Only independent Verifiers or Administrators may verify and close cases."
+                )
+
+            # 2b. Separation-of-duties enforcement (investigator cannot verify or close)
+            from app.api.modules.v1.cases.service.case_history_service import CaseHistoryService
+
+            await CaseHistoryService.enforce_separation_of_duties(
+                case_id=case_id,
+                current_user=current_user,
+                session=session,
+                actor=transition.actor,
+                verified_by=transition.verified_by,
+            )
+
+        # 3a. Enforce root_cause before advancing to Corrective Action
         if target_status == "Corrective Action":
             root_cause_value = (transition.root_cause or "").strip()
             if not root_cause_value:
@@ -164,7 +191,7 @@ class CaseService:
                 )
             case.root_cause = root_cause_value
 
-        # 2b. Enforce corrective_action before advancing to Pending Verification
+        # 3b. Enforce corrective_action before advancing to Pending Verification
         if target_status == "Pending Verification":
             corrective_action_value = (transition.corrective_action or "").strip()
             if not corrective_action_value:
@@ -177,7 +204,7 @@ class CaseService:
                 )
             case.corrective_action = corrective_action_value
 
-        # 2c. Enforce all 8 closure fields on final closure transition
+        # 3c. Enforce all 8 closure fields on final closure transition
         if target_status == "Closed":
             # Resolve fields: prefer payload value, fall back to what's already on the case record
             def _resolve(payload_val: str | None, case_val: str | None) -> str | None:
@@ -199,9 +226,7 @@ class CaseService:
                 ),
             }
 
-            missing_fields = [
-                field for field, val in resolved.items() if not val
-            ]
+            missing_fields = [field for field, val in resolved.items() if not val]
             if missing_fields:
                 raise VerifiedClosureValidationError(
                     message=f"Verified closure failed: missing mandatory fields {missing_fields}",
@@ -272,9 +297,7 @@ class CaseService:
             await NotificationService.emit(
                 db=session,
                 title=f"Case {case.case_id} Investigation Started",
-                message=(
-                    f"Investigation started for Case {case.case_id} by {transition.actor}."
-                ),
+                message=(f"Investigation started for Case {case.case_id} by {transition.actor}."),
                 category="CASE_ALERT",
                 severity="INFO",
                 recipient_role="Reviewer",
@@ -420,4 +443,3 @@ class CaseService:
         await session.refresh(case)
 
         return await CaseService.get_case_by_id(case_id, session)
-

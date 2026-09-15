@@ -218,4 +218,3 @@ async def test_patch_case_updates_investigation_and_corrective_fields(
     assert len(data["history"]) >= 2
     latest_history = data["history"][-1]
     assert "Case Details Updated" in latest_history["action"]
-

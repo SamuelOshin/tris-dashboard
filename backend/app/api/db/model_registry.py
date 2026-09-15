@@ -18,6 +18,8 @@ MODEL_MODULES = [
     "app.api.modules.v1.cases.models",
     "app.api.modules.v1.ingestion.models",
     "app.api.modules.v1.notifications.models",
+    "app.api.modules.v1.reconstruction.models",
+    "app.api.modules.v1.remediation.models",
 ]
 
 

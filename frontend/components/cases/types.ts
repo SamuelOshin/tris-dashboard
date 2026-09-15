@@ -8,6 +8,7 @@ export type TabId =
   | 'closure'
   | 'history'
   | 'recurrence'
+  | 'reconstruction'
 
 export interface TabConfig {
   id: TabId

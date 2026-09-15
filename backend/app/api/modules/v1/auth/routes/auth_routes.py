@@ -3,7 +3,7 @@ Authentication HTTP Gateway Routes.
 HTTP transport only — max 50 lines per handler, no business logic, no try-except.
 """
 
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Request, Response, status
 
 from app.api.core.config import settings
 from app.api.core.dependencies import AuthenticatedUser, DbSession
@@ -13,6 +13,8 @@ from app.api.modules.v1.auth.schemas.auth_schemas import (
     UserResponse,
 )
 from app.api.modules.v1.auth.service.auth_service import AuthService
+from app.api.modules.v1.users.schemas.user_schemas import ChangePasswordRequest
+from app.api.modules.v1.users.service.user_service import UserService
 from app.api.utils.response_payloads import auth_response, success_response
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -22,6 +24,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 async def login(
     payload: LoginRequest,
     response: Response,
+    request: Request,
     db: DbSession = None,
 ):
     """
@@ -29,10 +32,12 @@ async def login(
     - Web UI authenticates via the server-set HttpOnly cookie (no JS access).
     - Non-browser API clients (ERP pipelines, CLI scripts) receive the Bearer token in the body.
     """
+    ip = request.client.host if request.client else None
     user, token = await AuthService.authenticate_user(
         username=payload.username,
         password=payload.password,
         session=db,
+        ip_address=ip,
     )
     user_data = UserResponse.model_validate(user).model_dump()
     res = auth_response(
@@ -97,3 +102,24 @@ async def logout(response: Response):
         secure=settings.is_production,
     )
     return res
+
+
+@router.post("/change-password", response_model=None)
+async def change_password(
+    payload: ChangePasswordRequest,
+    current_user: AuthenticatedUser,
+    db: DbSession = None,
+):
+    """Allow currently authenticated user to change their account password."""
+    await UserService.change_password(
+        user_id=current_user.user_id,
+        current_password=payload.current_password,
+        new_password=payload.new_password,
+        session=db,
+    )
+    return success_response(
+        status_code=status.HTTP_200_OK,
+        message="Password changed successfully",
+        data=None,
+    )
+

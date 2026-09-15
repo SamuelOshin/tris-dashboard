@@ -1,13 +1,15 @@
 'use client'
 
 import React from 'react'
-import { Sliders, UserCheck, Database } from 'lucide-react'
+import { Sliders, UserCheck, Database, Users } from 'lucide-react'
 import { SettingsTabId, SettingsTabConfig } from './types'
+import { useAuth } from '@/lib/auth-context'
 
 export const SETTINGS_TABS: SettingsTabConfig[] = [
-  { id: 'rules', label: 'Detection Rules & Weights', icon: Sliders, badge: 'Live API' },
-  { id: 'profile', label: 'Account Profile', icon: UserCheck, badge: 'Active' },
-  { id: 'integrations', label: 'Integrations', icon: Database, badge: 'Roadmap' },
+  { id: 'rules', label: 'Detection Rules & Weights', icon: Sliders },
+  { id: 'profile', label: 'Account Profile', icon: UserCheck },
+  { id: 'users', label: 'User Administration', icon: Users, badge: 'Admin' },
+  { id: 'integrations', label: 'Integrations', icon: Database, badge: 'Coming Soon' },
 ]
 
 interface SettingsTabNavProps {
@@ -16,9 +18,17 @@ interface SettingsTabNavProps {
 }
 
 export function SettingsTabNav({ activeTab, onSelectTab }: SettingsTabNavProps) {
+  const { user } = useAuth()
+  const isAdmin = user?.role?.toLowerCase() === 'admin'
+
+  const visibleTabs = SETTINGS_TABS.filter((tab) => {
+    if (tab.id === 'users') return isAdmin
+    return true
+  })
+
   return (
     <div className="flex border-b border-border/80 gap-1.5 pb-px overflow-x-auto no-scrollbar">
-      {SETTINGS_TABS.map((tab) => {
+      {visibleTabs.map((tab) => {
         const Icon = tab.icon
         const isActive = activeTab === tab.id
 

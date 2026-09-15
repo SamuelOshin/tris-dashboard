@@ -380,6 +380,23 @@ class IngestionService:
         return report
 
     @staticmethod
+    async def ingest_temporal_fixture(
+        session: AsyncSession,
+        duplicate_strategy: str = "skip",
+    ) -> dict[str, Any]:
+        """
+        Ingests the isolated v1.4 temporal fixture (SUP-TEMP-001 / TX-TEMP-001).
+        """
+        from app.api.modules.v1.ingestion.service.temporal_fixture_service import (
+            TemporalFixtureService,
+        )
+
+        return await TemporalFixtureService.ingest_temporal_fixture(
+            session=session,
+            duplicate_strategy=duplicate_strategy,
+        )
+
+    @staticmethod
     async def _execute_pipeline(
         excel_file: pd.ExcelFile,
         session: AsyncSession,
@@ -999,6 +1016,7 @@ class IngestionService:
             "R-004": {"start_hour": 6, "end_hour": 20},
             "R-005": {"window_days": 30},
             "R-006": {"lookback_days": 90},
+            "R-007": {"required_level": "Level 2", "threshold_amount": 50000.0},
         }
 
         raw_ids = [
@@ -1100,7 +1118,9 @@ class IngestionService:
                 or "High",
                 status="New",
                 supplier_id=sanitize_text(row.get("supplier_id"), max_length=50),
-                transaction_id=sanitize_text(row.get("primary_record"), max_length=50),
+                transaction_id=sanitize_text(
+                    row.get("primary_record") or row.get("transaction_id"), max_length=50
+                ),
                 trigger_signals=[
                     {"rule_code": flag.strip()}
                     for flag in str(row.get("expected_flags", "")).split(";")

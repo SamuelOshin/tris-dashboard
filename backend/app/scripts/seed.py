@@ -86,6 +86,15 @@ DEMO_PERSONAS = [
         "role": "Security",
         "department": "Security",
     },
+    {
+        "user_id": "usr-po-08",
+        "username": "process_owner",
+        "name": "Process Owner",
+        "email": "process_owner@tris.internal",
+        "password": "password123",
+        "role": "process_owner",
+        "department": "Operations",
+    },
 ]
 
 
@@ -227,12 +236,32 @@ async def ingest_workbook_data(data_file_path: str | Path) -> dict:
         return report
 
 
+async def ingest_temporal_fixture_data() -> dict:
+    """Ingest v1.4 temporal synthetic fixture."""
+    from app.api.modules.v1.ingestion.service.temporal_fixture_service import (
+        TemporalFixtureService,
+    )
+
+    logger.info("Ingesting v1.4 temporal fixture (SUP-TEMP-001 / TX-TEMP-001)...")
+    async with async_session_factory() as session:
+        report = await TemporalFixtureService.ingest_temporal_fixture(session)
+        logger.info("   -> Temporal Ingestion Complete:")
+        for key, value in report.items():
+            logger.info(f"      - {key}: {value}")
+        return report
+
+
 async def main(
     data_file_path: str = "../test data.xlsx",
     users_only: bool = False,
     ingest_only: bool = False,
+    temporal_fixture: bool = False,
 ):
     """Orchestrates database seeding and/or ingestion."""
+    if temporal_fixture:
+        await ingest_temporal_fixture_data()
+        return
+
     if users_only:
         await seed_users_and_triggers()
         return
@@ -270,11 +299,17 @@ if __name__ == "__main__":
         action="store_true",
         help="Only ingest the Excel workbook (assumes tables/users exist)",
     )
+    group.add_argument(
+        "--temporal-fixture",
+        action="store_true",
+        help="Ingest v1.4 temporal fixture (SUP-TEMP-001 / TX-TEMP-001)",
+    )
     args = parser.parse_args()
     asyncio.run(
         main(
             data_file_path=args.data_file,
             users_only=args.users_only,
             ingest_only=args.ingest_only,
+            temporal_fixture=args.temporal_fixture,
         )
     )

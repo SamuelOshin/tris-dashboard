@@ -184,18 +184,30 @@ export function DashboardLayout({
     <SidebarProvider>
       <Sidebar collapsible="icon" variant="sidebar" className="border-r border-sidebar-border bg-sidebar">
         {/* Brand Header */}
-        <SidebarHeader className="h-14 border-b border-sidebar-border flex items-center px-3">
-          <Link href="/" className="flex items-center gap-2.5 font-bold text-foreground hover:opacity-90 transition-opacity min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-              <Shield className="w-4 h-4" />
-            </div>
-            <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden min-w-0">
-              <span className="text-sm font-bold tracking-tight font-mono truncate">TRIS</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold shrink-0">
-                v1.3
-              </span>
-            </div>
-          </Link>
+        <SidebarHeader className="h-14 border-b border-sidebar-border justify-center p-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                size="lg"
+                asChild
+                className="hover:bg-sidebar-accent/40 transition-colors group-data-[collapsible=icon]:justify-center"
+              >
+                <Link href="/" className="flex items-center gap-3 w-full">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/25 text-primary shrink-0 shadow-xs">
+                    <Shield className="size-4 text-primary" />
+                  </div>
+                  <div className="flex flex-col min-w-0 leading-none group-data-[collapsible=icon]:hidden">
+                    <span className="font-bold font-mono text-sm tracking-tight text-foreground truncate">
+                      TRIS
+                    </span>
+                    <span className="text-[10px] font-mono text-muted-foreground/80 tracking-wider uppercase truncate mt-1">
+                      Risk Intelligence
+                    </span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         </SidebarHeader>
 
         {/* Navigation Content */}

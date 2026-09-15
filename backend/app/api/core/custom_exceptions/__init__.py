@@ -10,6 +10,7 @@ from app.api.core.custom_exceptions.exceptions import (
     NotFoundError,
     PermissionDeniedError,
     RuleExecutionError,
+    SeparationOfDutiesViolationError,
     ValidationError,
     VerifiedClosureValidationError,
 )
@@ -25,6 +26,7 @@ __all__ = [
     "NotFoundError",
     "PermissionDeniedError",
     "RuleExecutionError",
+    "SeparationOfDutiesViolationError",
     "ValidationError",
     "VerifiedClosureValidationError",
     "register_exception_handlers",

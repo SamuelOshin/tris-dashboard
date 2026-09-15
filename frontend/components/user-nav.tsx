@@ -44,8 +44,11 @@ export function UserNav() {
     : 'U'
 
   const roleLabels: Record<string, { label: string; class: string }> = {
-    cfo: { label: 'Chief Risk Officer / CFO', class: 'bg-primary/10 text-primary' },
     admin: { label: 'System Administrator', class: 'bg-primary/10 text-primary' },
+    reviewer: { label: 'Risk Reviewer', class: 'bg-primary/10 text-primary' },
+    verifier: { label: 'Compliance Verifier', class: 'bg-success/10 text-success' },
+    process_owner: { label: 'Process Owner', class: 'bg-secondary/10 text-secondary' },
+    cfo: { label: 'Chief Risk Officer / CFO', class: 'bg-primary/10 text-primary' },
     compliance: { label: 'Compliance Verifier', class: 'bg-success/10 text-success' },
     security: { label: 'Security & Forensics', class: 'bg-warning/10 text-warning' },
     procurement: { label: 'Procurement Specialist', class: 'bg-muted text-muted-foreground' },

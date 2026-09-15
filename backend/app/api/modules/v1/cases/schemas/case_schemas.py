@@ -33,8 +33,8 @@ class CaseResponse(BaseModel):
     case_number: str
     priority: str
     status: str
-    supplier_id: str
-    transaction_id: str
+    supplier_id: Optional[str] = None
+    transaction_id: Optional[str] = None
     assigned_to: Optional[str] = None
     department: Optional[str] = None
     trigger_signals: List[Dict[str, Any]] = []
@@ -98,4 +98,3 @@ class CaseUpdateRequest(BaseModel):
     department: Optional[str] = None
     priority: Optional[str] = None
     note: Optional[str] = None
-

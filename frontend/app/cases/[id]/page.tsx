@@ -17,6 +17,7 @@ import { CorrectiveActionTab } from '@/components/cases/tabs/corrective-action-t
 import { ClosureTab } from '@/components/cases/tabs/closure-tab'
 import { HistoryTab } from '@/components/cases/tabs/history-tab'
 import { RecurrenceTab } from '@/components/cases/tabs/recurrence-tab'
+import { ReconstructionTab } from '@/components/cases/tabs/reconstruction-tab'
 import { ReopenModal } from '@/components/cases/modals/reopen-modal'
 import { useCaseWorkspace } from '@/components/cases/hooks/use-case-workspace'
 
@@ -191,6 +192,10 @@ export default function CaseDetailPage() {
             auditSortOrder={auditSortOrder}
             onToggleSortOrder={actions.toggleAuditSortOrder}
           />
+        )}
+
+        {activeTab === 'reconstruction' && (
+          <ReconstructionTab caseData={caseData} />
         )}
 
         {activeTab === 'recurrence' && (

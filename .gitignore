@@ -75,6 +75,11 @@ Thumbs.db
 ~$*
 
 
+# Archives
+*.zip
+*.tar.gz
+
 # FastAPI Cloud
 .fastapicloud/
 */.fastapicloud/
+

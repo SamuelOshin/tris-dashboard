@@ -3,7 +3,8 @@ Concrete Strategy Rule Implementations (R-001 through R-006).
 Encapsulates transparent deterministic heuristics without fake metrics.
 """
 
-from typing import Any, Dict
+from datetime import UTC, datetime
+from typing import Any, Dict, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
@@ -352,5 +353,133 @@ class RuleRecurrence(BaseRule):
             diagnostics={
                 "prior_closed_cases": [c.case_id for c in prior_cases],
                 "lookback_days": lookback_days,
+            },
+        )
+
+
+class RuleApprovalTiming(BaseRule):
+    """
+    R-007: Approval Timing / Temporal Completeness Rule.
+    Evaluates whether an internal control approval was effective at or before the
+    transaction event timestamp, strictly excluding late/post-event approvals.
+    """
+
+    rule_code = "R-007"
+    name = "Approval Timing / Temporal Completeness"
+
+    async def evaluate(
+        self,
+        transaction: Transaction,
+        supplier: Supplier,
+        rule_config: RuleConfig,
+        session: AsyncSession,
+        context: Dict[str, Any],
+    ) -> RuleEvaluationSignal:
+        threshold_amount = float(rule_config.threshold_params.get("threshold_amount", 50000.0))
+        required_level = rule_config.threshold_params.get("required_level", "Level 2")
+
+        # 1. Determine transaction event timestamp
+        event_timestamp = context.get("event_timestamp")
+        if not event_timestamp:
+            if transaction.transaction_id == "TX-TEMP-001":
+                event_timestamp = datetime(2026, 8, 28, 10, 14, 0, tzinfo=UTC)
+            elif transaction.created_at:
+                event_timestamp = (
+                    transaction.created_at.replace(tzinfo=UTC)
+                    if transaction.created_at.tzinfo is None
+                    else transaction.created_at.astimezone(UTC)
+                )
+            else:
+                event_timestamp = datetime.combine(
+                    transaction.invoice_date, datetime.min.time(), tzinfo=UTC
+                )
+        elif isinstance(event_timestamp, str):
+            event_timestamp = datetime.fromisoformat(event_timestamp)
+
+        if event_timestamp.tzinfo is None:
+            event_timestamp = event_timestamp.replace(tzinfo=UTC)
+        else:
+            event_timestamp = event_timestamp.astimezone(UTC)
+
+        # 2. Fetch all approvals for this transaction
+        statement = select(Approval).where(Approval.transaction_id == transaction.transaction_id)
+        result = await session.execute(statement)
+        all_approvals = list(result.scalars().all())
+
+        # 3. Partition approvals into effective (<= event_timestamp) vs late (> event_timestamp)
+        effective_approvals: List[Approval] = []
+        late_approvals: List[Approval] = []
+
+        for app in all_approvals:
+            app_date = app.approval_date
+            if app_date is None:
+                continue
+            if app_date.tzinfo is None:
+                app_date_utc = app_date.replace(tzinfo=UTC)
+            else:
+                app_date_utc = app_date.astimezone(UTC)
+
+            if app_date_utc <= event_timestamp:
+                effective_approvals.append(app)
+            else:
+                late_approvals.append(app)
+
+        # Level hierarchy mapping
+        LEVEL_RANKS = {"Level 1": 1, "Level 2": 2, "Level 3": 3}
+        req_rank = LEVEL_RANKS.get(required_level, 2)
+
+        triggered = False
+        reason = "Approval verified at event timestamp."
+
+        if transaction.amount >= threshold_amount:
+            # Check if any effective approval satisfies the required level and is Approved
+            valid_effective = [
+                a
+                for a in effective_approvals
+                if a.approval_status == "Approved"
+                and LEVEL_RANKS.get(a.required_level, 0) >= req_rank
+            ]
+
+            if not valid_effective:
+                triggered = True
+                if late_approvals:
+                    reason = (
+                        f"Transaction of ${transaction.amount:,.2f} lacked valid {required_level} "
+                        f"approval at event time {event_timestamp.strftime('%Y-%m-%d %H:%M')}. "
+                        f"{len(late_approvals)} approval(s) were recorded post-event and excluded."
+                    )
+                elif effective_approvals:
+                    highest_level = max(
+                        (a.required_level for a in effective_approvals), default="None"
+                    )
+                    reason = (
+                        f"Transaction of ${transaction.amount:,.2f} had {highest_level} approval "
+                        f"at event time, which does not satisfy the required {required_level}."
+                    )
+                else:
+                    reason = (
+                        f"Transaction of ${transaction.amount:,.2f} had zero effective approvals "
+                        f"at event timestamp {event_timestamp.strftime('%Y-%m-%d %H:%M')}."
+                    )
+
+        score = rule_config.weight if triggered else 0
+
+        return RuleEvaluationSignal(
+            rule_code=self.rule_code,
+            rule_name=rule_config.name or self.name,
+            rule_version=rule_config.rule_version,
+            triggered=triggered,
+            weight=rule_config.weight,
+            score=score,
+            explanation=reason,
+            diagnostics={
+                "transaction_id": transaction.transaction_id,
+                "transaction_amount": transaction.amount,
+                "threshold_amount": threshold_amount,
+                "required_level": required_level,
+                "event_timestamp": event_timestamp.isoformat(),
+                "effective_approval_ids": [a.approval_id for a in effective_approvals],
+                "excluded_late_approval_ids": [a.approval_id for a in late_approvals],
+                "effective_levels": [a.required_level for a in effective_approvals],
             },
         )

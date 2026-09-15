@@ -14,8 +14,6 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
-  UserCheck,
-  Building,
   Building2,
   KeyRound,
   Eye,
@@ -25,22 +23,6 @@ import {
   ShieldAlert,
 } from 'lucide-react'
 
-interface DemoUser {
-  email: string
-  role: string
-  title: string
-  password: string
-  icon: React.ComponentType<{ className?: string }>
-}
-
-const PRIMARY_DEMO_USER: DemoUser = {
-  email: 'reviewer@tris.internal',
-  role: 'Risk Reviewer / Case Owner',
-  title: 'Primary Demo Persona',
-  password: 'password123',
-  icon: UserCheck,
-}
-
 export function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -48,7 +30,6 @@ export function LoginForm() {
   const [rememberMe, setRememberMe] = useState(true)
   const [error, setError] = useState<{ title: string; message: string } | null>(null)
   const [loading, setLoading] = useState(false)
-  const [activeDemoEmail, setActiveDemoEmail] = useState<string | null>(null)
   const [showForgotModal, setShowForgotModal] = useState(false)
 
   const { login } = useAuth()
@@ -74,7 +55,7 @@ export function LoginForm() {
       title = 'Connection error'
       message = 'Unable to connect to the authentication server. Please check your network connection.'
     } else if (!message) {
-      message = 'Invalid email or password. Please check your credentials or select a demo sandbox persona below.'
+      message = 'Invalid email or password. Please check your credentials.'
     }
 
     return { title, message }
@@ -107,39 +88,9 @@ export function LoginForm() {
     }
   }
 
-  const selectDemoUser = (demoUser: DemoUser) => {
-    setEmail(demoUser.email)
-    setPassword(demoUser.password)
-    setActiveDemoEmail(demoUser.email)
-    setError(null)
-    toast.info(`Filled credentials for ${demoUser.role}`, {
-      description: 'Click "Sign in" to continue or edit the fields above.',
-    })
-  }
-
-  const quickLoginDemoUser = async (demoUser: DemoUser, e: React.MouseEvent) => {
-    e.stopPropagation()
-    setEmail(demoUser.email)
-    setPassword(demoUser.password)
-    setActiveDemoEmail(demoUser.email)
-    setError(null)
-    setLoading(true)
-
-    try {
-      await login(demoUser.email, demoUser.password)
-      toast.success(`Signed in as ${demoUser.role}`)
-      router.push(redirectTarget)
-    } catch (err: any) {
-      const authError = resolveAuthError(err, 'Sign in failed')
-      setError(authError)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleSSOClick = (providerName: string) => {
     toast.info(`${providerName} SSO`, {
-      description: 'Single Sign-On is available on the enterprise tier. Use email/password or select a demo account below.',
+      description: 'Single Sign-On is available on the enterprise tier. Please sign in with your corporate email and password.',
     })
   }
 
@@ -228,9 +179,6 @@ export function LoginForm() {
               <Shield className="w-4 h-4" />
             </div>
             <span className="text-base font-bold font-mono text-foreground">TRIS</span>
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-              v1.3
-            </span>
           </div>
 
           <div className="hidden lg:flex items-center gap-2 text-xs text-muted-foreground">
@@ -372,64 +320,6 @@ export function LoginForm() {
             </Button>
           </form>
 
-          {/* Evaluation Access Card - Single Primary Persona (Reviewer / Case Owner) */}
-          <div className="rounded-2xl border border-border/70 bg-muted/20 p-3.5 sm:p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <p className="text-xs font-semibold text-foreground">
-                  Evaluation Access
-                </p>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
-                  Primary Persona
-                </span>
-              </div>
-              <span className="text-[10px] text-muted-foreground hidden sm:inline">Click to auto-fill</span>
-            </div>
-
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Use the primary evaluation persona to experience the end-to-end exception review journey:
-            </p>
-
-            <div
-              onClick={() => selectDemoUser(PRIMARY_DEMO_USER)}
-              className={`group p-3 rounded-xl border transition-all text-xs flex items-center justify-between gap-3 cursor-pointer select-none ${
-                activeDemoEmail === PRIMARY_DEMO_USER.email
-                  ? 'bg-primary/10 border-primary/50 text-foreground ring-1 ring-primary/30 shadow-xs'
-                  : 'bg-card/70 border-border/80 hover:bg-card hover:border-primary/40 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center text-primary shrink-0">
-                  <UserCheck className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-xs text-foreground">
-                      {PRIMARY_DEMO_USER.role}
-                    </p>
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/20 text-primary font-bold">
-                      ACTIVE
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
-                    {PRIMARY_DEMO_USER.email} · password123
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={(e) => quickLoginDemoUser(PRIMARY_DEMO_USER, e)}
-                disabled={loading}
-                title="Instant sign in as Risk Reviewer / Case Owner"
-                className="shrink-0 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium flex items-center gap-1 transition-colors"
-              >
-                <span>Sign in</span>
-                <ArrowRight className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Bottom Trust & Legal Links */}
@@ -437,10 +327,10 @@ export function LoginForm() {
           <p>© 2026 TRIS Risk Intelligence Systems.</p>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => toast.info('Security policy documentation is available upon request.')}
+              onClick={() => toast.info('Platform policy documentation is available upon request.')}
               className="hover:text-foreground hover:underline"
             >
-              Security Policy
+              Platform Policy
             </button>
             <span>·</span>
             <button
@@ -479,12 +369,8 @@ export function LoginForm() {
               </button>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Please contact your system administrator to reset your password. For this evaluation environment, use the demo account credentials shown on the sign-in page.
+              Please contact your system administrator or security officer to request a password reset. Account access is managed in accordance with corporate identity governance policies.
             </p>
-            <div className="p-3 rounded-xl bg-muted/30 border border-border text-xs font-mono space-y-1">
-              <p className="text-foreground font-semibold">Evaluation Access:</p>
-              <p className="text-muted-foreground">Use a demo account from the sign-in page to explore TRIS.</p>
-            </div>
             <Button
               className="w-full text-xs"
               onClick={() => setShowForgotModal(false)}

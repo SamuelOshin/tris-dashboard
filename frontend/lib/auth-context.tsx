@@ -3,7 +3,15 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { api, User as BackendUser, resetSessionRedirectFlag } from './api'
 
-export type UserRole = 'cfo' | 'procurement' | 'compliance' | 'security' | 'admin' | 'reviewer' | 'verifier'
+export type UserRole =
+  | 'admin'
+  | 'reviewer'
+  | 'verifier'
+  | 'process_owner'
+  | 'cfo'
+  | 'procurement'
+  | 'compliance'
+  | 'security'
 
 export interface User {
   id: string

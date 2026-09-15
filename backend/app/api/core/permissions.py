@@ -10,9 +10,12 @@ class Role(StrEnum):
     """Canonical system roles. Values are lowercase for case-insensitive matching."""
 
     ADMIN = "admin"
-    COMPLIANCE = "compliance"
     REVIEWER = "reviewer"
     VERIFIER = "verifier"
+    PROCESS_OWNER = "process_owner"
+
+    # Deprecated legacy roles — preserved for backward compatibility
+    COMPLIANCE = "compliance"
     CFO = "cfo"
     SECURITY = "security"
     PROCUREMENT = "procurement"
@@ -20,17 +23,33 @@ class Role(StrEnum):
 
 ROLE_LABELS: dict[Role, str] = {
     Role.ADMIN: "System Administrator",
-    Role.COMPLIANCE: "Compliance Lead",
     Role.REVIEWER: "Risk Reviewer",
     Role.VERIFIER: "Compliance Verifier",
+    Role.PROCESS_OWNER: "Process Owner",
+    Role.COMPLIANCE: "Compliance Lead",
     Role.CFO: "Executive Leadership",
     Role.SECURITY: "Security Analyst",
     Role.PROCUREMENT: "Procurement Specialist",
 }
 
 
-# ── Pre-built permission groups ─────────────────────────────────────
-# Semantic constants for role combinations used across modules.
+# ── Role Groups ─────────────────────────────────────────────────────────────
+
+CORE_ROLES: list[Role] = [
+    Role.ADMIN,
+    Role.REVIEWER,
+    Role.VERIFIER,
+    Role.PROCESS_OWNER,
+]
+"""The four core roles of the TRIS v1.4 RBAC model."""
+
+DEPRECATED_ROLES: list[Role] = [
+    Role.COMPLIANCE,
+    Role.CFO,
+    Role.SECURITY,
+    Role.PROCUREMENT,
+]
+"""Deprecated roles preserved for legacy backward compatibility."""
 
 ALL_ROLES: list[Role] = list(Role)
 """Every authenticated role — functionally equivalent to any authenticated user."""
@@ -47,7 +66,13 @@ CASE_READ_ROLES: list[Role] = list(Role)
 CASE_TRANSITION_ROLES: list[Role] = [
     Role.REVIEWER,
     Role.VERIFIER,
+    Role.PROCESS_OWNER,
     Role.ADMIN,
-    Role.COMPLIANCE,
 ]
 """Roles permitted to execute case state transitions."""
+
+CASE_VERIFICATION_ROLES: list[Role] = [
+    Role.VERIFIER,
+    Role.ADMIN,
+]
+"""Roles permitted to independently verify and close cases."""

@@ -20,6 +20,7 @@ from app.api.modules.v1.rules.schemas.rule_schemas import (
 )
 from app.api.modules.v1.rules.service.strategies import (
     RuleAmountDeviation,
+    RuleApprovalTiming,
     RuleDuplicateInvoice,
     RuleMissingApproval,
     RuleOffHoursAccess,
@@ -37,6 +38,7 @@ RULE_STRATEGY_MAP = {
     "R-004": RuleOffHoursAccess(),
     "R-005": RuleDuplicateInvoice(),
     "R-006": RuleRecurrence(),
+    "R-007": RuleApprovalTiming(),
 }
 
 
