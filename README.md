@@ -7,7 +7,8 @@
 [![Swagger Docs](https://img.shields.io/badge/Swagger-API%20Interactive%20Docs-85EA2D?style=for-the-badge&logo=swagger)](https://tris-backend.fastapicloud.dev/docs)
 [![Python Version](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Database PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%2016-336791?style=for-the-badge&logo=postgresql)](https://www.postgresql.org)
-[![Test Suite](https://img.shields.io/badge/Tests-78%2F78%20Passing%20(100%25)-brightgreen?style=for-the-badge)](https://github.com/)
+[![Test Suite](https://img.shields.io/badge/Tests-127%2F127%20Passing%20(100%25)-brightgreen?style=for-the-badge)](https://github.com/SamuelOshin/tris-dashboard)
+[![Release](https://img.shields.io/badge/Release-v1.4.0-blue?style=for-the-badge)](https://github.com/SamuelOshin/tris-dashboard/tree/release/v1.4)
 
 ---
 
@@ -15,43 +16,56 @@
 
 | Resource | URL | Description |
 | :--- | :--- | :--- |
-| **🚀 Web Application** | **[`https://tris-sigma.vercel.app/`](https://tris-sigma.vercel.app/)** | Next.js 16 App Router UI with risk review dashboards, baseline visualizer, dynamic case detail workspaces, and 8-field system-validated closure modal. |
-| **⚡ Backend API Engine** | **[`https://tris-backend.fastapicloud.dev/`](https://tris-backend.fastapicloud.dev/)** | Asynchronous Python 3.12 FastAPI backend powered by SQLModel, Argon2id security, deterministic rule engine (R-001..R-006), and PostgreSQL append-only immutability triggers. |
+| **🚀 Web Application** | **[`https://tris-sigma.vercel.app/`](https://tris-sigma.vercel.app/)** | Next.js 16 App Router UI with risk review dashboards, baseline visualizer, dynamic case detail workspaces, historical replay timeline visualizer, user management, and 8-field system-validated closure modal. |
+| **⚡ Backend API Engine** | **[`https://tris-backend.fastapicloud.dev/`](https://tris-backend.fastapicloud.dev/)** | Asynchronous Python 3.12 FastAPI backend powered by SQLModel, Argon2id security, deterministic rule engine (`R-001`..`R-007`), bi-temporal reconstruction, remediation replay sandbox, and PostgreSQL append-only immutability triggers. |
 | **📑 Swagger Interactive Docs** | **[`https://tris-backend.fastapicloud.dev/docs`](https://tris-backend.fastapicloud.dev/docs)** | OpenAPI / Swagger interactive schema browser and live REST API test console. |
 | **📖 ReDoc API Reference** | **[`https://tris-backend.fastapicloud.dev/redoc`](https://tris-backend.fastapicloud.dev/redoc)** | Clean, formal OpenAPI documentation reference. |
 
 ---
 
-## 🔑 Primary Demo Evaluation Persona & Credentials
+## 🔑 Core Demo Evaluation Personas & Credentials
 
-The live deployment and local seed scripts provide a primary evaluation account for the Risk Reviewer journey:
+The live deployment and database seeding scripts provide **four pre-configured core personas** mapping directly to the TRIS v1.4 Role-Based Access Control (RBAC) and Separation-of-Duties (SoD) governance model:
 
-| Persona Role | User Name | Email Address | Password | Permissions & Operational Clearance |
-| :--- | :--- | :--- | :--- | :--- |
-| **Risk Reviewer / Case Owner** | `A. Reviewer` | `reviewer@tris.internal` | `password123` | Primary evaluator; case assignment, investigation, root-cause documentation, corrective actions, and system-validated closure. |
+| Persona Role | Username | Email Address | Password | Department | Operational Clearance & Governance Boundaries |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Risk Reviewer**<br/>*(Primary Investigator)* | `reviewer` | `reviewer@tris.internal` | `password123` | Finance | **Primary Investigation Clearance**: Investigates high-risk anomalies, attaches evidence, documents root causes and corrective actions, and transitions cases to `Pending Verification`.<br/>⚠️ **Enforced SoD Boundary**: Strictly prohibited from self-verifying or closing cases. |
+| **Compliance Verifier**<br/>*(Independent Approver)* | `verifier` | `verifier@tris.internal` | `password123` | Compliance | **Independent Verification Authority**: Evaluates submitted 8-field closure packages, verifies evidence, executes final verified closure (`Closed`), or returns cases for re-investigation (`Reopened`).<br/>⚠️ **Enforced SoD Boundary**: Cannot verify cases they investigated. |
+| **Process Owner**<br/>*(Business Operations)* | `process_owner` | `process_owner@tris.internal` | `password123` | Operations | **Process Oversight & Simulation**: Evaluates policy deviations, inspects point-in-time timeline reconstructions (`TX-TEMP-001`), and executes Remediation Replay simulations against proposed corrective controls. |
+| **System Administrator**<br/>*(Superadmin)* | `admin` | `admin@tris.internal` | `admin123` | Risk Management | **Administrative & Governance Control**: Full User Management suite (`/dashboard/settings`), Argon2id password management, role provisioning, account lock/unlock, rule weight/threshold adjustments, and security audit event monitoring. |
 
 ---
 
 ## 📖 Overview
 
-The **Trust & Risk Intelligence System (TRIS)** is a specialized enterprise risk-exception prioritization and investigation platform engineered for corporate finance teams, manufacturing supply chain managers, and internal audit reviewers.
+The **Trust & Risk Intelligence System (TRIS)** is an enterprise risk-exception prioritization, supplier risk intelligence, and internal control auditing platform engineered for corporate finance teams, internal audit reviewers, and procurement compliance officers.
 
-Traditional monitoring systems rely either on brittle, disconnected spreadsheet filters or opaque "black-box" AI models that output unexplainable confidence percentages (e.g., *"96.8% risk score"*). TRIS replaces these with **Explainability by Construction**: each rule-based case records the triggering conditions, inputs, thresholds, and score contributions backed by deterministic calculations and an append-only audit trail.
+Traditional monitoring systems rely either on brittle, disconnected spreadsheet filters or opaque "black-box" AI models that output unexplainable confidence percentages (e.g., *"96.8% risk score"*). TRIS replaces these with **Explainability by Construction**: each rule-based case records the exact triggering conditions, inputs, mathematical thresholds, and score contributions backed by deterministic calculations and an append-only audit trail.
 
 ### 🌟 Core Architectural Pillars
 
-1. **Zero Fake Metrics (Mathematical Explainability)**: Eliminates fabricated AI confidence percentages. Anomalies are mathematically calculated against supplier historical baselines that strictly exclude the evaluated target transaction (e.g. `SUP-001` historical mean = **$30,471.43** vs target anomaly `TX-1999` = **$104,000.00** $\implies$ **3.41x deviation**).
+1. **Zero Fake Metrics (Mathematical Explainability)**: Eliminates fabricated AI confidence percentages. Anomalies are mathematically calculated against supplier historical baselines that strictly exclude the evaluated target transaction (e.g., `SUP-001` historical mean = **$30,471.43** vs target anomaly `TX-1999` = **$104,000.00** $\implies$ **3.41x deviation**).
 2. **Multi-Vector Telemetry Correlation**: Correlates four distinct enterprise domains: Accounts Payable Invoices, Vendor Master Bank Modifications, Identity & Access Event Logs, and Hierarchical Approval Thresholds.
-3. **Deterministic Strategy Rule Engine**: Modular, version-tracked rule catalog (`R-001` through `R-006`) with runtime threshold adjustments, additive scoring ($35 + 25 + 25 + 15 = 100 \implies \text{High Priority}$), and JSON evaluation snapshots.
+3. **Deterministic Strategy Rule Engine (`R-001` through `R-007`)**: Modular, version-tracked rule catalog with runtime threshold adjustments, additive scoring ($35 + 25 + 25 + 15 = 100 \implies \text{High Priority}$), and JSON evaluation snapshots:
+   - `R-001`: Amount Deviation (> 2.0x Historical Baseline)
+   - `R-002`: Recent Bank Account Modification (< 7 Days)
+   - `R-003`: Missing Mandatory Control Approval (Level 3 Required)
+   - `R-004`: Off-Hours Access Telemetry (Outside 07:00–19:00 UTC)
+   - `R-005`: Duplicate Invoice Submission (Identical Supplier & Amount)
+   - `R-006`: High Cumulative Spend Velocity (> $100,000 in 30 Days)
+   - `R-007`: **Approval Timing / Temporal Completeness** (Identifies approvals timestamped *after* payment issuance or missing at event time).
 4. **Enforced System-Validated Closure Gatekeeper**: A governed state machine that strictly prohibits closing risk cases without 8 mandatory fields (`root_cause`, `corrective_action`, `closure_type`, `closure_evidence`, `verified_by`, `closure_date`, `follow_up_requirement`, and `recurrence_monitoring`).
-5. **Database-Level Immutability**: PostgreSQL engine triggers prevent `UPDATE` or `DELETE` operations on the `case_history` audit table, providing an append-only audit-history control.
-6. **Real-Time Notification Hub**: Multi-tier notification bus delivering user-specific, role-scoped, and broadcast alerts across case transitions and ingestion jobs.
+5. **Cryptographic Separation of Duties (SoD)**: Enforces dual-custody governance at the API and database levels. An investigator who authored case findings cannot act as the verifier or close the case.
+6. **Point-in-Time Historical Reconstruction Engine**: Bi-temporal reconstruction querying events strictly as of `event_timestamp <= T`, ensuring zero hindsight leakage and returning explicit `UNKNOWN` flags when evidence is absent from historical telemetry.
+7. **Remediation Replay Sandbox**: Evaluates proposed corrective policies (e.g., *"Payments > $50k within 7 days of bank account update require Level 2 verification"*) against reconstructed historical states, returning deterministic outcomes (`ALLOW`, `BLOCK/PREVENT`, `ESCALATE/HOLD`, `NOT DETERMINABLE`) with read-only guarantees on core transactions.
+8. **Database-Level Immutability & Security Audit Trail**: PostgreSQL triggers prevent `UPDATE` or `DELETE` operations on the `case_history` ledger. Structured `security_audit_logs` record all user management and authentication events.
+9. **Real-Time Notification Hub & User Management Suite**: Role-scoped and user-specific event routing for case assignments, status changes, and administrative actions.
 
 ---
 
 ## 🏛️ High-Level System Architecture
 
-TRIS uses a decoupled split-cloud architecture: Next.js 16 App Router on Vercel delivers high-velocity UI with server-rendered React components, while the FastAPI Cloud backend executes statistical calculations, rule evaluation pipelines, and database operations. Next.js internal `rewrites` transparently proxy API traffic to eliminate browser CORS friction:
+TRIS uses a decoupled split-cloud architecture: Next.js 16 App Router on Vercel delivers high-velocity UI with server-rendered React components, while the FastAPI backend executes statistical calculations, rule evaluation pipelines, and database operations:
 
 ```mermaid
 flowchart TB
@@ -63,9 +77,9 @@ flowchart TB
         NextServer["Next.js 16 Server Engine"]
         RSC["React Server Components<br/>(SSR, Geist Font, Vercel Analytics)"]
         ClientUI["Interactive Dashboards<br/>(shadcn/ui, Tailwind CSS v4, Recharts, Lucide)"]
-        DynRoutes["Dynamic Server Routes<br/>/cases/[id], /suppliers/[id]"]
+        DynRoutes["Dynamic Routes<br/>/cases/[id], /suppliers/[id], /dashboard/settings"]
         Middleware["Edge Middleware<br/>(Auth Guard & Session Cookie Check)"]
-        Proxy["Next.js Rewrites API Proxy<br/>/api/:path* → FastAPI Cloud Origin"]
+        Proxy["Next.js Rewrites API Proxy<br/>/api/:path* → FastAPI Origin"]
         
         NextServer --> Middleware
         Middleware --> RSC
@@ -74,27 +88,31 @@ flowchart TB
         NextServer --> Proxy
     end
 
-    subgraph BackendHost ["Backend Layer — FastAPI Cloud (Python 3.12+)"]
+    subgraph BackendHost ["Backend Layer — FastAPI (Python 3.12+)"]
         API["FastAPI App (v0.115+)<br/>Uvicorn ASGI Engine"]
         
         subgraph Endpoints ["REST API Endpoints (/api/v1/*)"]
-            AuthEP["/auth/login & /auth/me"]
-            SuppliersEP["/suppliers/* (Baseline Stats)"]
+            AuthEP["/auth/* (Login, Me, Change Password)"]
+            UsersEP["/users/* (User Management & Roles)"]
+            SuppliersEP["/suppliers/* (Baseline Statistics)"]
             TxEP["/transactions/*"]
             ApprovalsEP["/approvals/*"]
-            AccessEP["/access-events/* (Zero-Trust Telemetry)"]
+            AccessEP["/access-events/* (IAM Telemetry)"]
             CasesEP["/cases/* (State Machine & 8-Field Closure)"]
-            RulesEP["/rules/* (Strategy Catalog & Versioning)"]
+            RulesEP["/rules/* (Strategy Catalog R-001..R-007)"]
+            ReconEP["/reconstruction/* (Bi-Temporal Engine)"]
+            RemedEP["/remediation/* (Policy Replay Sandbox)"]
             IngestEP["/ingestion/* (Excel Parser & Async Jobs)"]
             NotifEP["/notifications/* (Notification Hub)"]
         end
         
         subgraph CoreEngines ["Core Domain Logic Engines"]
             BaselineEng["Baseline Calculation Engine<br/>(Strict Target Exclusion)"]
-            RuleEng["Strategy Rule Engine (R-001..R-006)<br/>(Rule Versioning & Snapshots)"]
-            ConsolidationEng["Case Consolidation Engine<br/>(Multi-Signal Grouping & Score 100)"]
-            StateMachineEng["State Machine & 8-Field Closure Guard"]
-            AuditEng["Immutable Audit History Logger"]
+            RuleEng["Strategy Rule Engine (R-001..R-007)<br/>(Rule Versioning & Snapshots)"]
+            ReconEng["Historical Reconstruction Engine<br/>(Bi-Temporal <= Event Time)"]
+            RemedEng["Remediation Replay Sandbox<br/>(Read-Only Policy Evaluation)"]
+            ConsolidationEng["Case Consolidation & SoD Gatekeeper"]
+            AuditEng["Security Audit & Immutability Logger"]
             NotifHub["PostgreSQL Notification Bus"]
         end
         
@@ -106,6 +124,7 @@ flowchart TB
         PG[("PostgreSQL 16 Database")]
         
         subgraph RelationalSchema ["Relational Tables & Constraints"]
+            T_Users["users"]
             T_Suppliers["suppliers"]
             T_Transactions["transactions (FK: supplier_id)"]
             T_Approvals["approvals (FK: transaction_id)"]
@@ -113,6 +132,8 @@ flowchart TB
             T_RiskCases["risk_cases (FK: supplier_id, transaction_id)"]
             T_CaseHistory["case_history (FK: case_id)"]
             T_RuleConfig["rule_config"]
+            T_ReconSnapshots["reconstruction_snapshots"]
+            T_AuditLogs["security_audit_logs"]
             T_Notifications["notifications (FK: user_id)"]
             T_IngestionJobs["ingestion_jobs"]
         end
@@ -130,7 +151,7 @@ flowchart TB
     Browser <-->|HTTPS / HTML & React Bundles| NextServer
     Browser <-->|Fetch /api/* - Cookies Included| Proxy
     Proxy <-->|Internal TLS API Proxy| API
-    CoreEngines <-->|SQLAlchemy 2.0 Async - asyncpg / psycopg| PG
+    CoreEngines <-->|SQLAlchemy 2.0 Async - asyncpg| PG
 ```
 
 ---
@@ -186,11 +207,14 @@ uv sync
 # Linux / macOS:
 # source .venv/bin/activate
 
-# 3. Apply database migrations & seed reference data
-uv run alembic upgrade head
-uv run python -m app.scripts.seed --data-file "../test data.xlsx"
+# 3. Configure environment
+cp .env.example .env
 
-# 4. Start backend API development server
+# 4. Apply database migrations & seed reference data + v1.4 temporal fixture
+uv run alembic upgrade head
+uv run python -m app.scripts.seed --data-file "../test data.xlsx" --temporal-fixture
+
+# 5. Start backend API development server
 uv run fastapi dev app/main.py --port 8000
 ```
 
@@ -206,11 +230,9 @@ cd frontend
 
 # 1. Install dependencies
 pnpm install
-# (or npm install)
 
 # 2. Start frontend development server
 pnpm run dev
-# (or npm run dev)
 ```
 
 - **Web Application**: `http://localhost:3000`
@@ -219,15 +241,15 @@ pnpm run dev
 
 ## 🧪 Automated Testing & Verification
 
-TRIS maintains a comprehensive 78-test automated regression suite covering domain services, mathematical baselines, security boundaries, and the T01–T10 developer acceptance matrix:
+TRIS maintains a comprehensive **127-test automated regression suite** covering domain services, mathematical baselines, security boundaries, and the T01–T10 developer acceptance matrix:
 
 ```bash
 cd backend
 
-# Run the 10-point Developer Acceptance Matrix (T01 through T10)
+# Run the 15-point Developer Acceptance Matrix (T01 through T10 + Workbook tests)
 uv run pytest tests/test_acceptance_t01_t10.py -v
 
-# Run the full test suite (78 tests, 100% pass rate)
+# Run the full test suite (127 tests, 100% pass rate)
 uv run pytest tests/ -v
 
 # Run Ruff linter and code formatter
@@ -235,27 +257,34 @@ uv run ruff check . --fix
 uv run ruff format .
 ```
 
-### Developer Acceptance Criteria Matrix (T01–T10)
+### Developer Acceptance Criteria Matrix (T01–T10 + Workbook Suite)
 
 | Gate | Requirement | Implementation | Evidence |
 | :---: | :--- | :--- | :--- |
-| **T01** | Ingestion & Schema Integrity | `IngestionService.ingest_excel_workbook` | 19 txns, 8 suppliers, 8 events loaded clean |
-| **T02** | Strict Baseline Exclusion | `BaselineService.calculate_baseline` | $30,471.43 average strictly excluding TX-1999 |
+| **T01** | Ingestion & Schema Integrity | `IngestionService.ingest_excel_workbook` | 20 txns, 9 suppliers, 11 approvals, 11 access events loaded clean |
+| **T02** | Strict Baseline Exclusion | `BaselineService.calculate_baseline` | $30,471.43 average strictly excluding target transaction `TX-1999` |
 | **T03** | R-001: Amount Deviation (> 2.0x) | `RuleAmountDeviation` | 3.41x observed, +35 points |
 | **T04** | R-002: Bank Change (< 7 days) | `RuleRecentBankChange` | 2 days observed, +25 points |
 | **T05** | R-003: Missing Control Approval | `RuleMissingApproval` | AP-1999 Missing Level 3, +25 points |
 | **T06** | R-004: Off-Hours Access Telemetry | `RuleOffHoursAccess` | AE-003 at 22:47:00, +15 points |
-| **T07** | Signal Consolidation & Score 100 | `RuleEngineService.evaluate_transaction` | Consolidated score 100 (High Priority) |
-| **T08** | Case State Machine Governance | `CaseService.transition_case` | Illegal transition returns 409 Conflict |
-| **T09** | 8-Field Verified Closure Validator | `CaseService.transition_case` | Incomplete returns 422; complete returns 200 |
-| **T10** | Immutable Audit Trail Integrity | `CaseHistory` + PostgreSQL trigger | Append-only history verified |
+| **T07** | Signal Consolidation & Score 100 | `RuleEngineService.evaluate_transaction` | Consolidated score 100 (High Priority anomaly) |
+| **T08** | Case State Machine Governance | `CaseService.transition_case` | Illegal transitions rejected with 409 Conflict |
+| **T09** | 8-Field Verified Closure Validator | `CaseService.transition_case` | Incomplete returns 422 Unprocessable; complete returns 200 OK |
+| **T10** | Immutable Audit Trail Integrity | `CaseHistory` + PostgreSQL trigger | `BEFORE UPDATE OR DELETE` trigger blocks history tampering |
+| **WB-04** | Plain-Language Explainability | `RuleEngineService` | Clean factual narratives; zero unsupported probability percentages |
+| **WB-05** | Ownership Assignment & Department | `CaseService` | Department-scoped assignment and full transition history |
+| **WB-07** | Recurrence Detection | `CaseService` | Surfaces prior cases and repeat anomaly patterns on supplier |
+| **WB-08** | R-005: Duplicate Invoice Detection | `RuleDuplicateInvoice` | Identifies duplicate amounts and matching supplier invoices |
+| **WB-09** | Normal Case Control Verification | `RuleEngineService` | Normal transactions (`SUP-002`) remain clean with zero false positives |
 
 ---
 
-## 🔒 Security & Compliance Posture
+## 🔒 Security & Supply Chain Hardening
 
-- **Password Hashing**: **Argon2id** (memory-hard, GPU-resistant algorithm).
-- **Session Delivery**: Secure **HttpOnly, SameSite=Lax** cookies.
+- **Password Hashing**: **Argon2id** (memory-hard, GPU-resistant algorithm via `pwd_context`).
+- **Cryptographic Commit Signing**: OpenSSH (`ed25519`) commit signatures required across all branches to prevent supply-chain attacks and unauthorized remote web modifications.
+- **Session Security**: Secure, encrypted **HttpOnly, SameSite=Lax** cookies with 8-hour token expiration.
+- **Segregation of Duties (SoD)**: Architectural separation preventing case authors from verifying or closing their own investigations.
 - **Audit Immutability**: PostgreSQL database triggers block `UPDATE` and `DELETE` on the `case_history` ledger.
-- **Segregation of Duties**: 8-field verification validation required prior to case closure.
-- **Input Sanitization**: Multi-sheet workbook ingestion validates cell data types, foreign key referential integrity, and isolates bad rows via transaction savepoints.
+- **Security Event Logging**: Dedicated `security_audit_logs` tracking user creation, status changes, role assignments, and password resets.
+- **Input Sanitization**: Multi-sheet workbook ingestion validates cell types, foreign key referential integrity, and isolates erroneous rows via nested savepoints.

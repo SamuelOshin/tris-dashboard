@@ -1,5 +1,5 @@
 # 📚 TRIS Project Documentation Hub
-**Trust & Risk Intelligence System (TRIS) v1.3**
+**Trust & Risk Intelligence System (TRIS) v1.4**
 
 ---
 
@@ -35,8 +35,8 @@
    - Complete technical handover, key architectural milestones, directory structure, and acceptance matrix.
 
 6. **[Automated Test Execution Results (`docs/TEST_EXECUTION_RESULTS.md`)](./TEST_EXECUTION_RESULTS.md)**
-   - *78/78 Automated Regression Tests Passing*
-   - Granular breakdown of all 78 tests across access events, auth, cases, ingestion, notifications, rules, security remediations, suppliers, and transactions.
+   - *127/127 Automated Regression Tests Passing (100%)*
+   - Granular breakdown of all 127 tests across access events, auth, cases, ingestion, notifications, rules (including R-007), security remediations, suppliers, transactions, historical reconstruction, remediation replay, and user management.
 
 7. **[Synthetic Test Data & Test Matrix Reference (`docs/SYNTHETIC_TEST_DATA.md`)](./SYNTHETIC_TEST_DATA.md)**
    - *Complete Tabular Dataset Extracted from `test data.xlsx`*
