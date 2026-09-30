@@ -158,4 +158,29 @@ The `v2.0-manufacturing-extension` branch will add a complete Material-Cost Inte
 | `docs/baseline/v14_baseline_build.txt` | Raw `pnpm run build` output (exit code 0, 14 routes) |
 | `docs/baseline/v14_baseline_tests.txt` | Raw `pytest tests/ -v` output (captured after PostgreSQL available) |
 
-Screenshots of every v1.4 screen are captured manually and stored in `docs/baseline/screenshots/` (to be added).
+Screenshots of every v1.4 screen are captured manually and stored in `docs/baseline/screenshots/` (to be added; see §11 for the recorded deferral).
+
+---
+
+## 11. Decisions, Deferrals and Known Issues
+
+Recorded so the baseline's limits are explicit rather than implied.
+
+### Deferred: "before" screenshots
+- The Ticket 1 acceptance criteria list a screenshot set of every working screen. It was deliberately deferred in the Ticket 1 implementation plan: capture is **manual**, and was accepted as non-blocking for Ticket 1 by the project owner.
+- **Status: not yet captured.** `docs/baseline/screenshots/` does not exist yet.
+- **Due before Ticket 3 (Navigation / UI Shell) changes the UI**, because that is the point at which a "before" reference stops being recoverable from the running app.
+- Expected coverage: login, risk cases, case detail, suppliers, ingestion, fraud detection, compliance, the three dashboard pages (correlation, reports, settings), zero trust, user administration.
+
+### Known issue: concurrent test sessions cause spurious failures
+- The suite resets shared tables in `tris_db_test` (`DROP SCHEMA` / `TRUNCATE`). Two pytest sessions running at the same time deadlock each other (`DeadlockDetected`) and produce different failing tests on each run.
+- Observed during independent QA of Ticket 1: overlapping runs gave 2, then 19 failures plus 11 errors. Every full run made with no other session active passed cleanly (133 and 141 passed at Tickets 2 and later, matching the expected totals).
+- The captured `127 passed` baseline was a clean single-session run and is valid. It is not reliable when another session overlaps.
+- **Mitigation added after this baseline** (commit `7e7aa91`): `backend/tests/conftest.py` takes a Postgres advisory lock for the whole session and exits immediately with a clear message if another session holds it. Do not run two test sessions against the same database.
+
+### Notes on the captured evidence
+- `v14_baseline_build.txt` is not byte-for-byte raw output: it carries a hand-added header line (capture time, branch, commit) and an `Exit code: 0` footer. The build output between them is unmodified.
+- The first attempted build capture was incomplete and left a stray file; it was discarded and is not part of this baseline.
+- The `v1.4-baseline` tag is **lightweight** (no tag message) and points at commit `72460432`, which is also the tip of `main` and `release/v1.4` at the time of capture.
+- The Ticket 1 commit (`578d6f8`) is one commit ahead of the tag and adds only the three files under `docs/baseline/`. No code changed.
+- The v2.0 planning documents (`TRIS.docx`, the consolidated instruction and the ticket list) are intentionally left untracked for now.
