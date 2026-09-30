@@ -26,4 +26,5 @@ class TransactionResponse(BaseModel):
     approval_status: str
     payment_status: str
     description: Optional[str] = None
+    event_timestamp: Optional[datetime] = None
     created_at: datetime

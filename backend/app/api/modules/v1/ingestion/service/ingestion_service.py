@@ -764,6 +764,19 @@ class IngestionService:
                 except Exception:
                     post_date = None
 
+            event_ts = None
+            raw_event_ts = row.get("event_timestamp") or row.get("event_time")
+            if pd.notna(raw_event_ts):
+                try:
+                    dt_val = pd.to_datetime(raw_event_ts).to_pydatetime()
+                    event_ts = (
+                        dt_val.replace(tzinfo=UTC)
+                        if dt_val.tzinfo is None
+                        else dt_val.astimezone(UTC)
+                    )
+                except Exception:
+                    event_ts = None
+
             tx = Transaction(
                 transaction_id=tx_id,
                 supplier_id=sup_id,
@@ -775,6 +788,7 @@ class IngestionService:
                 currency=sanitize_text(row.get("currency", "USD"), max_length=10) or "USD",
                 invoice_date=inv_date,
                 posting_date=post_date,
+                event_timestamp=event_ts,
                 approval_required=bool(row.get("approval_required", True)),
                 approval_status=sanitize_text(row.get("approval_status", "Approved"), max_length=50)
                 or "Approved",

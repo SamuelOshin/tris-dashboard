@@ -380,14 +380,9 @@ class RuleApprovalTiming(BaseRule):
 
         # 1. Determine transaction event timestamp
         event_timestamp = context.get("event_timestamp")
-        # KNOWN LIMITATION: see the matching note in remediation_service._resolve_event_timestamp.
-        # The temporal fixture pins its event time so the late-approval exclusion is testable;
-        # removing this branch would fall through to ingestion time and void that test.
-        # Proper fix: an explicit `event_timestamp` column on Transaction via a new
-        # Alembic revision.
         if not event_timestamp:
-            if transaction.transaction_id == "TX-TEMP-001":
-                event_timestamp = datetime(2026, 8, 28, 10, 14, 0, tzinfo=UTC)
+            if getattr(transaction, "event_timestamp", None):
+                event_timestamp = transaction.event_timestamp
             elif transaction.created_at:
                 event_timestamp = (
                     transaction.created_at.replace(tzinfo=UTC)

@@ -5,6 +5,7 @@ Pure ORM model — no business logic.
 
 from datetime import UTC, date, datetime
 
+from sqlalchemy import DateTime
 from sqlmodel import Field, SQLModel
 
 
@@ -25,4 +26,10 @@ class Transaction(SQLModel, table=True):
     approval_status: str = Field(default="Approved", index=True, max_length=50)
     payment_status: str = Field(default="Pending", index=True, max_length=50)
     description: str | None = Field(default=None, nullable=True)
+    event_timestamp: datetime | None = Field(
+        default=None,
+        nullable=True,
+        index=True,
+        sa_type=DateTime(timezone=True),
+    )
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

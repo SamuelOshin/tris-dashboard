@@ -98,6 +98,7 @@ class TemporalFixtureService:
                     "currency": "USD",
                     "invoice_date": "2026-08-28",
                     "posting_date": "2026-08-28",
+                    "event_timestamp": "2026-08-28 10:14:00",
                     "approval_required": True,
                     "approval_status": "Approved",
                     "payment_status": "Pending",
