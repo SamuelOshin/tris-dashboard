@@ -18,6 +18,7 @@ const ROLES = [
   { value: 'reviewer', label: 'Risk Reviewer' },
   { value: 'verifier', label: 'Compliance Verifier' },
   { value: 'process_owner', label: 'Process Owner' },
+  { value: 'read_only_reviewer', label: 'Read-Only Reviewer' },
   { value: 'admin', label: 'System Administrator' },
 ]
 

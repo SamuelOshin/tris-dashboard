@@ -16,6 +16,7 @@ from app.api.core.custom_exceptions.exceptions import (
     PermissionDeniedError,
 )
 from app.api.core.permissions import (
+    NON_READ_ONLY_ROLES,
     PRIVILEGED_ROLES,
     ROLE_LABELS,
     WRITE_ROLES,
@@ -129,4 +130,5 @@ def require_roles(allowed_roles: Sequence[Role | str]):
 AuthenticatedUser = Annotated[User, Depends(get_current_user)]
 PrivilegedUser = Annotated[User, Depends(require_roles(PRIVILEGED_ROLES))]
 WriteUser = Annotated[User, Depends(require_roles(WRITE_ROLES))]
+NonReadOnlyUser = Annotated[User, Depends(require_roles(NON_READ_ONLY_ROLES))]
 DbSession = Annotated[AsyncSession, Depends(get_db)]

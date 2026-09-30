@@ -11,7 +11,8 @@ from fastapi import APIRouter, Depends
 from fastapi import status as http_status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.core.dependencies import get_current_user
+from app.api.core.dependencies import get_current_user, require_roles
+from app.api.core.permissions import NON_READ_ONLY_ROLES, READ_ONLY_ROLES
 from app.api.db.database import get_db
 from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.reconstruction.schemas.reconstruction_schemas import (
@@ -38,7 +39,7 @@ router = APIRouter(prefix="/reconstruction", tags=["Historical Reconstruction"])
 async def reconstruct_historical_state(
     payload: ReconstructionRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(require_roles(NON_READ_ONLY_ROLES))],
 ) -> success_response:  # type: ignore[valid-type]
     """Reconstruct cross-system state at the specified event timestamp.
 
@@ -93,11 +94,12 @@ async def reconstruct_for_transaction(
     else:
         event_ts = tx.created_at if tx.created_at.tzinfo else tx.created_at.replace(tzinfo=UTC)
 
+    persist_snapshot = current_user.role not in [r.value for r in READ_ONLY_ROLES]
     result = await HistoricalReconstructionService.reconstruct(
         transaction_id=transaction_id,
         event_timestamp=event_ts,
         session=db,
-        persist=True,
+        persist=persist_snapshot,
     )
     return success_response(
         status_code=http_status.HTTP_200_OK,

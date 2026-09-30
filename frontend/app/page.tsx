@@ -34,6 +34,7 @@ export default function Home() {
     reviewer: 'Risk Review & Anomaly Investigation · Operational Workflows · Case Escalation',
     verifier: 'Independent Verification · 8-Field Closure Gates · SOX Compliance Governance',
     process_owner: 'Departmental Risk Oversight · Corrective Action Execution · Control Proposals',
+    read_only_reviewer: 'Read-Only Audit & Inspection · Dashboard Views · Validation Reports',
     cfo: 'Executive Risk Oversight · Forensic Ingestion Ledger · Additive Scoring Engine',
     procurement: 'Supplier Resilience Monitoring · Variance Baselines · Bank Surveillance',
     compliance: 'Immutable Audit Trails · SOX Framework Governance · 8-Field Closure Gates',

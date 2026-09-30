@@ -30,6 +30,7 @@ const ROLE_BADGE_MAP: Record<string, { label: string; className: string }> = {
   reviewer: { label: 'Risk Reviewer', className: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' },
   verifier: { label: 'Compliance Verifier', className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
   process_owner: { label: 'Process Owner', className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
+  read_only_reviewer: { label: 'Read-Only Reviewer', className: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20' },
 }
 
 export function UserManagementTab() {
@@ -146,6 +147,7 @@ export function UserManagementTab() {
               <option value="reviewer">Risk Reviewer</option>
               <option value="verifier">Compliance Verifier</option>
               <option value="process_owner">Process Owner</option>
+              <option value="read_only_reviewer">Read-Only Reviewer</option>
             </select>
           </div>
         </CardHeader>

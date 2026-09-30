@@ -13,6 +13,7 @@ class Role(StrEnum):
     REVIEWER = "reviewer"
     VERIFIER = "verifier"
     PROCESS_OWNER = "process_owner"
+    READ_ONLY_REVIEWER = "read_only_reviewer"
 
     # Deprecated legacy roles — preserved for backward compatibility
     COMPLIANCE = "compliance"
@@ -26,6 +27,7 @@ ROLE_LABELS: dict[Role, str] = {
     Role.REVIEWER: "Risk Reviewer",
     Role.VERIFIER: "Compliance Verifier",
     Role.PROCESS_OWNER: "Process Owner",
+    Role.READ_ONLY_REVIEWER: "Read-Only Reviewer",
     Role.COMPLIANCE: "Compliance Lead",
     Role.CFO: "Executive Leadership",
     Role.SECURITY: "Security Analyst",
@@ -76,3 +78,43 @@ CASE_VERIFICATION_ROLES: list[Role] = [
     Role.ADMIN,
 ]
 """Roles permitted to independently verify and close cases."""
+
+
+# ── Manufacturing & Analytics Capability Scaffolding (v2.0 D7) ───────────────
+
+MANUFACTURING_INGESTION_ROLES: list[Role] = [
+    Role.ADMIN,
+    Role.REVIEWER,
+]
+"""Roles permitted to upload/ingest manufacturing and ERP/BOM data."""
+
+ANALYTICS_EXECUTION_ROLES: list[Role] = [
+    Role.ADMIN,
+    Role.REVIEWER,
+]
+"""Roles permitted to run material cost analytics, forecasting, and scenario models."""
+
+VALIDATION_RUN_ROLES: list[Role] = [
+    Role.ADMIN,
+    Role.REVIEWER,
+]
+"""Roles permitted to execute model validation benchmark runs."""
+
+MANUFACTURING_CONFIG_ROLES: list[Role] = [
+    Role.ADMIN,
+]
+"""Roles permitted to configure models/versions, mapping profiles, and dataset registries."""
+
+ANALYTICS_EXPORT_ROLES: list[Role] = [
+    Role.ADMIN,
+    Role.REVIEWER,
+]
+"""Roles permitted to export approved analytical outputs."""
+
+READ_ONLY_ROLES: list[Role] = [
+    Role.READ_ONLY_REVIEWER,
+]
+"""Roles restricted to pure read-only access (no write/execution permissions)."""
+
+NON_READ_ONLY_ROLES: list[Role] = [r for r in Role if r not in READ_ONLY_ROLES]
+"""Every role except read-only ones; keeps pre-v2.0 access open for all existing roles."""

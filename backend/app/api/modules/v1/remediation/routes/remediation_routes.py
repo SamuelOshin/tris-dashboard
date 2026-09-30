@@ -11,7 +11,8 @@ from fastapi import status as http_status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.core.dependencies import get_current_user
+from app.api.core.dependencies import get_current_user, require_roles
+from app.api.core.permissions import NON_READ_ONLY_ROLES
 from app.api.db.database import get_db
 from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.remediation.schemas.remediation_schemas import (
@@ -54,7 +55,7 @@ async def list_proposed_controls(
 async def create_proposed_control(
     payload: ProposedControlCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(require_roles(NON_READ_ONLY_ROLES))],
 ) -> JSONResponse:
     """Registers a new proposed corrective control."""
     control = await RemediationService.create_proposed_control(
@@ -99,7 +100,7 @@ async def get_proposed_control(
 async def run_remediation_replay(
     payload: ReplayRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(require_roles(NON_READ_ONLY_ROLES))],
 ) -> JSONResponse:
     """Executes a replay evaluation against historical reconstructed state."""
     result = await RemediationService.replay(

@@ -5,7 +5,12 @@ HTTP transport only — max 50 lines per handler, no business logic, no try-exce
 
 from fastapi import APIRouter, Request, status
 
-from app.api.core.dependencies import AuthenticatedUser, DbSession, PrivilegedUser
+from app.api.core.dependencies import (
+    AuthenticatedUser,
+    DbSession,
+    NonReadOnlyUser,
+    PrivilegedUser,
+)
 from app.api.modules.v1.auth.service.security_audit_service import SecurityAuditService
 from app.api.modules.v1.rules.schemas.rule_schemas import (
     EvaluationResult,
@@ -87,7 +92,7 @@ async def update_rule(
 @router.post("/evaluate/{transaction_id}", response_model=None)
 async def evaluate_transaction(
     transaction_id: str,
-    current_user: AuthenticatedUser,
+    current_user: NonReadOnlyUser,
     db: DbSession = None,
 ):
     """Execute active detection rules against a transaction and consolidate signals."""

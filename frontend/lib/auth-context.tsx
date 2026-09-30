@@ -8,6 +8,7 @@ export type UserRole =
   | 'reviewer'
   | 'verifier'
   | 'process_owner'
+  | 'read_only_reviewer'
   | 'cfo'
   | 'procurement'
   | 'compliance'

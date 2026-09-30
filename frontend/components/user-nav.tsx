@@ -48,6 +48,7 @@ export function UserNav() {
     reviewer: { label: 'Risk Reviewer', class: 'bg-primary/10 text-primary' },
     verifier: { label: 'Compliance Verifier', class: 'bg-success/10 text-success' },
     process_owner: { label: 'Process Owner', class: 'bg-secondary/10 text-secondary' },
+    read_only_reviewer: { label: 'Read-Only Reviewer', class: 'bg-muted text-muted-foreground' },
     cfo: { label: 'Chief Risk Officer / CFO', class: 'bg-primary/10 text-primary' },
     compliance: { label: 'Compliance Verifier', class: 'bg-success/10 text-success' },
     security: { label: 'Security & Forensics', class: 'bg-warning/10 text-warning' },
