@@ -90,6 +90,7 @@ class TransactionStateAtEvent(BaseModel):
     """Reconstructed transaction/operational state as-of the event timestamp."""
 
     transaction_id: str
+    supplier_id: str
     amount: float
     currency: str
     invoice_date: str

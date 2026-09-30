@@ -1,10 +1,14 @@
 # TRIS — Real-Time Notification Hub & Event Alerting Architecture
 
 **System**: Trust & Risk Intelligence System (TRIS)  
-**Version**: 1.3  
+**Version**: 1.3 (module unchanged in 1.4)  
 **Document Type**: Engineering Architecture Specification & ADR-010  
 **Status**: ACCEPTED & IMPLEMENTED  
 **Target Module**: `backend/app/api/modules/v1/notifications/` & `frontend/components/notifications-popover.tsx`  
+
+> **Test counts on this page are the v1.3 figures.** The suite has since grown with the
+> v1.4 reconstruction, remediation-replay, and separation-of-duties modules. For the
+> authoritative current breakdown see [`TEST_EXECUTION_RESULTS.md`](./TEST_EXECUTION_RESULTS.md).
 
 ---
 
@@ -206,7 +210,8 @@ uv run pytest tests/modules/v1/test_notifications.py -v
 | `test_mark_single_read_and_mark_all_read` | Tests individual and bulk mark-as-read transitions | 🟢 PASSED |
 | `test_case_transition_emits_notifications` | Validates domain event emissions during case state changes | 🟢 PASSED |
 
-**Full System Test Suite**: **78 / 78 tests passing (100%)**.
+**Full System Test Suite**: **78 / 78 tests passing (100%)** as of v1.3. The current
+v1.4 suite is **127 / 127** — see [`TEST_EXECUTION_RESULTS.md`](./TEST_EXECUTION_RESULTS.md).
 
 ---
 

@@ -22,6 +22,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
+from app.api.core.custom_exceptions.exceptions import ValidationError
 from app.api.modules.v1.access_events.models.access_event import AccessEvent
 from app.api.modules.v1.approvals.models.approval import Approval
 from app.api.modules.v1.reconstruction.models.reconstruction_snapshot import ReconstructionSnapshot
@@ -54,11 +55,56 @@ def _to_utc(dt: datetime | None) -> datetime | None:
 # ---------------------------------------------------------------------------
 LEVEL_RANKS: dict[str, int] = {"Level 1": 1, "Level 2": 2, "Level 3": 3}
 
-# Amount threshold above which Level 2 approval is required (per R-007 spec)
+# Amount threshold above which an elevated approval level is required (per R-007 spec).
+# This is only a FALLBACK: the governing values come from the reconstructed rule's
+# threshold_params so a rule edit actually changes the determination.
 HIGH_VALUE_THRESHOLD = 50_000.0
 
 # Bank-change recency window (days) for the remediation replay control (Sec 7)
 BANK_CHANGE_RECENCY_DAYS = 7
+
+
+def _lower_level(level: str) -> str:
+    """Returns the next approval level below `level` (Level 1 is the floor)."""
+    rank = max(LEVEL_RANKS.get(level, 2) - 1, 1)
+    return next(name for name, value in LEVEL_RANKS.items() if value == rank)
+
+
+def _resolve_approval_requirements(
+    amount: float,
+    rule_state: "ApplicableRuleAtEvent",
+) -> tuple[str, float]:
+    """
+    Derives the required approval level for an amount from the rule version that
+    applied at event time.
+
+    ``threshold_params`` is the source of truth. A configuration such as
+    ``{"required_level": "Level 2", "threshold_amount": 50000.0}`` escalates only
+    transactions at or above the threshold; smaller amounts fall back to the next
+    approval level down.
+
+    Args:
+        amount: The transaction amount being evaluated.
+        rule_state: The rule version reconstructed as of the event timestamp.
+
+    Returns:
+        (required_level, threshold_amount) actually applied to this amount.
+    """
+    params = rule_state.threshold_params
+    if not isinstance(params, dict):
+        params = {}
+
+    configured_level = params.get("required_level")
+    if configured_level not in LEVEL_RANKS:
+        configured_level = "Level 2"
+
+    try:
+        threshold = float(params["threshold_amount"])
+    except (KeyError, TypeError, ValueError):
+        threshold = HIGH_VALUE_THRESHOLD
+
+    required_level = configured_level if amount >= threshold else _lower_level(configured_level)
+    return required_level, threshold
 
 
 class HistoricalReconstructionService:
@@ -94,9 +140,12 @@ class HistoricalReconstructionService:
         Returns:
             ReconstructionResult with PASS | FAIL | UNKNOWN outcome and full provenance.
         """
-        # Normalize event_timestamp to UTC
+        # Normalize event_timestamp to UTC. A non-normalizable timestamp is a caller
+        # error, not a missing-evidence condition, so it raises instead of degrading
+        # to UNKNOWN (which would mask a bad request as a legitimate determination).
         et = _to_utc(event_timestamp)
-        assert et is not None  # guaranteed by normalization above
+        if et is None:
+            raise ValidationError("Event timestamp could not be normalized to UTC")
 
         # 1. Reconstruct each domain
         (
@@ -212,6 +261,7 @@ class HistoricalReconstructionService:
 
         state = TransactionStateAtEvent(
             transaction_id=tx.transaction_id,
+            supplier_id=tx.supplier_id,
             amount=tx.amount,
             currency=tx.currency,
             invoice_date=tx.invoice_date.isoformat() if tx.invoice_date else "",
@@ -235,17 +285,7 @@ class HistoricalReconstructionService:
         if transaction_state is None:
             return None, "MISSING"
 
-        # Look up supplier via transaction_id
-        tx_result = await session.execute(
-            select(Transaction).where(
-                Transaction.transaction_id == transaction_state.transaction_id
-            )
-        )
-        tx = tx_result.scalar_one_or_none()
-        if tx is None:
-            return None, "MISSING"
-
-        supplier = await session.get(Supplier, tx.supplier_id)
+        supplier = await session.get(Supplier, transaction_state.supplier_id)
         if supplier is None:
             return None, "MISSING"
 
@@ -436,18 +476,9 @@ class HistoricalReconstructionService:
         if transaction_state is None:
             return None, "MISSING"
 
-        tx_result = await session.execute(
-            select(Transaction).where(
-                Transaction.transaction_id == transaction_state.transaction_id
-            )
-        )
-        tx = tx_result.scalar_one_or_none()
-        if tx is None:
-            return None, "MISSING"
-
         # Fetch all access events for this supplier at or before event_timestamp
         result = await session.execute(
-            select(AccessEvent).where(AccessEvent.supplier_id == tx.supplier_id)
+            select(AccessEvent).where(AccessEvent.supplier_id == transaction_state.supplier_id)
         )
         all_events = list(result.scalars().all())
 
@@ -581,6 +612,8 @@ class HistoricalReconstructionService:
 
         Rules:
             - If any critical domain is MISSING → UNKNOWN (never defaults to PASS).
+            - If the applicable rule version is MISSING → UNKNOWN (the control that
+              governed the event cannot be established).
             - If approval evidence is MISSING → UNKNOWN.
             - If required approval level not satisfied by effective approvals → FAIL.
             - If all checks pass → PASS.
@@ -600,15 +633,25 @@ class HistoricalReconstructionService:
                 "Missing required evidence — returning UNKNOWN, not PASS.",
             )
 
+        if rule_state is None:
+            return (
+                "UNKNOWN",
+                "Unable to determine outcome: no rule configuration is available for the "
+                "governing temporal rule. Missing required evidence — returning UNKNOWN, not PASS.",
+            )
+
         if transaction_state is None or approval_state is None:
             return (
                 "UNKNOWN",
                 "Insufficient historical evidence to make a determination.",
             )
 
-        # Determine required approval level based on amount
-        required_level = (
-            "Level 2" if transaction_state.amount >= HIGH_VALUE_THRESHOLD else "Level 1"
+        # Determine the required approval level from the rule version applicable at
+        # event time. This is the rule provenance surfaced to the caller, so the
+        # determination must be derived from it — otherwise a rule edit in the
+        # database would be recorded as governing while having no effect.
+        required_level, threshold_amount = _resolve_approval_requirements(
+            transaction_state.amount, rule_state
         )
         req_rank = LEVEL_RANKS.get(required_level, 2)
 
@@ -629,7 +672,9 @@ class HistoricalReconstructionService:
             return (
                 "PASS",
                 f"At event time {event_timestamp.strftime('%Y-%m-%d %H:%M')} UTC, "
-                f"transaction amount ${transaction_state.amount:,.2f} required {required_level}. "
+                f"transaction amount ${transaction_state.amount:,.2f} required {required_level} "
+                f"per {rule_state.rule_code} v{rule_state.rule_version} "
+                f"(threshold ${threshold_amount:,.2f}). "
                 f"Effective pre-event approval at {highest_used} satisfied the requirement.",
             )
         else:
@@ -638,13 +683,18 @@ class HistoricalReconstructionService:
             effective_levels = [
                 a.get("required_level", "None") for a in approval_state.effective_approvals
             ]
+            rule_citation = (
+                f"per {rule_state.rule_code} v{rule_state.rule_version} "
+                f"(threshold ${threshold_amount:,.2f}). "
+            )
 
             if excluded_count > 0 and not approval_state.effective_approvals:
                 explanation = (
                     f"CONTROL FAILED at event time "
                     f"{event_timestamp.strftime('%Y-%m-%d %H:%M')} UTC. "
                     f"Transaction of ${transaction_state.amount:,.2f} required "
-                    f"{required_level} approval before execution. "
+                    f"{required_level} approval {rule_citation}"
+                    f"before execution. "
                     f"Zero approvals existed at event time. "
                     f"{excluded_count} approval(s) were recorded AFTER the event and are excluded."
                 )
@@ -653,7 +703,7 @@ class HistoricalReconstructionService:
                     f"CONTROL FAILED at event time "
                     f"{event_timestamp.strftime('%Y-%m-%d %H:%M')} UTC. "
                     f"Transaction of ${transaction_state.amount:,.2f} required "
-                    f"{required_level} approval. "
+                    f"{required_level} approval {rule_citation}"
                     f"Effective pre-event approvals only reached level(s): {effective_levels}. "
                     f"This does not satisfy the {required_level} requirement."
                 )
@@ -670,7 +720,8 @@ class HistoricalReconstructionService:
                     f"CONTROL FAILED at event time "
                     f"{event_timestamp.strftime('%Y-%m-%d %H:%M')} UTC. "
                     f"Transaction of ${transaction_state.amount:,.2f} required "
-                    f"{required_level} approval before execution. "
+                    f"{required_level} approval {rule_citation}"
+                    f"before execution. "
                     f"No qualifying approvals were present at event time."
                 )
 

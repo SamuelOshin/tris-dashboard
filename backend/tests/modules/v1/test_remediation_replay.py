@@ -691,6 +691,7 @@ async def test_replay_handles_none_approval_state(db_session: AsyncSession):
         explanation="Test",
         transaction_state=TransactionStateAtEvent(
             transaction_id="TX-TEST-NONE-APP",
+            supplier_id="SUP-TEMP-001",
             amount=25000.0,  # <= $50,000
             currency="USD",
             invoice_date="2026-08-28",
@@ -737,6 +738,7 @@ async def test_replay_handles_none_approval_state(db_session: AsyncSession):
         explanation="Test",
         transaction_state=TransactionStateAtEvent(
             transaction_id="TX-TEST-NONE-APP-2",
+            supplier_id="SUP-TEMP-001",
             amount=90000.0,  # > $50,000
             currency="USD",
             invoice_date="2026-08-28",

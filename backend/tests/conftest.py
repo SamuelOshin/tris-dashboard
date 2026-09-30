@@ -1,9 +1,10 @@
 """
 Pytest Test Configuration and Fixtures for TRIS.
-Configures in-memory SQLite database and async HTTP test client.
+Provisions an isolated PostgreSQL test database and async HTTP test clients.
 """
 
 import os
+from contextlib import asynccontextmanager
 from typing import Annotated, AsyncGenerator, Optional
 from urllib.parse import urlparse, urlunparse
 
@@ -60,7 +61,20 @@ os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 os.environ.setdefault("ENVIRONMENT", "test")
 os.environ.setdefault("DEBUG", "true")
 
-# ── 2. Create PostgreSQL Test Engine and Session Factory ──────────────────────
+
+# ── 2. Administrative Connection Helper ──────────────────────────────────────
+def _admin_conninfo(dbname: str = "postgres", **overrides) -> str:
+    """Builds a psycopg connection string pointed at an administrative database."""
+    admin_url = TEST_DATABASE_URL.replace("postgresql+psycopg://", "postgresql://").replace(
+        "postgresql+asyncpg://", "postgresql://"
+    )
+    conn_params = psycopg.conninfo.conninfo_to_dict(admin_url)
+    conn_params["dbname"] = dbname
+    conn_params.update(overrides)
+    return psycopg.conninfo.make_conninfo(**conn_params)
+
+
+# ── 3. Create PostgreSQL Test Engine and Session Factory ─────────────────────
 test_engine = create_async_engine(
     TEST_DATABASE_URL,
     echo=False,
@@ -81,6 +95,35 @@ db_module.engine = test_engine
 db_module.async_session_factory = test_session_factory
 
 
+# ── 4. Fail Fast When PostgreSQL Is Unreachable ──────────────────────────────
+@pytest.fixture(scope="session", autouse=True)
+def require_postgres() -> None:
+    """
+    Probes PostgreSQL once per session and aborts immediately when it is unreachable.
+
+    The TRIS suite has no SQLite fallback: it depends on PostgreSQL triggers (T10
+    immutability) and JSONB columns. Without this probe an unavailable database
+    surfaces as one ConnectionTimeout per test, turning a single setup mistake into
+    minutes of cascading errors.
+    """
+    try:
+        with psycopg.connect(_admin_conninfo(connect_timeout=3), connect_timeout=3):
+            return
+    except psycopg.OperationalError as exc:
+        pytest.exit(
+            "\n"
+            "  PostgreSQL is not reachable - the TRIS test suite cannot run.\n"
+            "  ---------------------------------------------------\n"
+            f"  Target : {test_engine.url.host}:{test_engine.url.port}\n"
+            f"  Reason : {str(exc).strip()}\n"
+            "  Fix    : docker compose up -d postgres\n"
+            "\n"
+            "  There is no SQLite fallback; the suite requires PostgreSQL triggers\n"
+            "  and JSONB support. Start the database and re-run pytest.\n",
+            returncode=1,
+        )
+
+
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_database() -> None:
     """
@@ -94,16 +137,8 @@ def setup_test_database() -> None:
         f"Engine is pointed to: {test_engine.url.database}"
     )
 
-    # Convert database URL for administrative operations
-    admin_url = TEST_DATABASE_URL.replace("postgresql+psycopg://", "postgresql://").replace(
-        "postgresql+asyncpg://", "postgresql://"
-    )
-    conn_params = psycopg.conninfo.conninfo_to_dict(admin_url)
-    conn_params["dbname"] = "postgres"
-    admin_conn_str = psycopg.conninfo.make_conninfo(**conn_params)
-
     # Ensure test database exists
-    with psycopg.connect(admin_conn_str, autocommit=True) as conn, conn.cursor() as cur:
+    with psycopg.connect(_admin_conninfo(), autocommit=True) as conn, conn.cursor() as cur:
         cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (TEST_DB_NAME,))
         if not cur.fetchone():
             cur.execute(f'CREATE DATABASE "{TEST_DB_NAME}"')
@@ -236,3 +271,78 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
         yield client
 
     app.dependency_overrides.clear()
+
+
+def make_principal(
+    user_id: str,
+    username: str,
+    name: str,
+    role: str,
+    department: str = "Finance",
+) -> User:
+    """
+    Builds a transient (unsaved) User principal for a distinct test actor.
+
+    Use this to give an investigator and a verifier genuinely different identities —
+    production governance code contains no test-identity escape hatch, so Separation
+    of Duties must be satisfied by real principals.
+    """
+    return User(
+        user_id=user_id,
+        username=username,
+        name=name,
+        email=f"{username}@tris.internal",
+        role=role,
+        department=department,
+        is_active=True,
+    )
+
+
+@pytest.fixture
+def client_as(db_session: AsyncSession):
+    """
+    Factory yielding authenticated AsyncClients bound to a *specific* principal.
+
+    Required by any test exercising Separation of Duties or verified closure: the
+    actor recorded on an investigation transition must differ from the principal
+    that verifies and closes the case.
+
+    Because ``app.dependency_overrides`` holds a single auth override at a time, each
+    principal is scoped to its own ``async with`` block and the previous overrides
+    are restored on exit.
+
+    Usage:
+        async with client_as(investigator) as client:
+            await client.post(f"/api/v1/cases/{case_id}/transition", ...)
+        async with client_as(verifier) as client:
+            await client.post(f"/api/v1/cases/{case_id}/transition", ...)
+    """
+
+    async def override_get_db():
+        yield db_session
+
+    @asynccontextmanager
+    async def _bind(principal: User):
+        async def override_get_current_user(
+            request: Request,
+            credentials: Annotated[
+                Optional[HTTPAuthorizationCredentials], Depends(bearer_scheme)
+            ] = None,
+            db: Annotated[AsyncSession, Depends(get_db)] = None,
+        ):
+            if credentials or "access_token" in request.cookies:
+                return await get_current_user(request, credentials, db)
+            return principal
+
+        saved_overrides = dict(app.dependency_overrides)
+        app.dependency_overrides[get_db] = override_get_db
+        app.dependency_overrides[get_current_user] = override_get_current_user
+        client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+        try:
+            yield client
+        finally:
+            await client.aclose()
+            app.dependency_overrides.clear()
+            app.dependency_overrides.update(saved_overrides)
+
+    return _bind

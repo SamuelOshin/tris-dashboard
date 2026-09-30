@@ -47,13 +47,17 @@ Traditional monitoring systems rely either on brittle, disconnected spreadsheet 
 1. **Zero Fake Metrics (Mathematical Explainability)**: Eliminates fabricated AI confidence percentages. Anomalies are mathematically calculated against supplier historical baselines that strictly exclude the evaluated target transaction (e.g., `SUP-001` historical mean = **$30,471.43** vs target anomaly `TX-1999` = **$104,000.00** $\implies$ **3.41x deviation**).
 2. **Multi-Vector Telemetry Correlation**: Correlates four distinct enterprise domains: Accounts Payable Invoices, Vendor Master Bank Modifications, Identity & Access Event Logs, and Hierarchical Approval Thresholds.
 3. **Deterministic Strategy Rule Engine (`R-001` through `R-007`)**: Modular, version-tracked rule catalog with runtime threshold adjustments, additive scoring ($35 + 25 + 25 + 15 = 100 \implies \text{High Priority}$), and JSON evaluation snapshots:
-   - `R-001`: Amount Deviation (> 2.0x Historical Baseline)
+   - `R-001`: Amount Deviation (Amount > 2.0x Supplier Historical Baseline)
    - `R-002`: Recent Bank Account Modification (< 7 Days)
-   - `R-003`: Missing Mandatory Control Approval (Level 3 Required)
-   - `R-004`: Off-Hours Access Telemetry (Outside 07:00–19:00 UTC)
-   - `R-005`: Duplicate Invoice Submission (Identical Supplier & Amount)
-   - `R-006`: High Cumulative Spend Velocity (> $100,000 in 30 Days)
+   - `R-003`: Missing Mandatory Control Approval (Level 3 Required, ≥ $50,000)
+   - `R-004`: Off-Hours Access Telemetry (Outside 06:00–20:00 UTC)
+   - `R-005`: Duplicate Invoice Submission (Same Supplier **& Invoice Number**)
+   - `R-006`: 90-Day Recurrence Detection (Prior **Closed** Case for Same Supplier)
    - `R-007`: **Approval Timing / Temporal Completeness** (Identifies approvals timestamped *after* payment issuance or missing at event time).
+
+   > The authoritative rule catalog — conditions, thresholds, and default weights — is
+   > maintained in [`AGENTS.md`](./AGENTS.md#canonical-rule-catalog-r-001--r-007) and
+   > defined in `rules/service/strategies.py`. Read it from there rather than this summary.
 4. **Enforced System-Validated Closure Gatekeeper**: A governed state machine that strictly prohibits closing risk cases without 8 mandatory fields (`root_cause`, `corrective_action`, `closure_type`, `closure_evidence`, `verified_by`, `closure_date`, `follow_up_requirement`, and `recurrence_monitoring`).
 5. **Cryptographic Separation of Duties (SoD)**: Enforces dual-custody governance at the API and database levels. An investigator who authored case findings cannot act as the verifier or close the case.
 6. **Point-in-Time Historical Reconstruction Engine**: Bi-temporal reconstruction querying events strictly as of `event_timestamp <= T`, ensuring zero hindsight leakage and returning explicit `UNKNOWN` flags when evidence is absent from historical telemetry.
@@ -96,7 +100,6 @@ flowchart TB
             UsersEP["/users/* (User Management & Roles)"]
             SuppliersEP["/suppliers/* (Baseline Statistics)"]
             TxEP["/transactions/*"]
-            ApprovalsEP["/approvals/*"]
             AccessEP["/access-events/* (IAM Telemetry)"]
             CasesEP["/cases/* (State Machine & 8-Field Closure)"]
             RulesEP["/rules/* (Strategy Catalog R-001..R-007)"]
@@ -166,7 +169,7 @@ flowchart TB
 | **[`docs/INGESTION_ARCHITECTURE_AND_RESILIENCE_PLAN.md`](./docs/INGESTION_ARCHITECTURE_AND_RESILIENCE_PLAN.md)** | **Ingestion Engine Architecture & Resilience**: Asynchronous background jobs, 20% circuit breaker policy, batch PK pre-fetching, input sanitization, and transaction savepoints. |
 | **[`docs/HANDOVER_AND_CHANGELOG.md`](./docs/HANDOVER_AND_CHANGELOG.md)** | **Engineering Handover & Changelog**: Implementation history, architectural milestones, directory structure, and acceptance matrix. |
 | **[`docs/SYNTHETIC_TEST_DATA.md`](./docs/SYNTHETIC_TEST_DATA.md)** | **Synthetic Test Data Reference**: Complete tabular tables extracted from `test data.xlsx` across all 8 sheets with mathematical baseline proofs. |
-| **[`docs/TEST_EXECUTION_RESULTS.md`](./docs/TEST_EXECUTION_RESULTS.md)** | **Test Execution Results**: Detailed breakdown of the 78 automated test cases, execution timings, and coverage. |
+| **[`docs/TEST_EXECUTION_RESULTS.md`](./docs/TEST_EXECUTION_RESULTS.md)** | **Test Execution Results**: Detailed breakdown of the automated regression suite, execution timings, and coverage. |
 | **[`docs/v1_3_SCOPE_SPECIFICATION.md`](./docs/v1_3_SCOPE_SPECIFICATION.md)** | **TRIS v1.3 Scope Specification**: Requirements, boundaries, minimum screens, and acceptance criteria extracted from `tris updated.pdf`. |
 | **[`AGENTS.md`](./AGENTS.md)** | **Developer & Agent Guidelines**: 4-layer module boundaries (routes max 50 lines, services raise domain exceptions, models SQLModel only, schemas Pydantic), standard response envelopes, and Argon2id password security. |
 | **[`architecture.md`](./architecture.md)** | **System Architecture Specification**: Architectural principles, pictorial ERD, networking proxy flow, rule engine design, and database immutability. |
@@ -241,16 +244,23 @@ pnpm run dev
 
 ## 🧪 Automated Testing & Verification
 
-TRIS maintains a comprehensive **127-test automated regression suite** covering domain services, mathematical baselines, security boundaries, and the T01–T10 developer acceptance matrix:
+TRIS maintains a comprehensive **127-test automated regression suite** covering domain services, mathematical baselines, security boundaries, and the T01–T10 developer acceptance matrix.
+
+> **PostgreSQL is required.** The suite provisions an isolated `tris_db_test` database and
+> resets its schema between tests, so it depends on PostgreSQL triggers and JSONB columns.
+> There is no SQLite fallback. Start the database first:
+> ```bash
+> docker compose up -d postgres
+> ```
 
 ```bash
 cd backend
 
-# Run the 15-point Developer Acceptance Matrix (T01 through T10 + Workbook tests)
+# Run the Developer Acceptance Matrix (T01 through T10 + Workbook gates)
 uv run pytest tests/test_acceptance_t01_t10.py -v
 
-# Run the full test suite (127 tests, 100% pass rate)
-uv run pytest tests/ -v
+# Run the full test suite
+uv run pytest tests/ -q
 
 # Run Ruff linter and code formatter
 uv run ruff check . --fix

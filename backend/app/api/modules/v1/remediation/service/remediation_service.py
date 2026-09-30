@@ -616,7 +616,14 @@ class RemediationService:
                 raise ValidationError("Invalid event timestamp provided")
             return et
 
-        # Canonical timestamp for TX-TEMP-001 fixture
+        # KNOWN LIMITATION: the temporal fixture (TX-TEMP-001) pins its event time to
+        # 2026-08-28 10:14 UTC because that instant sits between the two seeded approvals
+        # (09:32 pre-event, 11:06 late) and is what makes the hindsight-exclusion test
+        # meaningful. Deriving it from `tx.created_at` (ingestion time) would move the event
+        # past both approvals and void the test.
+        # Proper fix: add an explicit `event_timestamp` column to Transaction (new Alembic
+        # revision — migrations are never hand-edited) and have ingestion persist it.
+        # Until then, do not add further hardcoded IDs: derive event times from record data.
         if transaction_id == "TX-TEMP-001":
             return datetime(2026, 8, 28, 10, 14, 0, tzinfo=UTC)
 

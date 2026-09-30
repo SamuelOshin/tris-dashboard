@@ -10,6 +10,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.modules.v1.ingestion.service.ingestion_service import IngestionService
+from tests.conftest import make_principal
 
 DATA_FILE = Path("../test data.xlsx").resolve()
 
@@ -60,137 +61,158 @@ async def test_invalid_state_transition_rejected(async_client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_verified_closure_8_field_validation(async_client: AsyncClient):
+async def test_verified_closure_8_field_validation(client_as):
     """
     Verified Closure Gatekeeper Test (Acceptance T09).
     Case sequence:
     New -> Assigned -> Under Investigation -> Corrective Action -> Pending Verification.
     Closing WITHOUT all 8 mandatory fields MUST fail with 422 Unprocessable Content.
     Providing all 8 fields MUST succeed with 200 OK.
+
+    Separation of Duties is exercised honestly here: the investigation is performed by
+    one principal and the verified closure is signed off by a *different* principal,
+    because the server has no test-identity escape hatch.
     """
     case_id = "TEST-CASE-001"
 
-    # Step 1: New -> Assigned
-    r1 = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Assigned", "actor": "lead_triage", "assigned_to": "investigator_alice"},
+    investigator = make_principal(
+        user_id="USR-TEST-INV-001",
+        username="investigator_alice",
+        name="Alice Investigator",
+        role="reviewer",
+        department="Finance",
     )
-    assert r1.status_code == 200
-    assert r1.json()["data"]["status"] == "Assigned"
-
-    # Step 2: Assigned -> Under Investigation
-    r2 = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Under Investigation", "actor": "investigator_alice"},
+    verifier = make_principal(
+        user_id="USR-TEST-VER-001",
+        username="verifier_bob",
+        name="Bob Verifier",
+        role="verifier",
+        department="Assurance",
     )
-    assert r2.status_code == 200
-    assert r2.json()["data"]["status"] == "Under Investigation"
 
-    # Step 3a: Under Investigation -> Corrective Action WITHOUT root_cause -> MUST FAIL (422)
-    r3_fail = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Corrective Action", "actor": "investigator_alice"},
-    )
-    assert r3_fail.status_code == 422
-    assert r3_fail.json()["error_code"] == "WORKFLOW_PRECONDITION_ERROR"
+    async with client_as(investigator) as client:
+        # Step 1: New -> Assigned
+        r1 = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={"to_status": "Assigned", "assigned_to": investigator.name},
+        )
+        assert r1.status_code == 200
+        assert r1.json()["data"]["status"] == "Assigned"
 
-    # Step 3b: Under Investigation -> Corrective Action WITH root_cause -> SUCCESS (200)
-    r3 = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Corrective Action",
-            "actor": "investigator_alice",
+        # Step 2: Assigned -> Under Investigation
+        r2 = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={"to_status": "Under Investigation"},
+        )
+        assert r2.status_code == 200
+        assert r2.json()["data"]["status"] == "Under Investigation"
+
+        # Step 3a: Under Investigation -> Corrective Action WITHOUT root_cause -> MUST FAIL (422)
+        r3_fail = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={"to_status": "Corrective Action"},
+        )
+        assert r3_fail.status_code == 422
+        assert r3_fail.json()["error_code"] == "WORKFLOW_PRECONDITION_ERROR"
+
+        # Step 3b: Under Investigation -> Corrective Action WITH root_cause -> SUCCESS (200)
+        r3 = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Corrective Action",
+                "root_cause": (
+                    "Compromised vendor portal credentials used for off-hours bank detail change"
+                ),
+            },
+        )
+        assert r3.status_code == 200
+        assert r3.json()["data"]["status"] == "Corrective Action"
+        assert r3.json()["data"]["root_cause"] is not None
+
+        # Step 4a: Corrective Action -> Pending Verification (no corrective_action) -> FAIL (422)
+        r4_fail = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={"to_status": "Pending Verification"},
+        )
+        assert r4_fail.status_code == 422
+        assert r4_fail.json()["error_code"] == "WORKFLOW_PRECONDITION_ERROR"
+
+        # Step 4b: Corrective Action -> Pending Verification WITH corrective_action -> SUCCESS (200)
+        r4 = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Pending Verification",
+                "corrective_action": (
+                    "Vendor bank details restored to primary account; payment hold placed on "
+                    "NC-260828"
+                ),
+            },
+        )
+        assert r4.status_code == 200
+        assert r4.json()["data"]["status"] == "Pending Verification"
+        assert r4.json()["data"]["corrective_action"] is not None
+
+    # Steps 5-6 are performed by an independent verifier (Separation of Duties).
+    async with client_as(verifier) as client:
+        # Step 5: Attempt closure with INCOMPLETE fields (only 3 of 8 fields provided)
+        r5_fail = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Closed",
+                "root_cause": "Compromised ERP vendor portal credentials",
+                "corrective_action": "Bank account reverted, credentials revoked",
+                "closure_type": "Confirmed Fraud / Blocked",
+                # Missing: closure_evidence, verified_by, closure_date, etc.
+            },
+        )
+        assert r5_fail.status_code == 422
+        err_json = r5_fail.json()
+        assert err_json["error_code"] == "VERIFIED_CLOSURE_VALIDATION_ERROR"
+        assert "missing mandatory fields" in err_json["message"]
+
+        # Step 6: Submit Verified Closure with ALL 8 MANDATORY FIELDS
+        closure_payload = {
+            "to_status": "Closed",
             "root_cause": (
                 "Compromised vendor portal credentials used for off-hours bank detail change"
             ),
-        },
-    )
-    assert r3.status_code == 200
-    assert r3.json()["data"]["status"] == "Corrective Action"
-    assert r3.json()["data"]["root_cause"] is not None
-
-    # Step 4a: Corrective Action -> Pending Verification (no corrective_action) -> FAIL (422)
-    r4_fail = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Pending Verification", "actor": "investigator_alice"},
-    )
-    assert r4_fail.status_code == 422
-    assert r4_fail.json()["error_code"] == "WORKFLOW_PRECONDITION_ERROR"
-
-    # Step 4b: Corrective Action -> Pending Verification WITH corrective_action -> SUCCESS (200)
-    r4 = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Pending Verification",
-            "actor": "investigator_alice",
             "corrective_action": (
                 "Vendor bank details restored to primary account; payment hold placed on NC-260828"
             ),
-        },
-    )
-    assert r4.status_code == 200
-    assert r4.json()["data"]["status"] == "Pending Verification"
-    assert r4.json()["data"]["corrective_action"] is not None
-
-    # Step 5: Attempt closure with INCOMPLETE fields (only 3 of 8 fields provided)
-    r5_fail = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Closed",
-            "actor": "verifier_bob",
-            "root_cause": "Compromised ERP vendor portal credentials",
-            "corrective_action": "Bank account reverted, credentials revoked",
             "closure_type": "Confirmed Fraud / Blocked",
-            # Missing: closure_evidence, verified_by, closure_date, etc.
-        },
-    )
-    assert r5_fail.status_code == 422
-    err_json = r5_fail.json()
-    assert err_json["error_code"] == "VERIFIED_CLOSURE_VALIDATION_ERROR"
-    assert "missing mandatory fields" in err_json["message"]
+            "closure_evidence": (
+                "Audit ticket SEC-2026-881; verified phone confirmation with Northstar CFO"
+            ),
+            "verified_by": "Bob Verifier (Independent Controls Auditor)",
+            "closure_date": "2026-08-30",
+            "follow_up_requirement": (
+                "Mandatory multifactor authentication rollout for all vendor portal admins"
+            ),
+            "recurrence_monitoring": "Enrolled in 90-day automated bank modification monitoring",
+        }
+        r5_success = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json=closure_payload,
+        )
+        assert r5_success.status_code == 200
+        closed_case = r5_success.json()["data"]
+        assert closed_case["status"] == "Closed"
+        assert closed_case["root_cause"] is not None
+        assert closed_case["closure_type"] == "Confirmed Fraud / Blocked"
+        assert closed_case["verified_by"] == "Bob Verifier (Independent Controls Auditor)"
 
-    # Step 6: Submit Verified Closure with ALL 8 MANDATORY FIELDS
-    closure_payload = {
-        "to_status": "Closed",
-        "actor": "verifier_bob",
-        "root_cause": "Compromised vendor portal credentials used for off-hours bank detail change",
-        "corrective_action": (
-            "Vendor bank details restored to primary account; payment hold placed on NC-260828"
-        ),
-        "closure_type": "Confirmed Fraud / Blocked",
-        "closure_evidence": (
-            "Audit ticket SEC-2026-881; verified phone confirmation with Northstar CFO"
-        ),
-        "verified_by": "verifier_bob (Independent Controls Auditor)",
-        "closure_date": "2026-08-30",
-        "follow_up_requirement": (
-            "Mandatory multifactor authentication rollout for all vendor portal admins"
-        ),
-        "recurrence_monitoring": "Enrolled in 90-day automated bank modification monitoring",
-    }
-    r5_success = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json=closure_payload,
-    )
-    assert r5_success.status_code == 200
-    closed_case = r5_success.json()["data"]
-    assert closed_case["status"] == "Closed"
-    assert closed_case["root_cause"] is not None
-    assert closed_case["closure_type"] == "Confirmed Fraud / Blocked"
-    assert closed_case["verified_by"] == "verifier_bob (Independent Controls Auditor)"
-
-    # Step 7: Verify Audit Trail Completeness (T10)
-    history = closed_case["history"]
-    assert len(history) == 6  # Created + 5 transitions
-    statuses = [h["new_status"] for h in history]
-    assert statuses == [
-        "New",
-        "Assigned",
-        "Under Investigation",
-        "Corrective Action",
-        "Pending Verification",
-        "Closed",
-    ]
+        # Step 7: Verify Audit Trail Completeness (T10)
+        history = closed_case["history"]
+        assert len(history) == 6  # Created + 5 transitions
+        statuses = [h["new_status"] for h in history]
+        assert statuses == [
+            "New",
+            "Assigned",
+            "Under Investigation",
+            "Corrective Action",
+            "Pending Verification",
+            "Closed",
+        ]
 
 
 @pytest.mark.asyncio

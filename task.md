@@ -1,9 +1,9 @@
-# 📋 TRIS v1.3: Live Execution Task Tracker
+# 📋 TRIS: Live Execution Task Tracker
 
 **System**: Trust & Risk Intelligence System (TRIS)  
-**Target Version**: v1.3 (Synthetic-Data Driven Architecture)  
-**Active Phase**: **Phase 0 (Ready for Execution)**  
-**Active Branch**: `main` (switching to `feature/v1.3-fastapi-postgres` in Task 0.2)  
+**Target Version**: v1.3 → v1.4 (v1.3 plan complete: 38/38 tasks)  
+**Active Phase**: **Complete** — v1.3 delivered and merged to `main`; v1.4 is the current release  
+**Active Branch**: `main` (the `feature/v1.3-fastapi-postgres` branch was merged and is historical)  
 **Primary Reference Documents**:
 - [`AGENTS.md`](./AGENTS.md) — Non-negotiable 4-layer module rules, max 50 lines per route, no try-except, Argon2id, `uv`
 - [`architecture.md`](./architecture.md) — Master system architecture, pictorial database ERD, deployment topology

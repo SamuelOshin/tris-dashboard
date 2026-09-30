@@ -19,6 +19,7 @@ from app.api.modules.v1.rules.service.rule_engine_service import RuleEngineServi
 from app.api.modules.v1.suppliers.models.supplier import Supplier
 from app.api.modules.v1.suppliers.service.baseline_service import BaselineService
 from app.api.modules.v1.transactions.models.transaction import Transaction
+from tests.conftest import make_principal
 
 DATA_FILE = Path("../test data.xlsx").resolve()
 
@@ -172,69 +173,85 @@ async def test_t08_case_state_machine_boundary_enforcement(async_client: AsyncCl
 
 
 @pytest.mark.asyncio
-async def test_t09_verified_closure_gatekeeper_validation(async_client: AsyncClient):
+async def test_t09_verified_closure_gatekeeper_validation(client_as):
     """
     T09 Acceptance Test: 8-Field Verified Closure Compliance Gatekeeper.
     Rejects incomplete closure with 422; allows closure only with all 8 fields.
+
+    Separation of Duties is honoured with distinct real principals: the investigator
+    progresses the case, an independent verifier signs off the closure. The server
+    has no test-identity escape hatch, so the two actors must genuinely differ.
     """
     case_id = "TEST-CASE-001"
 
-    # Progress case to Pending Verification
-    await async_client.post(
-        f"/api/v1/cases/{case_id}/transition", json={"to_status": "Assigned", "actor": "auditor"}
+    investigator = make_principal(
+        user_id="USR-TEST-INV-T09",
+        username="t09_investigator",
+        name="T. Investigator",
+        role="reviewer",
+        department="Finance",
     )
-    await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Under Investigation", "actor": "auditor"},
-    )
-    await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Corrective Action",
-            "actor": "auditor",
-            "root_cause": "Compromised vendor portal account",
-        },
-    )
-    await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Pending Verification",
-            "actor": "auditor",
-            "corrective_action": "Bank details reverted; payment hold placed",
-        },
+    verifier = make_principal(
+        user_id="USR-TEST-VER-T09",
+        username="t09_verifier",
+        name="B. Verifier",
+        role="verifier",
+        department="Assurance",
     )
 
-    # Incomplete closure attempt (only 2 fields) -> MUST return 422
-    fail_res = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Closed",
-            "actor": "verifier",
-            "root_cause": "Test error",
-            "closure_type": "Confirmed Fraud / Blocked",
-        },
-    )
-    assert fail_res.status_code == 422
-    assert fail_res.json()["error_code"] == "VERIFIED_CLOSURE_VALIDATION_ERROR"
+    # Progress case to Pending Verification as the investigator
+    async with client_as(investigator) as client:
+        await client.post(f"/api/v1/cases/{case_id}/transition", json={"to_status": "Assigned"})
+        await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={"to_status": "Under Investigation"},
+        )
+        await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Corrective Action",
+                "root_cause": "Compromised vendor portal account",
+            },
+        )
+        await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Pending Verification",
+                "corrective_action": "Bank details reverted; payment hold placed",
+            },
+        )
 
-    # Complete closure attempt (All 8 mandatory fields) -> MUST return 200
-    success_res = await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Closed",
-            "actor": "verifier",
-            "root_cause": "Compromised vendor portal account",
-            "corrective_action": "Bank details reverted; payment hold placed",
-            "closure_type": "Confirmed Fraud / Blocked",
-            "closure_evidence": "Audit ticket SEC-2026-881",
-            "verified_by": "Independent Controls Auditor",
-            "closure_date": "2026-08-30",
-            "follow_up_requirement": "Mandatory MFA rollout",
-            "recurrence_monitoring": "Enrolled in 90-day surveillance",
-        },
-    )
-    assert success_res.status_code == 200
-    assert success_res.json()["data"]["status"] == "Closed"
+    # Independent verifier attempts the closure
+    async with client_as(verifier) as client:
+        # Incomplete closure attempt (only 2 fields) -> MUST return 422
+        fail_res = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Closed",
+                "root_cause": "Test error",
+                "closure_type": "Confirmed Fraud / Blocked",
+            },
+        )
+        assert fail_res.status_code == 422
+        assert fail_res.json()["error_code"] == "VERIFIED_CLOSURE_VALIDATION_ERROR"
+
+        # Complete closure attempt (All 8 mandatory fields) -> MUST return 200
+        success_res = await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Closed",
+                "root_cause": "Compromised vendor portal account",
+                "corrective_action": "Bank details reverted; payment hold placed",
+                "closure_type": "Confirmed Fraud / Blocked",
+                "closure_evidence": "Audit ticket SEC-2026-881",
+                "verified_by": "B. Verifier",
+                "closure_date": "2026-08-30",
+                "follow_up_requirement": "Mandatory MFA rollout",
+                "recurrence_monitoring": "Enrolled in 90-day surveillance",
+            },
+        )
+        assert success_res.status_code == 200
+        assert success_res.json()["data"]["status"] == "Closed"
 
 
 @pytest.mark.asyncio
@@ -392,7 +409,7 @@ async def test_workbook_t05_ownership_assignment_department_and_history(
 
 @pytest.mark.asyncio
 async def test_workbook_t07_recurrence_detection_and_prior_case_surfacing(
-    async_client: AsyncClient, db_session: AsyncSession
+    db_session: AsyncSession, client_as
 ):
     """
     Workbook T07 Acceptance Test: Recurrence Detection (Rule R-006).
@@ -402,36 +419,49 @@ async def test_workbook_t07_recurrence_detection_and_prior_case_surfacing(
     """
     case_id = "TEST-CASE-001"
 
-    # Progress and close TEST-CASE-001 with full verified closure
-    await async_client.post(
-        f"/api/v1/cases/{case_id}/transition", json={"to_status": "Assigned", "actor": "auditor"}
+    investigator = make_principal(
+        user_id="USR-TEST-INV-T07",
+        username="t07_investigator",
+        name="T. Investigator",
+        role="reviewer",
+        department="Finance",
     )
-    await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={"to_status": "Under Investigation", "actor": "auditor"},
-    )
-    await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Corrective Action",
-            "actor": "auditor",
-            "root_cause": "Supplier bank-change verification workflow not completed",
-        },
-    )
-    await async_client.post(
-        f"/api/v1/cases/{case_id}/transition",
-        json={
-            "to_status": "Pending Verification",
-            "actor": "auditor",
-            "corrective_action": (
-                "Require independent verification of supplier banking change and second approval"
-            ),
-        },
+    verifier = make_principal(
+        user_id="USR-TEST-VER-T07",
+        username="t07_verifier",
+        name="B. Verifier",
+        role="verifier",
+        department="Assurance",
     )
 
+    # Progress TEST-CASE-001 to Pending Verification as the investigator
+    async with client_as(investigator) as client:
+        await client.post(f"/api/v1/cases/{case_id}/transition", json={"to_status": "Assigned"})
+        await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={"to_status": "Under Investigation"},
+        )
+        await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Corrective Action",
+                "root_cause": "Supplier bank-change verification workflow not completed",
+            },
+        )
+        await client.post(
+            f"/api/v1/cases/{case_id}/transition",
+            json={
+                "to_status": "Pending Verification",
+                "corrective_action": (
+                    "Require independent verification of supplier banking change "
+                    "and second approval"
+                ),
+            },
+        )
+
+    # Close the case as an independent verifier (Separation of Duties)
     closure_payload = {
         "to_status": "Closed",
-        "actor": "verifier",
         "root_cause": "Supplier bank-change verification workflow not completed",
         "corrective_action": (
             "Require independent verification of supplier banking change and second approval"
@@ -443,7 +473,8 @@ async def test_workbook_t07_recurrence_detection_and_prior_case_surfacing(
         "follow_up_requirement": "Mandatory callback confirmation",
         "recurrence_monitoring": "90-day surveillance",
     }
-    close_res = await async_client.post(f"/api/v1/cases/{case_id}/transition", json=closure_payload)
+    async with client_as(verifier) as client:
+        close_res = await client.post(f"/api/v1/cases/{case_id}/transition", json=closure_payload)
     assert close_res.status_code == 200
 
     # Insert a subsequent transaction for SUP-001 within 90 days
@@ -477,7 +508,8 @@ async def test_workbook_t07_recurrence_detection_and_prior_case_surfacing(
     assert "TEST-CASE-001" in r006.diagnostics["prior_closed_cases"]
 
     # Query the newly generated case and verify prior case context is surfaced
-    new_case_res = await async_client.get("/api/v1/cases/CASE-2026-1999-RECUR")
+    async with client_as(verifier) as client:
+        new_case_res = await client.get("/api/v1/cases/CASE-2026-1999-RECUR")
     assert new_case_res.status_code == 200
     new_case_data = new_case_res.json()["data"]
 

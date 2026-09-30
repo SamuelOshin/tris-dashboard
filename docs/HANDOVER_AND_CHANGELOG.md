@@ -3,6 +3,12 @@
 > **TRIS (Total Risk Intelligence System) — Version 1.3 Implementation Handover**  
 > Complete transition from client-side prototype to an enterprise-grade FastAPI + PostgreSQL risk platform.
 
+> **Historical record.** This is the v1.3 handover. The platform is now on **v1.4**,
+> which added the bi-temporal reconstruction engine, remediation replay, and rule
+> `R-007`. Test counts below are the v1.3 figures; the current suite is **127 / 127**.
+> See [`TEST_EXECUTION_RESULTS.md`](./TEST_EXECUTION_RESULTS.md) for the authoritative
+> breakdown, and [`AGENTS.md`](../AGENTS.md) for the v1.4 domain invariants.
+
 ---
 
 ## 1. Executive Summary
@@ -16,7 +22,7 @@ TRIS v1.3 introduces a robust, auditable risk architecture designed to withstand
 4. **Governed Case Lifecycle**: State machine matrix strictly prohibits illegal status jumps and enforces an **8-field verified closure gatekeeper** before any case can transition to `Closed`.
 5. **Append-Only Immutability**: Protected audit logs via PostgreSQL triggers blocking `UPDATE` and `DELETE` mutations on `case_history`.
 6. **Real-Time Notification Hub**: PostgreSQL-backed event alerting engine with multi-tier RBAC routing (user, role, broadcast) and automated domain event emissions from case transitions and background ingestion jobs.
-7. **Unified Developer Acceptance Matrix & Full Suite**: Automated test suite achieving **78/78 overall backend tests passing (100% pass rate)**.
+7. **Unified Developer Acceptance Matrix & Full Suite**: Automated test suite achieving **78/78 overall backend tests passing (100% pass rate)** at v1.3 (127/127 as of v1.4).
 
 ---
 

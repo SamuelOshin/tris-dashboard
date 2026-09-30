@@ -60,7 +60,13 @@ class CaseTransitionRequest(BaseModel):
     """Request payload for state machine transitions."""
 
     to_status: str = Field(..., description="Target status in case lifecycle")
-    actor: str = Field(..., description="User or service performing transition")
+    actor: Optional[str] = Field(
+        None,
+        description=(
+            "Ignored. The audit actor is always derived from the authenticated "
+            "principal so the case history cannot be forged from the request body."
+        ),
+    )
     note: Optional[str] = Field(None, description="Investigation or transition notes")
     assigned_to: Optional[str] = Field(None, description="Assigned investigator")
     department: Optional[str] = Field(None, description="Assigned department")

@@ -57,25 +57,19 @@ class InvestigationActors:
                 return True
 
         # 3. For authenticated users, verify the principal didn't investigate.
-        # USR-TEST-001 is the shared pytest mock fixture used across legacy tests (e.g. T09, T07);
-        # when running under USR-TEST-001, separation of duties honors the distinct verified_by.
         if user:
-            is_generic_test_runner = (
-                str(getattr(user, "user_id", "")).strip().upper() == "USR-TEST-001"
-            )
-            if not is_generic_test_runner:
-                user_identities: Set[str] = set()
-                if user.user_id:
-                    user_identities.add(str(user.user_id).strip().lower())
-                if user.username:
-                    user_identities.add(user.username.strip().lower())
-                if user.name:
-                    user_identities.add(user.name.strip().lower())
-                if user.email:
-                    user_identities.add(user.email.strip().lower())
+            user_identities: Set[str] = set()
+            if user.user_id:
+                user_identities.add(str(user.user_id).strip().lower())
+            if user.username:
+                user_identities.add(user.username.strip().lower())
+            if user.name:
+                user_identities.add(user.name.strip().lower())
+            if user.email:
+                user_identities.add(user.email.strip().lower())
 
-                if bool(user_identities & all_investigators):
-                    return True
+            if bool(user_identities & all_investigators):
+                return True
 
         return False
 
