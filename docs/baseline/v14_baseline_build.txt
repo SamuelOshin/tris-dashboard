@@ -1,0 +1,48 @@
+$ pnpm run build (captured 2026-09-30T15:23:37+01:00 on branch v2.0-manufacturing-extension, commit 72460432ef8fee8e6bce81bf5ad7ee416436c267)
+
+$ next build
+▲ Next.js 16.3.4 (Turbopack)
+✓ Running next.config.mjs took 103ms
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead.
+
+  To migrate automatically, run:
+  npx @next/codemod@canary middleware-to-proxy .
+
+  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 76s
+  Running TypeScript ...
+⚠ Minimum recommended TypeScript version is v5.1.0, older versions can potentially be incompatible with Next.js. Detected: 5.0.2
+  Finished TypeScript in 28.1s ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/14) ...
+  Generating static pages using 3 workers (3/14) 
+  Generating static pages using 3 workers (6/14) 
+  Generating static pages using 3 workers (10/14) 
+✓ Generating static pages using 3 workers (14/14) in 4.2s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /cases/[id]
+├ ○ /compliance
+├ ○ /dashboard/correlation
+├ ○ /dashboard/reports
+├ ○ /dashboard/settings
+├ ○ /developer-tests
+├ ○ /fraud-detection
+├ ○ /ingestion
+├ ○ /login
+├ ○ /risk-cases
+├ ○ /suppliers
+└ ○ /zero-trust
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Exit code: 0
