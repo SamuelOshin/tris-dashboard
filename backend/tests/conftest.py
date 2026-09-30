@@ -96,8 +96,12 @@ db_module.async_session_factory = test_session_factory
 
 
 # ── 4. Fail Fast When PostgreSQL Is Unreachable ──────────────────────────────
+TEST_SUITE_LOCK_KEY = 7_424_001
+"""Advisory-lock key serialising pytest sessions that share the test database."""
+
+
 @pytest.fixture(scope="session", autouse=True)
-def require_postgres() -> None:
+def require_postgres():
     """
     Probes PostgreSQL once per session and aborts immediately when it is unreachable.
 
@@ -105,10 +109,33 @@ def require_postgres() -> None:
     immutability) and JSONB columns. Without this probe an unavailable database
     surfaces as one ConnectionTimeout per test, turning a single setup mistake into
     minutes of cascading errors.
+
+    It also takes a session-level advisory lock so two pytest sessions can never run
+    against the same test database at once. The suite drops and truncates shared
+    tables, so concurrent sessions deadlock each other and produce spurious failures.
+    The lock is released when this session's connection closes, including on a crash.
     """
     try:
-        with psycopg.connect(_admin_conninfo(connect_timeout=3), connect_timeout=3):
-            return
+        conn = psycopg.connect(_admin_conninfo(connect_timeout=3), connect_timeout=3)
+        conn.autocommit = True
+        acquired = conn.execute(
+            "SELECT pg_try_advisory_lock(%s)", (TEST_SUITE_LOCK_KEY,)
+        ).fetchone()[0]
+        if not acquired:
+            conn.close()
+            pytest.exit(
+                "\n"
+                "  Another pytest session is already running against the TRIS test database.\n"
+                "  ---------------------------------------------------\n"
+                f"  Database : {TEST_DB_NAME}\n"
+                "  Why      : the suite drops and truncates shared tables; concurrent runs\n"
+                "             deadlock each other and report spurious failures.\n"
+                "  Fix      : wait for the other run to finish (or stop it), then re-run.\n",
+                returncode=1,
+            )
+        yield
+        conn.close()
+        return
     except psycopg.OperationalError as exc:
         pytest.exit(
             "\n"
