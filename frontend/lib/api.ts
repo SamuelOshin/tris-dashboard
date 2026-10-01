@@ -402,7 +402,7 @@ export function resetSessionRedirectFlag() {
   isSessionExpiredRedirecting = false
 }
 
-async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+export async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const headers = new Headers(options.headers || {})
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')

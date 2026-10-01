@@ -1,0 +1,36 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 25 items
+
+tests/modules/v1/test_erp_mapping_engine.py::test_mapping_profile_save_and_reload_round_trip PASSED [  4%]
+tests/modules/v1/test_erp_mapping_engine.py::test_saved_profile_drives_a_later_import PASSED [  8%]
+tests/modules/v1/test_erp_mapping_engine.py::test_profile_definition_is_validated PASSED [ 12%]
+tests/modules/v1/test_erp_mapping_engine.py::test_targets_distinguish_required_and_optional_fields PASSED [ 16%]
+tests/modules/v1/test_erp_mapping_engine.py::test_preview_shows_columns_samples_and_suggests_the_matching_style PASSED [ 20%]
+tests/modules/v1/test_erp_mapping_engine.py::test_generic_import_end_to_end PASSED [ 24%]
+tests/modules/v1/test_erp_mapping_engine.py::test_sap_style_import_end_to_end PASSED [ 28%]
+tests/modules/v1/test_erp_mapping_engine.py::test_dynamics_style_bom_import PASSED [ 32%]
+tests/modules/v1/test_erp_mapping_engine.py::test_excel_workbook_import_with_sheet_selection PASSED [ 36%]
+tests/modules/v1/test_erp_mapping_engine.py::test_malformed_source_file_produces_readable_row_errors PASSED [ 40%]
+tests/modules/v1/test_erp_mapping_engine.py::test_unreadable_files_give_readable_errors PASSED [ 44%]
+tests/modules/v1/test_erp_mapping_engine.py::test_circuit_breaker_trips_on_badly_mapped_column PASSED [ 48%]
+tests/modules/v1/test_erp_mapping_engine.py::test_circuit_breaker_thresholds_match_v14_semantics PASSED [ 52%]
+tests/modules/v1/test_erp_mapping_engine.py::test_validate_is_a_dry_run PASSED [ 56%]
+tests/modules/v1/test_erp_mapping_engine.py::test_required_fields_and_columns_are_checked_before_any_row PASSED [ 60%]
+tests/modules/v1/test_erp_mapping_engine.py::test_duplicates_are_skipped_or_rejected_by_strategy PASSED [ 64%]
+tests/modules/v1/test_erp_mapping_engine.py::test_references_to_unknown_suppliers_are_rejected_readably PASSED [ 68%]
+tests/modules/v1/test_erp_mapping_engine.py::test_defaults_missing_values_and_unmapped_fields_are_reported PASSED [ 72%]
+tests/modules/v1/test_erp_mapping_engine.py::test_cross_field_rules PASSED [ 76%]
+tests/modules/v1/test_erp_mapping_engine.py::test_error_log_csv_download_is_escaped PASSED [ 80%]
+tests/modules/v1/test_erp_mapping_engine.py::test_server_side_roles PASSED [ 84%]
+tests/modules/v1/test_erp_mapping_engine.py::test_database_rejections_are_isolated_and_hide_internals PASSED [ 88%]
+tests/modules/v1/test_erp_mapping_engine.py::test_value_coercion_rules PASSED [ 92%]
+tests/modules/v1/test_erp_mapping_engine.py::test_mapping_profiles_table_exists_with_unique_name PASSED [ 96%]
+tests/modules/v1/test_erp_mapping_engine.py::test_ui_never_claims_a_live_erp_integration PASSED [100%]
+
+======================= 25 passed in 213.18s (0:03:33) ========================

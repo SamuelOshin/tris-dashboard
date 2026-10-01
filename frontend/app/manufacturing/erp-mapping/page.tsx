@@ -1,4 +1,5 @@
 import { ManufacturingPage } from '@/components/manufacturing/manufacturing-page'
+import { ErpMappingWorkspace } from '@/components/manufacturing/erp-mapping/erp-mapping-workspace'
 
 export const metadata = {
   title: 'ERP/BOM Data Mapping - TRIS',
@@ -6,5 +7,9 @@ export const metadata = {
 }
 
 export default function ErpMappingPage() {
-  return <ManufacturingPage pageId="erp-mapping" />
+  return (
+    <ManufacturingPage pageId="erp-mapping">
+      <ErpMappingWorkspace />
+    </ManufacturingPage>
+  )
 }

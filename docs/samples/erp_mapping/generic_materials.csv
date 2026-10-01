@@ -1,0 +1,7 @@
+material_id,description,category,unit_of_measure
+SOL-GLASS-32,Solar glass 3.2 mm,Glass,M2
+SOL-ALU-FRAME,Aluminium frame profile,Metals,KG
+SOL-CELL-M10,Monocrystalline cell M10,Cells,PCS
+SOL-EVA-FILM,EVA encapsulant film,Polymers,M2
+SOL-JBOX-IP68,Junction box IP68,Electrical,PCS
+SOL-BACKSHEET,Backsheet TPT,Polymers,M2

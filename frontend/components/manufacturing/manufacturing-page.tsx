@@ -1,6 +1,7 @@
 'use client'
 
 import { DashboardLayout } from '@/components/dashboard-layout'
+import type { ReactNode } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import {
   canViewManufacturing,
@@ -9,7 +10,13 @@ import {
 } from './manufacturing-navigation'
 import { NotImplementedState, PermissionDeniedState } from './not-implemented-state'
 
-export function ManufacturingPage({ pageId }: { pageId: ManufacturingPageId }) {
+interface ManufacturingPageProps {
+  pageId: ManufacturingPageId
+  /** The page's content once it is built; pages without content show the empty state. */
+  children?: ReactNode
+}
+
+export function ManufacturingPage({ pageId, children }: ManufacturingPageProps) {
   const { user } = useAuth()
   const item = getManufacturingNavItem(pageId)
   const allowed = canViewManufacturing(user?.role)
@@ -26,7 +33,7 @@ export function ManufacturingPage({ pageId }: { pageId: ManufacturingPageId }) {
           : [{ label: 'TRIS Studio', href: '/' }, { label: 'Manufacturing' }]
       }
     >
-      {allowed ? <NotImplementedState item={item} /> : <PermissionDeniedState />}
+      {allowed ? (children ?? <NotImplementedState item={item} />) : <PermissionDeniedState />}
     </DashboardLayout>
   )
 }

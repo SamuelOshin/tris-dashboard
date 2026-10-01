@@ -1,0 +1,7 @@
+ProductNumber,ProductName,ItemNumber,BOMQuantity,UnitId,FromDate
+PANEL-60C,60-cell solar panel,SOL-GLASS-32,1.7,M2,2024-01-01
+PANEL-60C,60-cell solar panel,SOL-ALU-FRAME,2.6,KG,2024-01-01
+PANEL-60C,60-cell solar panel,SOL-CELL-M10,60,PCS,2024-01-01
+PANEL-60C,60-cell solar panel,SOL-EVA-FILM,3.4,M2,2024-01-01
+PANEL-60C,60-cell solar panel,SOL-JBOX-IP68,1,PCS,2024-01-01
+PANEL-60C,60-cell solar panel,SOL-BACKSHEET,1.7,M2,2024-01-01

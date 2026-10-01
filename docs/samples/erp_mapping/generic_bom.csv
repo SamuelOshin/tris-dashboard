@@ -1,0 +1,7 @@
+product_sku,product_description,material_id,bom_quantity,unit_of_measure
+PANEL-60C,60-cell solar panel,SOL-GLASS-32,1.7,M2
+PANEL-60C,60-cell solar panel,SOL-ALU-FRAME,2.6,KG
+PANEL-60C,60-cell solar panel,SOL-CELL-M10,60,PCS
+PANEL-60C,60-cell solar panel,SOL-EVA-FILM,3.4,M2
+PANEL-60C,60-cell solar panel,SOL-JBOX-IP68,1,PCS
+PANEL-60C,60-cell solar panel,SOL-BACKSHEET,1.7,M2

@@ -171,6 +171,26 @@ Material-cost risk cases use the **same** `risk_cases` table and lifecycle as fi
 The case state machine, separation of duties, 8-field verified closure and audit trail are unchanged
 and have no category-specific branching.
 
+## Mapping profiles (Ticket 5)
+
+### `mapping_profiles` — saved ERP/BOM column mappings
+| Field | Type | Required | Notes |
+|:---|:---|:---|:---|
+| `profile_id` | text(50), **PK** | Required | Generated (`PROF-…`). |
+| `name` | text(120) | Required | Unique (`ix_mapping_profiles_name`). |
+| `description` | text(500) | Optional | |
+| `source_profile` | text(30) | Required | Layout the mapping started from: `generic`, `sap_style` or `dynamics_style`. |
+| `target` | text(50) | Required | Canonical table the file is mapped into (a table name from this dictionary). |
+| `field_mapping` | JSON | Required | `{canonical field: source column}`. |
+| `defaults` | JSON | Required | `{canonical field: fixed value}` used where the file has no column. |
+| `created_by` | text(50), FK → `users` | Required | Administrator who saved it. |
+| `created_at` | timestamptz | Required | |
+
+Imports reuse the existing `ingestion_jobs` table for telemetry (counts, error log, who and when). A job
+made by the mapping tool is identified by `summary_report.import_type = "manufacturing_mapping"` and
+records the mapping and layout it used. Every canonical row an import creates carries the optional
+`dataset_id` the uploader entered. Row-level import rules are in `ERP_MAPPING_GUIDE.md`.
+
 ## Not implemented
 
 - **`ExternalDriverReference`** (optional in the specification): not created. It is only to be built if a
