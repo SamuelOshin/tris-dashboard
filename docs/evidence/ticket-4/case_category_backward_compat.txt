@@ -1,0 +1,17 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 7 items
+
+tests/modules/v1/test_case_category_backward_compat.py::test_migration_backfills_existing_cases_and_round_trips PASSED [ 14%]
+tests/modules/v1/test_case_category_backward_compat.py::test_new_case_defaults_to_financial_exception PASSED [ 28%]
+tests/modules/v1/test_case_category_backward_compat.py::test_raw_insert_without_category_gets_database_default PASSED [ 42%]
+tests/modules/v1/test_case_category_backward_compat.py::test_invalid_case_category_rejected PASSED [ 57%]
+tests/modules/v1/test_case_category_backward_compat.py::test_material_cost_risk_case_links_to_material PASSED [ 71%]
+tests/modules/v1/test_case_category_backward_compat.py::test_case_cannot_reference_unknown_material PASSED [ 85%]
+tests/modules/v1/test_case_category_backward_compat.py::test_existing_case_api_and_state_machine_unchanged PASSED [100%]
+
+============================= 7 passed in 43.65s ==============================

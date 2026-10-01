@@ -20,6 +20,7 @@ MODEL_MODULES = [
     "app.api.modules.v1.notifications.models",
     "app.api.modules.v1.reconstruction.models",
     "app.api.modules.v1.remediation.models",
+    "app.api.modules.v1.manufacturing.models",
 ]
 
 

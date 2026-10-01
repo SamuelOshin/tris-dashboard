@@ -6,14 +6,23 @@ Pure ORM model — no business logic.
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import JSON, Column
+from sqlalchemy import JSON, CheckConstraint, Column
 from sqlmodel import Field, SQLModel
+
+CASE_CATEGORY_FINANCIAL_EXCEPTION = "financial_exception"
+CASE_CATEGORY_MATERIAL_COST_RISK = "material_cost_risk"
 
 
 class RiskCase(SQLModel, table=True):
     """Governed risk cases table."""
 
     __tablename__ = "risk_cases"
+    __table_args__ = (
+        CheckConstraint(
+            "case_category IN ('financial_exception', 'material_cost_risk')",
+            name="ck_risk_cases_case_category",
+        ),
+    )
 
     case_id: str = Field(primary_key=True, index=True, max_length=50)
     case_number: str = Field(unique=True, index=True, max_length=50)
@@ -27,6 +36,19 @@ class RiskCase(SQLModel, table=True):
     )
     assigned_to: str | None = Field(default=None, index=True, nullable=True, max_length=200)
     department: str | None = Field(default=None, max_length=100, nullable=True)
+
+    # v2.0 material-cost extension (D3). Existing rows default to "financial_exception".
+    case_category: str = Field(
+        default=CASE_CATEGORY_FINANCIAL_EXCEPTION,
+        index=True,
+        max_length=40,
+        sa_column_kwargs={"server_default": CASE_CATEGORY_FINANCIAL_EXCEPTION},
+    )
+    material_id: str | None = Field(
+        default=None, foreign_key="materials.material_id", index=True, nullable=True, max_length=50
+    )
+    forecast_horizon: int | None = Field(default=None, nullable=True)
+    projected_exposure_amount: float | None = Field(default=None, nullable=True)
 
     trigger_signals: list[dict[str, Any]] = Field(
         default_factory=list,

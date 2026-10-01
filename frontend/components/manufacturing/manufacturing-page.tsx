@@ -12,19 +12,21 @@ import { NotImplementedState, PermissionDeniedState } from './not-implemented-st
 export function ManufacturingPage({ pageId }: { pageId: ManufacturingPageId }) {
   const { user } = useAuth()
   const item = getManufacturingNavItem(pageId)
+  const allowed = canViewManufacturing(user?.role)
 
+  // Roles without access must not see which section they tried to open.
   return (
     <DashboardLayout
-      title={item.name}
-      description={item.description}
+      title={allowed ? item.name : undefined}
+      description={allowed ? item.description : undefined}
       showActions={false}
-      breadcrumbs={[
-        { label: 'TRIS Studio', href: '/' },
-        { label: 'Manufacturing' },
-        { label: item.name },
-      ]}
+      breadcrumbs={
+        allowed
+          ? [{ label: 'TRIS Studio', href: '/' }, { label: 'Manufacturing' }, { label: item.name }]
+          : [{ label: 'TRIS Studio', href: '/' }, { label: 'Manufacturing' }]
+      }
     >
-      {canViewManufacturing(user?.role) ? <NotImplementedState item={item} /> : <PermissionDeniedState />}
+      {allowed ? <NotImplementedState item={item} /> : <PermissionDeniedState />}
     </DashboardLayout>
   )
 }
