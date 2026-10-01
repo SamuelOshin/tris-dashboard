@@ -1,4 +1,5 @@
 import { ManufacturingPage } from '@/components/manufacturing/manufacturing-page'
+import { MaterialCostWorkspace } from '@/components/manufacturing/material-cost/material-cost-workspace'
 
 export const metadata = {
   title: 'Material Cost Intelligence - TRIS',
@@ -6,5 +7,9 @@ export const metadata = {
 }
 
 export default function MaterialCostPage() {
-  return <ManufacturingPage pageId="material-cost" />
+  return (
+    <ManufacturingPage pageId="material-cost">
+      <MaterialCostWorkspace />
+    </ManufacturingPage>
+  )
 }

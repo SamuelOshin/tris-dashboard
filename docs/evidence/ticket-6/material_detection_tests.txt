@@ -1,0 +1,30 @@
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 20 items
+
+tests/modules/v1/test_material_detection.py::test_rapid_increase_triggers_clear_and_not_evaluable PASSED [  5%]
+tests/modules/v1/test_material_detection.py::test_abnormal_price_uses_the_materials_own_history PASSED [ 10%]
+tests/modules/v1/test_material_detection.py::test_standard_cost_deviation_needs_every_month_and_a_standard PASSED [ 15%]
+tests/modules/v1/test_material_detection.py::test_standard_cost_follows_the_version_in_force PASSED [ 20%]
+tests/modules/v1/test_material_detection.py::test_ppv_trend_reported_derived_and_insufficient PASSED [ 25%]
+tests/modules/v1/test_material_detection.py::test_procurement_anomaly_flags_only_recent_outliers PASSED [ 30%]
+tests/modules/v1/test_material_detection.py::test_bom_escalation_attributes_the_rise_to_the_right_material PASSED [ 35%]
+tests/modules/v1/test_material_detection.py::test_supplier_concentration PASSED [ 40%]
+tests/modules/v1/test_material_detection.py::test_inventory_exposure_needs_low_cover_and_a_rising_price PASSED [ 45%]
+tests/modules/v1/test_material_detection.py::test_high_spend_ranking PASSED [ 50%]
+tests/modules/v1/test_material_detection.py::test_lead_time_and_delivery_deterioration PASSED [ 55%]
+tests/modules/v1/test_material_detection.py::test_a_stable_supplier_cannot_hide_a_deteriorating_one PASSED [ 60%]
+tests/modules/v1/test_material_detection.py::test_engine_runs_every_detector_and_never_mixes_currencies PASSED [ 65%]
+tests/modules/v1/test_material_detection.py::test_empty_manufacturing_data_gives_a_genuine_empty_state PASSED [ 70%]
+tests/modules/v1/test_material_detection.py::test_overview_figures_are_computed_from_the_rows_and_change_with_them PASSED [ 75%]
+tests/modules/v1/test_material_detection.py::test_data_after_the_as_of_date_never_influences_the_result PASSED [ 80%]
+tests/modules/v1/test_material_detection.py::test_filters_and_detail PASSED [ 85%]
+tests/modules/v1/test_material_detection.py::test_overview_roles PASSED  [ 90%]
+tests/modules/v1/test_material_detection.py::test_manufacturing_ui_contains_no_hardcoded_figures_markers PASSED [ 95%]
+tests/modules/v1/test_material_detection.py::test_as_of_is_a_date_not_the_clock PASSED [100%]
+
+============================= 20 passed in 36.27s =============================

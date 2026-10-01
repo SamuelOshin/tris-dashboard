@@ -111,6 +111,13 @@ ANALYTICS_EXPORT_ROLES: list[Role] = [
 ]
 """Roles permitted to export approved analytical outputs."""
 
+MANUFACTURING_VIEW_ROLES: list[Role] = [
+    Role.ADMIN,
+    Role.REVIEWER,
+    Role.READ_ONLY_REVIEWER,
+]
+"""Roles that may open the Manufacturing section and read its results (mirrors the UI)."""
+
 READ_ONLY_ROLES: list[Role] = [
     Role.READ_ONLY_REVIEWER,
 ]

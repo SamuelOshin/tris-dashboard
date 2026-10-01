@@ -18,6 +18,7 @@ from app.api.core.custom_exceptions.exceptions import (
 from app.api.core.permissions import (
     MANUFACTURING_CONFIG_ROLES,
     MANUFACTURING_INGESTION_ROLES,
+    MANUFACTURING_VIEW_ROLES,
     NON_READ_ONLY_ROLES,
     PRIVILEGED_ROLES,
     ROLE_LABELS,
@@ -134,5 +135,6 @@ PrivilegedUser = Annotated[User, Depends(require_roles(PRIVILEGED_ROLES))]
 WriteUser = Annotated[User, Depends(require_roles(WRITE_ROLES))]
 NonReadOnlyUser = Annotated[User, Depends(require_roles(NON_READ_ONLY_ROLES))]
 ManufacturingIngestionUser = Annotated[User, Depends(require_roles(MANUFACTURING_INGESTION_ROLES))]
+ManufacturingViewUser = Annotated[User, Depends(require_roles(MANUFACTURING_VIEW_ROLES))]
 ManufacturingConfigUser = Annotated[User, Depends(require_roles(MANUFACTURING_CONFIG_ROLES))]
 DbSession = Annotated[AsyncSession, Depends(get_db)]
