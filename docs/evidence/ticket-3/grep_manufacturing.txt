@@ -1,0 +1,4 @@
+frontend/components/manufacturing-nav.tsx:15:  canViewManufacturing,
+frontend/components/manufacturing-nav.tsx:18:/** Sidebar section for the Manufacturing domain, visible per role (Ticket 2 / D7). */
+frontend/components/manufacturing-nav.tsx:19:export function ManufacturingNavGroup() {
+frontend/components/manufacturing-nav.tsx:23:  if (!canViewManufacturing(user?.role)) return null

@@ -40,6 +40,7 @@ import { ThemeToggle } from './theme-toggle'
 import { NotificationsPopover } from './notifications-popover'
 import { HeaderSearch } from './header-search'
 import { UserNav } from '@/components/user-nav'
+import { ManufacturingNavGroup } from '@/components/manufacturing-nav'
 
 export interface BreadcrumbItem {
   label: string
@@ -245,7 +246,7 @@ export function DashboardLayout({
             </SidebarMenu>
           </SidebarGroup>
 
-
+          <ManufacturingNavGroup />
         </SidebarContent>
 
         {/* Sidebar Footer */}

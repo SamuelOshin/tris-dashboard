@@ -12,6 +12,7 @@ const PROTECTED_PREFIXES = [
   '/zero-trust',
   '/ingestion',
   '/developer-tests',
+  '/manufacturing',
 ]
 
 export function middleware(request: NextRequest) {
