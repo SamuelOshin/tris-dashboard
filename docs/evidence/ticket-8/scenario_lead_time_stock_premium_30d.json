@@ -1,0 +1,1092 @@
+{
+ "has_data": true,
+ "kind": "scenario",
+ "label": "Scenario \u2014 a what-if calculation, not a prediction. Nothing here is saved.",
+ "method_version": "1.0",
+ "as_of": "2025-12-12",
+ "horizon_days": 30,
+ "horizon_months": 1,
+ "usage_window_months": 6,
+ "scenario": {
+  "price_change_pct": 0,
+  "demand_change_pct": 0,
+  "lead_time_delay_days": 60.0,
+  "inventory_change_pct": -50.0,
+  "supplier_id": null,
+  "supplier_price_change_pct": 0,
+  "spot_premium_pct": 25.0
+ },
+ "materials": [
+  {
+   "material_id": "SOL-JBOX-IP68",
+   "description": "Junction box IP68",
+   "category": "Electrical",
+   "unit_of_measure": "PCS",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-a9cb1b75e694",
+    "model": "Moving average (3 months) v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:13.702204+00:00"
+   },
+   "baseline_unit_cost": 2.9257,
+   "forecast_unit_cost": 2.9742,
+   "forecast_end_unit_cost": 2.9742,
+   "expected_usage": 19522.0,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 19522.0,
+    "months_used": 6
+   },
+   "baseline_spend": 57115.5154,
+   "forecast_spend": 58061.6882,
+   "projected_exposure": 946.1728,
+   "exposure_pct": 1.6566,
+   "supply_cover": {
+    "evaluable": true,
+    "cover_days": 61.5095,
+    "lead_time_days": 16.7,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-001": 1.0
+    },
+    "product": {
+     "PANEL-60C": 0.6278,
+     "PANEL-72C": 0.3722
+    },
+    "category": {
+     "Electrical": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 2.9742,
+    "scenario_usage": 19522.0,
+    "price_effect": 946.1728,
+    "volume_effect": 0.0,
+    "premium_cost": 21925.9539,
+    "scenario_spend": 79987.6421,
+    "scenario_exposure": 22872.1267,
+    "change_vs_baseline": 21925.9539,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 30.7548,
+     "lead_time_days": 76.7,
+     "uncovered_days": 45.9452,
+     "uncovered_quantity": 29488.531
+    },
+    "notes": []
+   }
+  },
+  {
+   "material_id": "SOL-GLASS-32",
+   "description": "Solar glass 3.2 mm",
+   "category": "Glass",
+   "unit_of_measure": "M2",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-9891fc78d0d5",
+    "model": "Moving average (3 months) v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:13.578636+00:00"
+   },
+   "baseline_unit_cost": 8.3763,
+   "forecast_unit_cost": 8.0864,
+   "forecast_end_unit_cost": 8.0864,
+   "expected_usage": 2762.6667,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 2762.6667,
+    "months_used": 6
+   },
+   "baseline_spend": 23140.9248,
+   "forecast_spend": 22340.1023,
+   "projected_exposure": -800.8225,
+   "exposure_pct": -3.4606,
+   "supply_cover": {
+    "evaluable": true,
+    "cover_days": 42.6964,
+    "lead_time_days": 18.5517,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-003": 0.6896,
+     "SUP-005": 0.3104
+    },
+    "product": {
+     "PANEL-60C": 0.5891,
+     "PANEL-72C": 0.4109
+    },
+    "category": {
+     "Glass": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 8.0864,
+    "scenario_usage": 2762.6667,
+    "price_effect": -800.8225,
+    "volume_effect": 0.0,
+    "premium_cost": 10503.552,
+    "scenario_spend": 32843.6543,
+    "scenario_exposure": 9702.7295,
+    "change_vs_baseline": 10503.552,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 21.3482,
+     "lead_time_days": 78.5517,
+     "uncovered_days": 57.2035,
+     "uncovered_quantity": 5195.6455
+    },
+    "notes": []
+   }
+  },
+  {
+   "material_id": "SOL-ALU-FRAME",
+   "description": "Aluminium frame profile",
+   "category": "Metals",
+   "unit_of_measure": "KG",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-5effeb67b2cc",
+    "model": "Naive (last value) v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:12.895202+00:00"
+   },
+   "baseline_unit_cost": 4.2354,
+   "forecast_unit_cost": 4.2354,
+   "forecast_end_unit_cost": 4.2354,
+   "expected_usage": 1814.6667,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 1814.6667,
+    "months_used": 6
+   },
+   "baseline_spend": 7685.9027,
+   "forecast_spend": 7685.9027,
+   "projected_exposure": 0.0,
+   "exposure_pct": 0.0,
+   "supply_cover": {
+    "evaluable": true,
+    "cover_days": 10.6939,
+    "lead_time_days": 35.4327,
+    "uncovered_days": 24.7389,
+    "uncovered_quantity": 1475.9266
+   },
+   "shares": {
+    "supplier": {
+     "SUP-006": 0.8333,
+     "SUP-002": 0.1667
+    },
+    "product": {
+     "PANEL-60C": 0.5858,
+     "PANEL-72C": 0.4142
+    },
+    "category": {
+     "Metals": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 4.2354,
+    "scenario_usage": 1814.6667,
+    "price_effect": 0.0,
+    "volume_effect": 0.0,
+    "premium_cost": 4128.0841,
+    "scenario_spend": 11813.9868,
+    "scenario_exposure": 4128.0841,
+    "change_vs_baseline": 4128.0841,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 5.3469,
+     "lead_time_days": 95.4327,
+     "uncovered_days": 90.0858,
+     "uncovered_quantity": 5374.543
+    },
+    "notes": []
+   }
+  },
+  {
+   "material_id": "SOL-CELL-M10",
+   "description": "Monocrystalline cell M10",
+   "category": "Cells",
+   "unit_of_measure": "PCS",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-b60e9dd94377",
+    "model": "Lagged price regression v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:13.266779+00:00"
+   },
+   "baseline_unit_cost": 0.2798,
+   "forecast_unit_cost": 0.2823,
+   "forecast_end_unit_cost": 0.2823,
+   "expected_usage": 18996.5,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 18996.5,
+    "months_used": 6
+   },
+   "baseline_spend": 5315.2207,
+   "forecast_spend": 5363.2818,
+   "projected_exposure": 48.0611,
+   "exposure_pct": 0.9042,
+   "supply_cover": {
+    "evaluable": true,
+    "cover_days": 18.3975,
+    "lead_time_days": 17.6,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-004": 1.0
+    },
+    "product": {
+     "PANEL-60C": 0.5843,
+     "PANEL-72C": 0.4157
+    },
+    "category": {
+     "Cells": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 0.2823,
+    "scenario_usage": 18996.5,
+    "price_effect": 48.0611,
+    "volume_effect": 0.0,
+    "premium_cost": 3015.2488,
+    "scenario_spend": 8378.5306,
+    "scenario_exposure": 3063.3099,
+    "change_vs_baseline": 3015.2488,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 9.1987,
+     "lead_time_days": 77.6,
+     "uncovered_days": 68.4013,
+     "uncovered_quantity": 42719.4953
+    },
+    "notes": []
+   }
+  },
+  {
+   "material_id": "SOL-EVA-FILM",
+   "description": "EVA encapsulant film",
+   "category": "Polymers",
+   "unit_of_measure": "M2",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-4e8372d3c460",
+    "model": "Naive (last value) v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:13.444558+00:00"
+   },
+   "baseline_unit_cost": 1.2559,
+   "forecast_unit_cost": 1.2559,
+   "forecast_end_unit_cost": 1.2559,
+   "expected_usage": 3195.5,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 3195.5,
+    "months_used": 6
+   },
+   "baseline_spend": 4013.3371,
+   "forecast_spend": 4013.3371,
+   "projected_exposure": 0.0,
+   "exposure_pct": 0.0,
+   "supply_cover": {
+    "evaluable": true,
+    "cover_days": 48.4877,
+    "lead_time_days": 17.0889,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-007": 0.5556,
+     "SUP-001": 0.4444
+    },
+    "product": {
+     "PANEL-60C": 0.5891,
+     "PANEL-72C": 0.4109
+    },
+    "category": {
+     "Polymers": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 1.2559,
+    "scenario_usage": 3195.5,
+    "price_effect": 0.0,
+    "volume_effect": 0.0,
+    "premium_cost": 1743.1641,
+    "scenario_spend": 5756.5012,
+    "scenario_exposure": 1743.1641,
+    "change_vs_baseline": 1743.1641,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 24.2439,
+     "lead_time_days": 77.0889,
+     "uncovered_days": 52.845,
+     "uncovered_quantity": 5551.7699
+    },
+    "notes": []
+   }
+  },
+  {
+   "material_id": "SOL-BACKSHEET",
+   "description": "Backsheet TPT",
+   "category": "Polymers",
+   "unit_of_measure": "M2",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-b55315a56201",
+    "model": "Lagged price regression v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:13.126956+00:00"
+   },
+   "baseline_unit_cost": 2.4697,
+   "forecast_unit_cost": 2.4415,
+   "forecast_end_unit_cost": 2.4415,
+   "expected_usage": 1300.5,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 1300.5,
+    "months_used": 6
+   },
+   "baseline_spend": 3211.8448,
+   "forecast_spend": 3175.1616,
+   "projected_exposure": -36.6832,
+   "exposure_pct": -1.1421,
+   "supply_cover": {
+    "evaluable": true,
+    "cover_days": 62.9383,
+    "lead_time_days": 19.1,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-002": 1.0
+    },
+    "product": {
+     "PANEL-60C": 1.0
+    },
+    "category": {
+     "Polymers": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 2.4415,
+    "scenario_usage": 1300.5,
+    "price_effect": -36.6832,
+    "volume_effect": 0.0,
+    "premium_cost": 1243.0328,
+    "scenario_spend": 4418.1945,
+    "scenario_exposure": 1206.3496,
+    "change_vs_baseline": 1243.0328,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 31.4691,
+     "lead_time_days": 79.1,
+     "uncovered_days": 47.6309,
+     "uncovered_quantity": 2036.5126
+    },
+    "notes": []
+   }
+  },
+  {
+   "material_id": "000000000000100004",
+   "description": "Junction box IP68",
+   "category": "Electrical",
+   "unit_of_measure": "PCS",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-a6b1a62cd929",
+    "model": "Moving average (3 months) v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:12.373344+00:00"
+   },
+   "baseline_unit_cost": 2.9257,
+   "forecast_unit_cost": 2.9742,
+   "forecast_end_unit_cost": 2.9742,
+   "expected_usage": 19522.0,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 19522.0,
+    "months_used": 6
+   },
+   "baseline_spend": 57115.5154,
+   "forecast_spend": 58061.6882,
+   "projected_exposure": 946.1728,
+   "exposure_pct": 1.6566,
+   "supply_cover": {
+    "evaluable": false,
+    "cover_days": null,
+    "lead_time_days": 16.7,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-001": 1.0
+    },
+    "product": {
+     "Unallocated": 1.0
+    },
+    "category": {
+     "Electrical": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 2.9742,
+    "scenario_usage": 19522.0,
+    "price_effect": 946.1728,
+    "volume_effect": 0.0,
+    "premium_cost": 0.0,
+    "scenario_spend": 58061.6882,
+    "scenario_exposure": 946.1728,
+    "change_vs_baseline": 0.0,
+    "supply_cover": {
+     "evaluable": false,
+     "cover_days": null,
+     "lead_time_days": 76.7,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "notes": [
+     "Supply cover could not be evaluated: no stock snapshot or lead time on file."
+    ]
+   }
+  },
+  {
+   "material_id": "SOL-AG-PASTE",
+   "description": "Silver conductive paste",
+   "category": "Electrical",
+   "unit_of_measure": "KG",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-dd8ee34447cd",
+    "model": "Linear trend regression v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:12.695242+00:00"
+   },
+   "baseline_unit_cost": 496.23,
+   "forecast_unit_cost": 505.8869,
+   "forecast_end_unit_cost": 505.8869,
+   "expected_usage": 90.1667,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 90.1667,
+    "months_used": 6
+   },
+   "baseline_spend": 44743.405,
+   "forecast_spend": 45614.1376,
+   "projected_exposure": 870.7326,
+   "exposure_pct": 1.9461,
+   "supply_cover": {
+    "evaluable": false,
+    "cover_days": null,
+    "lead_time_days": 18.0,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-005": 1.0
+    },
+    "product": {
+     "Unallocated": 1.0
+    },
+    "category": {
+     "Electrical": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 505.8869,
+    "scenario_usage": 90.1667,
+    "price_effect": 870.7326,
+    "volume_effect": 0.0,
+    "premium_cost": 0.0,
+    "scenario_spend": 45614.1376,
+    "scenario_exposure": 870.7326,
+    "change_vs_baseline": 0.0,
+    "supply_cover": {
+     "evaluable": false,
+     "cover_days": null,
+     "lead_time_days": 78.0,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "notes": [
+     "Supply cover could not be evaluated: no stock snapshot or lead time on file."
+    ]
+   }
+  },
+  {
+   "material_id": "000000000000100002",
+   "description": "Monocrystalline cell M10",
+   "category": "Cells",
+   "unit_of_measure": "PCS",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-ad3b328bbcb9",
+    "model": "Lagged price regression v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:12.076227+00:00"
+   },
+   "baseline_unit_cost": 0.2798,
+   "forecast_unit_cost": 0.2823,
+   "forecast_end_unit_cost": 0.2823,
+   "expected_usage": 18996.5,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 18996.5,
+    "months_used": 6
+   },
+   "baseline_spend": 5315.2207,
+   "forecast_spend": 5363.2818,
+   "projected_exposure": 48.0611,
+   "exposure_pct": 0.9042,
+   "supply_cover": {
+    "evaluable": false,
+    "cover_days": null,
+    "lead_time_days": 17.6,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-004": 1.0
+    },
+    "product": {
+     "Unallocated": 1.0
+    },
+    "category": {
+     "Cells": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 0.2823,
+    "scenario_usage": 18996.5,
+    "price_effect": 48.0611,
+    "volume_effect": 0.0,
+    "premium_cost": 0.0,
+    "scenario_spend": 5363.2818,
+    "scenario_exposure": 48.0611,
+    "change_vs_baseline": 0.0,
+    "supply_cover": {
+     "evaluable": false,
+     "cover_days": null,
+     "lead_time_days": 77.6,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "notes": [
+     "Supply cover could not be evaluated: no stock snapshot or lead time on file."
+    ]
+   }
+  },
+  {
+   "material_id": "000000000000100000",
+   "description": "Solar glass 3.2 mm",
+   "category": "Glass",
+   "unit_of_measure": "M2",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-5c48104b2bde",
+    "model": "Naive (last value) v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:11.721045+00:00"
+   },
+   "baseline_unit_cost": 8.343,
+   "forecast_unit_cost": 8.343,
+   "forecast_end_unit_cost": 8.343,
+   "expected_usage": 3810.3333,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 3810.3333,
+    "months_used": 6
+   },
+   "baseline_spend": 31789.611,
+   "forecast_spend": 31789.611,
+   "projected_exposure": 0.0,
+   "exposure_pct": 0.0,
+   "supply_cover": {
+    "evaluable": false,
+    "cover_days": null,
+    "lead_time_days": 18.8,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-003": 1.0
+    },
+    "product": {
+     "Unallocated": 1.0
+    },
+    "category": {
+     "Glass": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 8.343,
+    "scenario_usage": 3810.3333,
+    "price_effect": 0.0,
+    "volume_effect": 0.0,
+    "premium_cost": 0.0,
+    "scenario_spend": 31789.611,
+    "scenario_exposure": 0.0,
+    "change_vs_baseline": 0.0,
+    "supply_cover": {
+     "evaluable": false,
+     "cover_days": null,
+     "lead_time_days": 78.8,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "notes": [
+     "Supply cover could not be evaluated: no stock snapshot or lead time on file."
+    ]
+   }
+  },
+  {
+   "material_id": "000000000000100001",
+   "description": "Aluminium frame profile",
+   "category": "Metals",
+   "unit_of_measure": "KG",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-227ed03907e7",
+    "model": "Naive (last value) v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:11.891454+00:00"
+   },
+   "baseline_unit_cost": 4.2318,
+   "forecast_unit_cost": 4.2318,
+   "forecast_end_unit_cost": 4.2318,
+   "expected_usage": 1512.1667,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 1512.1667,
+    "months_used": 6
+   },
+   "baseline_spend": 6399.1869,
+   "forecast_spend": 6399.1869,
+   "projected_exposure": 0.0,
+   "exposure_pct": 0.0,
+   "supply_cover": {
+    "evaluable": false,
+    "cover_days": null,
+    "lead_time_days": 38.7,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-006": 1.0
+    },
+    "product": {
+     "Unallocated": 1.0
+    },
+    "category": {
+     "Metals": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 4.2318,
+    "scenario_usage": 1512.1667,
+    "price_effect": 0.0,
+    "volume_effect": 0.0,
+    "premium_cost": 0.0,
+    "scenario_spend": 6399.1869,
+    "scenario_exposure": 0.0,
+    "change_vs_baseline": 0.0,
+    "supply_cover": {
+     "evaluable": false,
+     "cover_days": null,
+     "lead_time_days": 98.7,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "notes": [
+     "Supply cover could not be evaluated: no stock snapshot or lead time on file."
+    ]
+   }
+  },
+  {
+   "material_id": "000000000000100003",
+   "description": "EVA encapsulant film",
+   "category": "Polymers",
+   "unit_of_measure": "M2",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-07c5dabb25ab",
+    "model": "Naive (last value) v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:12.228570+00:00"
+   },
+   "baseline_unit_cost": 1.2694,
+   "forecast_unit_cost": 1.2694,
+   "forecast_end_unit_cost": 1.2694,
+   "expected_usage": 1775.3333,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 1775.3333,
+    "months_used": 6
+   },
+   "baseline_spend": 2253.6081,
+   "forecast_spend": 2253.6081,
+   "projected_exposure": 0.0,
+   "exposure_pct": 0.0,
+   "supply_cover": {
+    "evaluable": false,
+    "cover_days": null,
+    "lead_time_days": 17.4,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-007": 1.0
+    },
+    "product": {
+     "Unallocated": 1.0
+    },
+    "category": {
+     "Polymers": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 1.2694,
+    "scenario_usage": 1775.3333,
+    "price_effect": 0.0,
+    "volume_effect": 0.0,
+    "premium_cost": 0.0,
+    "scenario_spend": 2253.6081,
+    "scenario_exposure": 0.0,
+    "change_vs_baseline": 0.0,
+    "supply_cover": {
+     "evaluable": false,
+     "cover_days": null,
+     "lead_time_days": 77.4,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "notes": [
+     "Supply cover could not be evaluated: no stock snapshot or lead time on file."
+    ]
+   }
+  },
+  {
+   "material_id": "000000000000100005",
+   "description": "Backsheet TPT",
+   "category": "Polymers",
+   "unit_of_measure": "M2",
+   "currency": "USD",
+   "forecast": {
+    "run_id": "FRC-d6fe1b456ec4",
+    "model": "Lagged price regression v1.0",
+    "horizon_days": 30,
+    "horizon_months": 1,
+    "as_of": "2025-12-12",
+    "stored_at": "2026-10-02T00:45:12.519742+00:00"
+   },
+   "baseline_unit_cost": 2.4697,
+   "forecast_unit_cost": 2.4415,
+   "forecast_end_unit_cost": 2.4415,
+   "expected_usage": 1300.5,
+   "usage_basis": {
+    "method": "trailing_purchases",
+    "monthly_usage": 1300.5,
+    "months_used": 6
+   },
+   "baseline_spend": 3211.8448,
+   "forecast_spend": 3175.1616,
+   "projected_exposure": -36.6832,
+   "exposure_pct": -1.1421,
+   "supply_cover": {
+    "evaluable": false,
+    "cover_days": null,
+    "lead_time_days": 19.1,
+    "uncovered_days": 0.0,
+    "uncovered_quantity": 0.0
+   },
+   "shares": {
+    "supplier": {
+     "SUP-002": 1.0
+    },
+    "product": {
+     "Unallocated": 1.0
+    },
+    "category": {
+     "Polymers": 1.0
+    }
+   },
+   "scenario": {
+    "scenario_unit_cost": 2.4415,
+    "scenario_usage": 1300.5,
+    "price_effect": -36.6832,
+    "volume_effect": 0.0,
+    "premium_cost": 0.0,
+    "scenario_spend": 3175.1616,
+    "scenario_exposure": -36.6832,
+    "change_vs_baseline": 0.0,
+    "supply_cover": {
+     "evaluable": false,
+     "cover_days": null,
+     "lead_time_days": 79.1,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "notes": [
+     "Supply cover could not be evaluated: no stock snapshot or lead time on file."
+    ]
+   }
+  }
+ ],
+ "not_available": [],
+ "rollups": {
+  "supplier": [
+   {
+    "currency": "USD",
+    "groups": [
+     {
+      "key": "SUP-001",
+      "materials": 3,
+      "baseline_spend": 116014.6664,
+      "forecast_spend": 117907.012,
+      "projected_exposure": 1892.3455,
+      "scenario_spend": 140607.6752,
+      "scenario_exposure": 24593.0088,
+      "change_vs_baseline": 22700.6632,
+      "premium_cost": 22700.6632
+     },
+     {
+      "key": "SUP-003",
+      "materials": 2,
+      "baseline_spend": 47747.8586,
+      "forecast_spend": 47195.6022,
+      "projected_exposure": -552.2564,
+      "scenario_spend": 54438.9723,
+      "scenario_exposure": 6691.1137,
+      "change_vs_baseline": 7243.3701,
+      "premium_cost": 7243.3701
+     },
+     {
+      "key": "SUP-005",
+      "materials": 2,
+      "baseline_spend": 51926.0823,
+      "forecast_spend": 52548.2487,
+      "projected_exposure": 622.1665,
+      "scenario_spend": 55808.4306,
+      "scenario_exposure": 3882.3483,
+      "change_vs_baseline": 3260.1819,
+      "premium_cost": 3260.1819
+     },
+     {
+      "key": "SUP-006",
+      "materials": 2,
+      "baseline_spend": 12803.8705,
+      "forecast_spend": 12803.8705,
+      "projected_exposure": 0.0,
+      "scenario_spend": 16243.8143,
+      "scenario_exposure": 3439.9437,
+      "change_vs_baseline": 3439.9437,
+      "premium_cost": 3439.9437
+     },
+     {
+      "key": "SUP-004",
+      "materials": 2,
+      "baseline_spend": 10630.4414,
+      "forecast_spend": 10726.5637,
+      "projected_exposure": 96.1223,
+      "scenario_spend": 13741.8125,
+      "scenario_exposure": 3111.3711,
+      "change_vs_baseline": 3015.2488,
+      "premium_cost": 3015.2488
+     },
+     {
+      "key": "SUP-002",
+      "materials": 3,
+      "baseline_spend": 7704.9088,
+      "forecast_spend": 7631.5424,
+      "projected_exposure": -73.3664,
+      "scenario_spend": 9562.7156,
+      "scenario_exposure": 1857.8068,
+      "change_vs_baseline": 1931.1732,
+      "premium_cost": 1931.1732
+     },
+     {
+      "key": "SUP-007",
+      "materials": 2,
+      "baseline_spend": 4483.3096,
+      "forecast_spend": 4483.3096,
+      "projected_exposure": 0.0,
+      "scenario_spend": 5451.7645,
+      "scenario_exposure": 968.4548,
+      "change_vs_baseline": 968.4548,
+      "premium_cost": 968.4548
+     }
+    ],
+    "total": {
+     "baseline_spend": 251311.1375,
+     "forecast_spend": 253296.1491,
+     "projected_exposure": 1985.0115,
+     "scenario_spend": 295855.1848,
+     "scenario_exposure": 44544.0473,
+     "change_vs_baseline": 42559.0357,
+     "premium_cost": 42559.0357
+    }
+   }
+  ],
+  "product": [
+   {
+    "currency": "USD",
+    "groups": [
+     {
+      "key": "PANEL-60C",
+      "materials": 6,
+      "baseline_spend": 62671.1907,
+      "forecast_spend": 62784.8224,
+      "projected_exposure": 113.6317,
+      "scenario_spend": 89186.578,
+      "scenario_exposure": 26515.3873,
+      "change_vs_baseline": 26401.7556,
+      "premium_cost": 26401.7556
+     },
+     {
+      "key": "PANEL-72C",
+      "materials": 5,
+      "baseline_spend": 37811.5549,
+      "forecast_spend": 37854.6514,
+      "projected_exposure": 43.0965,
+      "scenario_spend": 54011.9316,
+      "scenario_exposure": 16200.3767,
+      "change_vs_baseline": 16157.2802,
+      "premium_cost": 16157.2802
+     },
+     {
+      "key": "Unallocated",
+      "materials": 7,
+      "baseline_spend": 150828.392,
+      "forecast_spend": 152656.6753,
+      "projected_exposure": 1828.2833,
+      "scenario_spend": 152656.6753,
+      "scenario_exposure": 1828.2833,
+      "change_vs_baseline": 0.0,
+      "premium_cost": 0.0
+     }
+    ],
+    "total": {
+     "baseline_spend": 251311.1375,
+     "forecast_spend": 253296.1491,
+     "projected_exposure": 1985.0115,
+     "scenario_spend": 295855.1848,
+     "scenario_exposure": 44544.0473,
+     "change_vs_baseline": 42559.0357,
+     "premium_cost": 42559.0357
+    }
+   }
+  ],
+  "category": [
+   {
+    "currency": "USD",
+    "groups": [
+     {
+      "key": "Electrical",
+      "materials": 3,
+      "baseline_spend": 158974.4358,
+      "forecast_spend": 161737.5139,
+      "projected_exposure": 2763.0781,
+      "scenario_spend": 183663.4678,
+      "scenario_exposure": 24689.032,
+      "change_vs_baseline": 21925.9539,
+      "premium_cost": 21925.9539
+     },
+     {
+      "key": "Glass",
+      "materials": 2,
+      "baseline_spend": 54930.5358,
+      "forecast_spend": 54129.7133,
+      "projected_exposure": -800.8225,
+      "scenario_spend": 64633.2653,
+      "scenario_exposure": 9702.7295,
+      "change_vs_baseline": 10503.552,
+      "premium_cost": 10503.552
+     },
+     {
+      "key": "Metals",
+      "materials": 2,
+      "baseline_spend": 14085.0896,
+      "forecast_spend": 14085.0896,
+      "projected_exposure": 0.0,
+      "scenario_spend": 18213.1737,
+      "scenario_exposure": 4128.0841,
+      "change_vs_baseline": 4128.0841,
+      "premium_cost": 4128.0841
+     },
+     {
+      "key": "Cells",
+      "materials": 2,
+      "baseline_spend": 10630.4414,
+      "forecast_spend": 10726.5637,
+      "projected_exposure": 96.1223,
+      "scenario_spend": 13741.8125,
+      "scenario_exposure": 3111.3711,
+      "change_vs_baseline": 3015.2488,
+      "premium_cost": 3015.2488
+     },
+     {
+      "key": "Polymers",
+      "materials": 4,
+      "baseline_spend": 12690.6349,
+      "forecast_spend": 12617.2685,
+      "projected_exposure": -73.3664,
+      "scenario_spend": 15603.4655,
+      "scenario_exposure": 2912.8305,
+      "change_vs_baseline": 2986.1969,
+      "premium_cost": 2986.1969
+     }
+    ],
+    "total": {
+     "baseline_spend": 251311.1375,
+     "forecast_spend": 253296.1491,
+     "projected_exposure": 1985.0115,
+     "scenario_spend": 295855.1848,
+     "scenario_exposure": 44544.0473,
+     "change_vs_baseline": 42559.0357,
+     "premium_cost": 42559.0357
+    }
+   }
+  ]
+ },
+ "computed_at": "2026-10-02T00:47:13.257153+00:00"
+}

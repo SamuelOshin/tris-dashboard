@@ -1,0 +1,25 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 15 items
+
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_price_and_demand_scenario_matches_a_hand_calculation PASSED [  6%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_a_scenario_with_no_changes_reproduces_the_baseline PASSED [ 13%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_supplier_scenario_applies_only_to_that_suppliers_share PASSED [ 20%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_horizon_90_scenario_uses_the_stored_path_average PASSED [ 26%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_lead_time_delay_and_inventory_change_drive_supply_cover_and_the_premium PASSED [ 33%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_premium_applies_only_to_the_shortfall_the_scenario_adds PASSED [ 40%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_missing_stock_or_lead_time_is_reported_not_assumed PASSED [ 46%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_scenario_output_is_labelled_a_scenario_and_never_a_prediction PASSED [ 53%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_scenario_rollups_add_back_to_the_material_scenario_totals PASSED [ 60%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_invalid_scenarios_are_rejected_with_nothing_applied PASSED [ 66%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_read_only_reviewers_can_explore_scenarios_but_other_roles_cannot PASSED [ 73%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_scenario_does_not_mutate_baseline_forecast PASSED [ 80%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_a_scenario_request_issues_no_writes_to_the_database PASSED [ 86%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_the_scenario_code_has_no_way_to_write PASSED [ 93%]
+tests/modules/v1/test_scenario_does_not_mutate_baseline.py::test_the_rush_buy_premium_is_capped_at_the_usage_of_the_horizon PASSED [100%]
+
+======================== 15 passed in 60.38s (0:01:00) ========================

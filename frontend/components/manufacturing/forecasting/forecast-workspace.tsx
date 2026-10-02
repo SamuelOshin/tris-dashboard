@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAuth } from '@/lib/auth-context'
-import { ComingSoonBadge } from '../coming-soon-badge'
 import { formatDate, formatMonth, formatTimestamp } from '../material-cost/material-cost-guards'
 import { ForecastChart } from './forecast-chart'
 import { canRunForecast } from './forecast-guards'
@@ -118,9 +117,6 @@ export function ForecastWorkspace() {
           )}
         </>
       )}
-      <p className="flex items-center gap-2 text-xs text-muted-foreground">
-        What-if scenarios and financial exposure <ComingSoonBadge />
-      </p>
     </div>
   )
 }

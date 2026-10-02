@@ -35,7 +35,9 @@ from app.api.modules.v1.manufacturing.service.price_series import (
 DATA_FREQUENCY = "monthly"
 
 
-def _history(data: MaterialData, cutoff: date) -> tuple[str | None, list[MonthPoint], date | None]:
+def monthly_history(
+    data: MaterialData, cutoff: date
+) -> tuple[str | None, list[MonthPoint], date | None]:
     """
     Monthly price history up to the cutoff, in the material's main currency.
 
@@ -218,7 +220,7 @@ async def run_forecasts(
         DataLeakageError: If the history contains data after the cutoff (a defect guard).
     """
     cutoff, data = await _load(session, material_id, as_of, dataset_id)
-    currency, points, excluded = _history(data, cutoff)
+    currency, points, excluded = monthly_history(data, cutoff)
     _require_purchases(data, cutoff, points)
     horizons, stored = [], []
     for days in cfg.horizons_days:
@@ -294,7 +296,7 @@ async def get_forecasts(
 ) -> dict[str, Any]:
     """Latest stored run per horizon for a material, with the history and any withheld reason."""
     cutoff, data = await _load(session, material_id, as_of, dataset_id)
-    currency, points, excluded = _history(data, cutoff)
+    currency, points, excluded = monthly_history(data, cutoff)
     _require_purchases(data, cutoff, points)
     horizons = []
     for days in cfg.horizons_days:
@@ -351,7 +353,7 @@ async def list_forecastable_materials(
     materials, _ = await loader.load_material_data(session, cutoff, dataset_id)
     rows = []
     for m in materials:
-        currency, points, _ = _history(m, cutoff)
+        currency, points, _ = monthly_history(m, cutoff)
         if not points:
             continue
         usable = len(trailing_consecutive_run(points))

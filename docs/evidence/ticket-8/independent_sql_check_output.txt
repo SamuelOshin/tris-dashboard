@@ -1,0 +1,5 @@
+      run_id      | usage_30d | baseline_from_purchases | baseline_stored_in_run | forecast_unit | baseline_spend | forecast_spend | projected_exposure 
+------------------+-----------+-------------------------+------------------------+---------------+----------------+----------------+--------------------
+ FRC-dd8ee34447cd |   90.1667 |                496.2300 |               496.2300 |      505.8869 |       44743.41 |       45614.14 |             870.73
+(1 row)
+

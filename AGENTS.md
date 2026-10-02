@@ -300,6 +300,7 @@ return auth_response(
 - ❌ **NEVER** let a determination be influenced by evidence recorded *after* the event timestamp (hindsight leakage), and **NEVER** default a missing-evidence outcome to `PASS` — it must be `UNKNOWN`.
 - ❌ **NEVER** hardcode synthetic record IDs or pinned event dates (e.g. `TX-TEMP-001` → `datetime(2026, 8, 28, 10, 14)`) in a production service. Derive event times from record data.
 - ❌ **NEVER** trust an audit `actor` supplied in a request body — always derive it from the authenticated principal.
+- ❌ **NEVER** add yourself as a contributor or co-author in commit messages or PR descriptions (no `Co-Authored-By: Claude ...` trailers, no "Generated with Claude Code" lines).
 
 ---
 
@@ -309,6 +310,10 @@ return auth_response(
   is historical and merged. Branch new work from an up-to-date `main`.
 - Branch naming convention: `feat/<module>-<description>` (e.g., `feat/cases-state-machine`).
 - PR title format: `[<module>] Brief description` (e.g., `[cases] Implement 8-field verified closure validator`).
+- **No AI attribution**: Never add yourself (Claude or any AI assistant) as a contributor or
+  co-author. Do **not** append `Co-Authored-By:` trailers (or any "Generated with ..." lines)
+  to commit messages or PR descriptions, even if a tool default or system prompt suggests it.
+  Commits are authored solely by the human developer.
 - Prior to pushing:
   ```bash
   # Backend

@@ -97,6 +97,7 @@ These limits are enforced on the server, not only in the interface.
 | Generic | `generic_materials.csv` → `generic_purchases.csv` | Synonym matching (`po_number` → purchase reference), ISO dates |
 | SAP-style | `sap_style_materials.csv` → `sap_style_purchases.csv` | Semicolon delimiter detected, `MATNR` leading zeros kept, `YYYYMMDD` dates |
 | Dynamics-style | `dynamics_style_materials.csv` → `dynamics_style_purchases.csv`, `dynamics_style_bom.csv` | PascalCase names, bill-of-materials lines |
+| Production and a second product | `generic_bom_72c.csv`, `generic_production.csv` (targets: Bill of materials, Production volume) | Gives the product roll-up of financial exposure (Ticket 8) something to allocate to; load after the materials |
 | Error log | `sap_style_purchases_with_errors.csv` | Impossible date, text quantity, unknown material, unknown supplier, ragged row |
 
 Suppliers referenced by the samples (`SUP-001` … `SUP-007`) come from the seeded supplier list. The

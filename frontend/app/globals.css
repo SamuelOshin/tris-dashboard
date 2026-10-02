@@ -173,6 +173,9 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* Thin, theme-coloured scrollbars instead of the bright native ones */
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--muted-foreground) 40%, transparent) transparent;
   }
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;

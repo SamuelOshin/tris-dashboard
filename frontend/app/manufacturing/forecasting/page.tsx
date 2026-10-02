@@ -1,5 +1,5 @@
 import { ManufacturingPage } from '@/components/manufacturing/manufacturing-page'
-import { ForecastWorkspace } from '@/components/manufacturing/forecasting/forecast-workspace'
+import { ForecastingView } from '@/components/manufacturing/forecasting/forecasting-view'
 
 export const metadata = {
   title: 'Forecasting & Scenarios - TRIS',
@@ -9,7 +9,7 @@ export const metadata = {
 export default function ForecastingPage() {
   return (
     <ManufacturingPage pageId="forecasting">
-      <ForecastWorkspace />
+      <ForecastingView />
     </ManufacturingPage>
   )
 }

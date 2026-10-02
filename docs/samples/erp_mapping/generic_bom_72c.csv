@@ -1,0 +1,6 @@
+product_sku,product_description,material_id,bom_quantity,unit_of_measure
+PANEL-72C,72-cell solar panel,SOL-GLASS-32,2.0,M2
+PANEL-72C,72-cell solar panel,SOL-ALU-FRAME,3.1,KG
+PANEL-72C,72-cell solar panel,SOL-CELL-M10,72,PCS
+PANEL-72C,72-cell solar panel,SOL-EVA-FILM,4.0,M2
+PANEL-72C,72-cell solar panel,SOL-JBOX-IP68,1,PCS
