@@ -1,0 +1,25 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 15 items
+
+tests/test_acceptance_t01_t10.py::test_t01_ingestion_schema_and_fk_validation PASSED [  6%]
+tests/test_acceptance_t01_t10.py::test_t02_baseline_calculation_strict_exclusion PASSED [ 13%]
+tests/test_acceptance_t01_t10.py::test_t03_rule_r001_amount_deviation_trigger PASSED [ 20%]
+tests/test_acceptance_t01_t10.py::test_t04_rule_r002_recent_bank_change_trigger PASSED [ 26%]
+tests/test_acceptance_t01_t10.py::test_t05_rule_r003_missing_required_approval_trigger PASSED [ 33%]
+tests/test_acceptance_t01_t10.py::test_t06_rule_r004_off_hours_access_trigger PASSED [ 40%]
+tests/test_acceptance_t01_t10.py::test_t07_multi_signal_case_consolidation_and_score PASSED [ 46%]
+tests/test_acceptance_t01_t10.py::test_t08_case_state_machine_boundary_enforcement PASSED [ 53%]
+tests/test_acceptance_t01_t10.py::test_t09_verified_closure_gatekeeper_validation PASSED [ 60%]
+tests/test_acceptance_t01_t10.py::test_t10_immutable_audit_trail_integrity PASSED [ 66%]
+tests/test_acceptance_t01_t10.py::test_workbook_t04_plain_language_explainability_no_unsupported_probability PASSED [ 73%]
+tests/test_acceptance_t01_t10.py::test_workbook_t05_ownership_assignment_department_and_history PASSED [ 80%]
+tests/test_acceptance_t01_t10.py::test_workbook_t07_recurrence_detection_and_prior_case_surfacing PASSED [ 86%]
+tests/test_acceptance_t01_t10.py::test_workbook_t08_duplicate_invoice_r005_detection PASSED [ 93%]
+tests/test_acceptance_t01_t10.py::test_workbook_t09_normal_case_control_sup002_clean PASSED [100%]
+
+======================= 15 passed in 133.91s (0:02:13) ========================

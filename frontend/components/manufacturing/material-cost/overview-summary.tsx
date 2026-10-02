@@ -54,7 +54,7 @@ export function OverviewSummary({ overview }: { overview: Overview }) {
         />
       </div>
       <p className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        Forecast cost, financial exposure and risk score will appear here once available:
+        Forecast cost and financial exposure columns will appear here once available:
         {overview.pending_capabilities.map((name) => (
           <span key={name} className="inline-flex items-center gap-1">
             {name} <ComingSoonBadge />

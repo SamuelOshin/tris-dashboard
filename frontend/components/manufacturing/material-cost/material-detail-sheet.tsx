@@ -11,12 +11,15 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate, formatMoney, formatTimestamp, STATUS_LABEL } from './material-cost-guards'
 import { PriceTrend } from './price-trend'
+import { RiskScoreSection } from '../risk-score/risk-score-section'
 import type { MaterialDetail, SignalDetail } from './types'
 
 interface Props {
   open: boolean
   loading: boolean
   detail: MaterialDetail | null
+  dataset: string
+  onRiskChanged: () => void
   onClose: () => void
 }
 
@@ -52,11 +55,25 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function Body({ detail }: { detail: MaterialDetail }) {
+function Body({
+  detail,
+  dataset,
+  onRiskChanged,
+}: {
+  detail: MaterialDetail
+  dataset: string
+  onRiskChanged: () => void
+}) {
   const products = detail.signals.find((s) => s.code === 'bom_cost_escalation')?.details
     .products as { product_sku: string; unit_cost_now: number; change_pct: number | null }[] | undefined
   return (
     <div className="space-y-6 px-4 pb-6">
+      <RiskScoreSection
+        materialId={detail.material_id}
+        asOf={detail.as_of}
+        dataset={dataset}
+        onChanged={onRiskChanged}
+      />
       <Section title="Signals">
         <SignalList signals={detail.signals} />
       </Section>
@@ -107,7 +124,7 @@ function Body({ detail }: { detail: MaterialDetail }) {
   )
 }
 
-export function MaterialDetailSheet({ open, loading, detail, onClose }: Props) {
+export function MaterialDetailSheet({ open, loading, detail, dataset, onRiskChanged, onClose }: Props) {
   return (
     <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
@@ -123,7 +140,7 @@ export function MaterialDetailSheet({ open, loading, detail, onClose }: Props) {
             <Skeleton className="h-40 w-full" />
           </div>
         )}
-        {detail && <Body detail={detail} />}
+        {detail && <Body detail={detail} dataset={dataset} onRiskChanged={onRiskChanged} />}
       </SheetContent>
     </Sheet>
   )

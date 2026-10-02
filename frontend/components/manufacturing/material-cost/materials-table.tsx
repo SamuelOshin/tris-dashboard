@@ -4,11 +4,14 @@ import {
   formatMonth,
   formatPercent,
 } from './material-cost-guards'
+import { RiskBadge } from '../risk-score/risk-badge'
+import type { ScoreSummary } from '../risk-score/types'
 import { SignalChips } from './signal-chips'
 import type { MaterialRow } from './types'
 
 interface Props {
   rows: MaterialRow[]
+  scores: Record<string, ScoreSummary>
   onOpen: (materialId: string) => void
 }
 
@@ -17,10 +20,10 @@ function Cell({ children, className = '' }: { children: React.ReactNode; classNa
 }
 
 /** One row per material. Every number comes from the stored purchase, cost and stock records. */
-export function MaterialsTable({ rows, onOpen }: Props) {
+export function MaterialsTable({ rows, scores, onOpen }: Props) {
   return (
     <div className="overflow-x-auto rounded-xl border border-border bg-card">
-      <table className="w-full min-w-[960px] text-left text-sm">
+      <table className="w-full min-w-[1040px] text-left text-sm">
         <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
           <tr>
             <th className="px-3 py-2 font-medium">Material</th>
@@ -31,6 +34,7 @@ export function MaterialsTable({ rows, onOpen }: Props) {
             <th className="px-3 py-2 font-medium">12-month spend</th>
             <th className="px-3 py-2 font-medium">Main supplier</th>
             <th className="px-3 py-2 font-medium">Stock cover</th>
+            <th className="px-3 py-2 font-medium">Risk score</th>
             <th className="px-3 py-2 font-medium">Signals</th>
           </tr>
         </thead>
@@ -100,6 +104,9 @@ export function MaterialsTable({ rows, onOpen }: Props) {
                 ) : (
                   `${Math.round(row.coverage_days)} days`
                 )}
+              </Cell>
+              <Cell>
+                <RiskBadge score={scores[row.material_id]} />
               </Cell>
               <Cell>
                 <SignalChips signals={row.signals} />

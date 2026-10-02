@@ -1,0 +1,45 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 35 items
+
+tests/modules/v1/test_material_risk_scoring.py::test_default_weights_add_up_to_100_and_the_defaults_are_valid PASSED [  2%]
+tests/modules/v1/test_material_risk_scoring.py::test_score_is_the_weighted_sum_of_sub_scores_on_a_0_to_100_scale PASSED [  5%]
+tests/modules/v1/test_material_risk_scoring.py::test_each_factor_scale_runs_from_0_to_1_including_the_reversed_ones PASSED [  8%]
+tests/modules/v1/test_material_risk_scoring.py::test_risk_levels_follow_the_configured_bands PASSED [ 11%]
+tests/modules/v1/test_material_risk_scoring.py::test_a_missing_factor_is_left_out_and_never_lowers_or_raises_the_score PASSED [ 14%]
+tests/modules/v1/test_material_risk_scoring.py::test_too_little_data_gives_no_score_never_a_default PASSED [ 17%]
+tests/modules/v1/test_material_risk_scoring.py::test_every_evaluated_factor_has_a_plain_language_explanation_with_its_numbers PASSED [ 20%]
+tests/modules/v1/test_material_risk_scoring.py::test_weight_sets_are_validated_before_they_are_stored PASSED [ 22%]
+tests/modules/v1/test_material_risk_scoring.py::test_volatility_is_the_spread_of_month_to_month_changes PASSED [ 25%]
+tests/modules/v1/test_material_risk_scoring.py::test_demand_trend_compares_the_latest_three_months_with_the_three_before PASSED [ 28%]
+tests/modules/v1/test_material_risk_scoring.py::test_bom_exposure_is_the_largest_share_in_any_product_that_can_be_costed PASSED [ 31%]
+tests/modules/v1/test_material_risk_scoring.py::test_metric_based_factors_report_missing_data_instead_of_guessing PASSED [ 34%]
+tests/modules/v1/test_material_risk_scoring.py::test_a_run_scores_the_material_and_stores_every_factor PASSED [ 37%]
+tests/modules/v1/test_material_risk_scoring.py::test_material_detail_returns_the_factor_by_factor_explanation PASSED [ 40%]
+tests/modules/v1/test_material_risk_scoring.py::test_not_enough_data_is_reported_and_nothing_is_stored PASSED [ 42%]
+tests/modules/v1/test_material_risk_scoring.py::test_data_after_the_as_of_date_cannot_change_a_score PASSED [ 45%]
+tests/modules/v1/test_material_risk_scoring.py::test_new_weights_make_a_new_version_and_old_scores_keep_their_own PASSED [ 48%]
+tests/modules/v1/test_material_risk_scoring.py::test_a_stored_score_can_be_reproduced_from_its_own_record PASSED [ 51%]
+tests/modules/v1/test_material_risk_scoring.py::test_invalid_weights_are_rejected_and_only_admins_can_change_them PASSED [ 54%]
+tests/modules/v1/test_material_risk_scoring.py::test_roles_for_running_reading_and_configuring PASSED [ 57%]
+tests/modules/v1/test_material_risk_scoring.py::test_unknown_material_and_empty_data PASSED [ 60%]
+tests/modules/v1/test_material_risk_scoring.py::test_stored_scores_and_weight_sets_are_immutable_in_the_database PASSED [ 62%]
+tests/modules/v1/test_material_risk_scoring.py::test_the_scoring_code_imports_nothing_from_the_rule_engine PASSED [ 65%]
+tests/modules/v1/test_material_risk_scoring.py::test_the_rule_engine_code_imports_nothing_from_the_scoring_service PASSED [ 68%]
+tests/modules/v1/test_material_risk_scoring.py::test_the_scoring_tables_share_no_foreign_key_or_table_with_the_rule_engine PASSED [ 71%]
+tests/modules/v1/test_material_risk_scoring.py::test_scoring_and_weight_changes_never_touch_rule_configuration PASSED [ 74%]
+tests/modules/v1/test_material_risk_scoring.py::test_changing_rule_configuration_never_changes_a_material_score PASSED [ 77%]
+tests/modules/v1/test_material_risk_scoring.py::test_non_numbers_and_non_finite_numbers_are_rejected_as_settings PASSED [ 80%]
+tests/modules/v1/test_material_risk_scoring.py::test_the_weights_endpoint_refuses_nan_and_booleans PASSED [ 82%]
+tests/modules/v1/test_material_risk_scoring.py::test_the_level_comes_from_the_stored_rounded_score PASSED [ 85%]
+tests/modules/v1/test_material_risk_scoring.py::test_volatility_only_compares_consecutive_calendar_months PASSED [ 88%]
+tests/modules/v1/test_material_risk_scoring.py::test_demand_trend_uses_calendar_months_and_counts_empty_months_as_zero PASSED [ 91%]
+tests/modules/v1/test_material_risk_scoring.py::test_weight_versions_never_collide_under_concurrent_requests PASSED [ 94%]
+tests/modules/v1/test_material_risk_scoring.py::test_the_first_ever_reads_create_version_one_exactly_once PASSED [ 97%]
+tests/modules/v1/test_material_risk_scoring.py::test_a_material_without_purchases_is_reported_not_silently_dropped PASSED [100%]
+
+======================= 35 passed in 259.91s (0:04:19) ========================

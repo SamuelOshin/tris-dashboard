@@ -40,7 +40,7 @@ SIGNAL_NAMES: dict[str, str] = {
     "high_spend": "Among the highest-spend materials",
     "lead_time_deterioration": "Supplier lead time or delivery getting worse",
 }
-PENDING_CAPABILITIES = ["Cost forecast", "Financial exposure", "Risk score"]
+PENDING_CAPABILITIES = ["Cost forecast", "Financial exposure"]
 
 
 def _signal_dto(signal: Signal, with_details: bool) -> dict[str, Any]:

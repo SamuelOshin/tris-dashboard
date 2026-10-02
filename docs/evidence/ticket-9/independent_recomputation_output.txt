@@ -1,0 +1,13 @@
+     score_id     | weight_version |  level   | stored_score | recomputed_score | evaluated_weight 
+------------------+----------------+----------+--------------+------------------+------------------
+ MRS-69168d58a7fa |              1 | Moderate |      41.8720 |          41.8720 |              100
+(1 row)
+
+              factor               | value 
+-----------------------------------+-------
+ price change 3m %                 |  4.72
+ top supplier share of 12m spend % | 100.0
+(2 rows)
+
+Price change|4.72
+Supplier concentration|100.0

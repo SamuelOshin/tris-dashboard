@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { Factory } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useAuth } from '@/lib/auth-context'
+import { useRiskScores } from '../risk-score/hooks/use-risk-scores'
+import { canRunScoring } from '../risk-score/risk-guards'
 import { FilterBar } from './filter-bar'
 import { useMaterialCostOverview } from './hooks/use-material-cost-overview'
 import { hasActiveFilters } from './material-cost-guards'
@@ -33,6 +36,8 @@ function NoDataState() {
 export function MaterialCostWorkspace() {
   const ws = useMaterialCostOverview()
   const { overview } = ws
+  const { user } = useAuth()
+  const risk = useRiskScores(overview?.as_of ?? '', ws.filters.dataset)
 
   if (ws.error && !overview) {
     return (
@@ -75,14 +80,26 @@ export function MaterialCostWorkspace() {
           No materials match these filters.
         </div>
       ) : (
-        <div className={ws.loading ? 'opacity-60 transition-opacity' : ''}>
-          <MaterialsTable rows={overview.materials} onOpen={ws.openMaterial} />
+        <div className={ws.loading ? 'space-y-3 opacity-60 transition-opacity' : 'space-y-3'}>
+          {canRunScoring(user?.role) && (
+            <div className="flex items-center justify-end gap-3">
+              <p className="text-xs text-muted-foreground">
+                Risk scores are saved calculations; each run keeps the earlier ones.
+              </p>
+              <Button size="sm" variant="outline" onClick={risk.calculate} disabled={risk.running}>
+                {risk.running ? 'Calculating...' : 'Calculate risk scores'}
+              </Button>
+            </div>
+          )}
+          <MaterialsTable rows={overview.materials} scores={risk.scores} onOpen={ws.openMaterial} />
         </div>
       )}
       <MaterialDetailSheet
         open={ws.selectedId !== null}
         loading={ws.detailLoading}
         detail={ws.detail}
+        dataset={ws.filters.dataset}
+        onRiskChanged={risk.refresh}
         onClose={() => ws.openMaterial(null)}
       />
     </div>

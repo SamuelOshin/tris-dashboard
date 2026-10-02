@@ -29,7 +29,12 @@ from tests.conftest import TEST_DATABASE_URL, _admin_conninfo
 
 BACKEND_DIR = Path(__file__).resolve().parents[3]
 PREVIOUS_REVISION = "cbbdff801f48"
-LATER_TABLES = {"mapping_profiles", "forecast_runs"}  # added by Tickets 5 and 7
+LATER_TABLES = {
+    "mapping_profiles",
+    "forecast_runs",
+    "material_risk_scores",
+    "material_risk_weight_sets",
+}  # added by Tickets 5 and 7
 NEW_TABLES = {
     "materials",
     "material_suppliers",

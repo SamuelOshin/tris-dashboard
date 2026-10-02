@@ -42,6 +42,26 @@ CREATE TRIGGER trg_forecast_runs_immutable
 """
 
 
+MATERIAL_RISK_IMMUTABILITY_SQL = """
+CREATE OR REPLACE FUNCTION prevent_material_risk_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION '% rows are immutable: UPDATE and DELETE are prohibited', TG_TABLE_NAME;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_material_risk_scores_immutable ON material_risk_scores;
+CREATE TRIGGER trg_material_risk_scores_immutable
+    BEFORE UPDATE OR DELETE ON material_risk_scores
+    FOR EACH ROW EXECUTE FUNCTION prevent_material_risk_mutation();
+
+DROP TRIGGER IF EXISTS trg_material_risk_weight_sets_immutable ON material_risk_weight_sets;
+CREATE TRIGGER trg_material_risk_weight_sets_immutable
+    BEFORE UPDATE OR DELETE ON material_risk_weight_sets
+    FOR EACH ROW EXECUTE FUNCTION prevent_material_risk_mutation();
+"""
+
+
 async def apply_database_triggers(session: AsyncSession) -> None:
     """
     Applies database-level triggers if running on PostgreSQL.
@@ -56,6 +76,9 @@ async def apply_database_triggers(session: AsyncSession) -> None:
             await session.execute(text(FORECAST_RUN_IMMUTABILITY_SQL))
             await session.commit()
             logger.info("Successfully applied forecast_runs immutability trigger")
+            await session.execute(text(MATERIAL_RISK_IMMUTABILITY_SQL))
+            await session.commit()
+            logger.info("Successfully applied material risk immutability triggers")
         except Exception as e:
             logger.warning(f"Could not apply PostgreSQL trigger: {e}")
             await session.rollback()

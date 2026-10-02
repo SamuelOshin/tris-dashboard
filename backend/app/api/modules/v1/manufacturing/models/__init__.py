@@ -17,6 +17,10 @@ from app.api.modules.v1.manufacturing.models.operations import (
     ProductionRecord,
     SupplierOperationsMetric,
 )
+from app.api.modules.v1.manufacturing.models.risk_score import (
+    MaterialRiskScore,
+    MaterialRiskWeightSet,
+)
 
 __all__ = [
     "BOMEntry",
@@ -27,6 +31,8 @@ __all__ = [
     "MappingProfile",
     "Material",
     "MaterialCost",
+    "MaterialRiskScore",
+    "MaterialRiskWeightSet",
     "MaterialSupplier",
     "ProductionRecord",
     "PurchaseRecord",
