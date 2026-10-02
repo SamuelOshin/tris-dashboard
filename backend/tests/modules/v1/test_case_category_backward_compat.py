@@ -29,7 +29,7 @@ from tests.conftest import TEST_DATABASE_URL, _admin_conninfo
 
 BACKEND_DIR = Path(__file__).resolve().parents[3]
 PREVIOUS_REVISION = "cbbdff801f48"
-MANUFACTURING_REVISION = "a4c7d1e9b302"
+LATER_TABLES = {"mapping_profiles", "forecast_runs"}  # added by Tickets 5 and 7
 NEW_TABLES = {
     "materials",
     "material_suppliers",
@@ -107,13 +107,16 @@ def test_migration_backfills_existing_cases_and_round_trips():
         # Build the full current schema, then step back to the pre-Ticket-4 revision so the
         # database genuinely looks like v1.4 with a legacy case row in it.
         SQLModel.metadata.create_all(engine)
-        _alembic(scratch_url, "stamp", MANUFACTURING_REVISION)
+        # Stamp at the current head so the downgrade walks the real chain (later migrations
+        # that reference these tables, such as forecast_runs, are removed first).
+        _alembic(scratch_url, "stamp", "head")
         _alembic(scratch_url, "downgrade", PREVIOUS_REVISION)
 
         with engine.begin() as conn:
             tables = {r[0] for r in conn.execute(text(LIST_TABLES_SQL))}
             columns = {r[0] for r in conn.execute(text(LIST_CASE_COLUMNS_SQL))}
             assert not (NEW_TABLES & tables), "downgrade must drop the manufacturing tables"
+            assert not (LATER_TABLES & tables), "downgrade must also drop later migrations' tables"
             assert not (NEW_CASE_COLUMNS & columns), "downgrade must drop the new case columns"
 
             conn.execute(

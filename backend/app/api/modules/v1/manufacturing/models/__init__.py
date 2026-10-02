@@ -4,6 +4,7 @@ from app.api.modules.v1.manufacturing.models.activity import (
     VarianceInput,
 )
 from app.api.modules.v1.manufacturing.models.finance import FinancialPlanRecord
+from app.api.modules.v1.manufacturing.models.forecast_run import ForecastRun
 from app.api.modules.v1.manufacturing.models.mapping_profile import MappingProfile
 from app.api.modules.v1.manufacturing.models.material import (
     Material,
@@ -21,6 +22,7 @@ __all__ = [
     "BOMEntry",
     "DemandForecast",
     "FinancialPlanRecord",
+    "ForecastRun",
     "InventoryRecord",
     "MappingProfile",
     "Material",

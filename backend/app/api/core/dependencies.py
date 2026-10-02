@@ -16,6 +16,7 @@ from app.api.core.custom_exceptions.exceptions import (
     PermissionDeniedError,
 )
 from app.api.core.permissions import (
+    ANALYTICS_EXECUTION_ROLES,
     MANUFACTURING_CONFIG_ROLES,
     MANUFACTURING_INGESTION_ROLES,
     MANUFACTURING_VIEW_ROLES,
@@ -136,5 +137,6 @@ WriteUser = Annotated[User, Depends(require_roles(WRITE_ROLES))]
 NonReadOnlyUser = Annotated[User, Depends(require_roles(NON_READ_ONLY_ROLES))]
 ManufacturingIngestionUser = Annotated[User, Depends(require_roles(MANUFACTURING_INGESTION_ROLES))]
 ManufacturingViewUser = Annotated[User, Depends(require_roles(MANUFACTURING_VIEW_ROLES))]
+AnalyticsExecutionUser = Annotated[User, Depends(require_roles(ANALYTICS_EXECUTION_ROLES))]
 ManufacturingConfigUser = Annotated[User, Depends(require_roles(MANUFACTURING_CONFIG_ROLES))]
 DbSession = Annotated[AsyncSession, Depends(get_db)]

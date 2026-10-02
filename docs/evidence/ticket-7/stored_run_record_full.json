@@ -1,0 +1,149 @@
+{
+  "run_id": "FRC-548f7d1e7c64",
+  "created_at": "2026-10-01T23:59:40.858130+00:00",
+  "created_by": "usr-admin-03",
+  "as_of": "2025-12-12",
+  "dataset_id": null,
+  "currency": "USD",
+  "horizon_days": 90,
+  "horizon_months": 3,
+  "model": {
+    "code": "lagged_regression",
+    "name": "Lagged price regression",
+    "version": "1.0"
+  },
+  "dataset_version": "sha256:410e18f0682c43fc",
+  "history": {
+    "months": 23,
+    "start": "2024-01-01",
+    "end": "2025-11-01",
+    "frequency": "monthly"
+  },
+  "forecast": {
+    "month": "2026-02-01",
+    "value": 0.289058,
+    "lower": 0.280483,
+    "upper": 0.297632,
+    "interval_level": 0.8,
+    "last_observed_price": 0.2798,
+    "change_pct": 3.31
+  },
+  "path": [
+    {
+      "month": "2025-12-01",
+      "value": 0.28233,
+      "lower": 0.275382,
+      "upper": 0.289278
+    },
+    {
+      "month": "2026-01-01",
+      "value": 0.285514,
+      "lower": 0.277032,
+      "upper": 0.293996
+    },
+    {
+      "month": "2026-02-01",
+      "value": 0.289058,
+      "lower": 0.280483,
+      "upper": 0.297632
+    }
+  ],
+  "candidates": [
+    {
+      "code": "naive",
+      "name": "Naive (last value)",
+      "version": "1.0",
+      "kind": "baseline",
+      "params": {},
+      "origins_scored": 4,
+      "mae": 0.010824999999999987,
+      "rmse": 0.0118645480318468,
+      "mape": 3.984463229470145,
+      "directional_accuracy": 0.0,
+      "eligible": true,
+      "note": "",
+      "selected": false
+    },
+    {
+      "code": "moving_average",
+      "name": "Moving average (3 months)",
+      "version": "1.0",
+      "kind": "baseline",
+      "params": {
+        "window": 3
+      },
+      "origins_scored": 4,
+      "mae": 0.016975000000000004,
+      "rmse": 0.01729276502535735,
+      "mape": 6.277417766953018,
+      "directional_accuracy": 0.0,
+      "eligible": true,
+      "note": "",
+      "selected": false
+    },
+    {
+      "code": "exponential_smoothing",
+      "name": "Simple exponential smoothing",
+      "version": "1.0",
+      "kind": "baseline",
+      "params": {
+        "alpha": 0.95
+      },
+      "origins_scored": 4,
+      "mae": 0.011194720383209511,
+      "rmse": 0.012160717237786554,
+      "mape": 4.1231514713767705,
+      "directional_accuracy": 0.25,
+      "eligible": true,
+      "note": "",
+      "selected": false
+    },
+    {
+      "code": "trend_regression",
+      "name": "Linear trend regression",
+      "version": "1.0",
+      "kind": "regression",
+      "params": {
+        "slope_per_month": 0.002825,
+        "months_used": 20
+      },
+      "origins_scored": 4,
+      "mae": 0.012784949137549746,
+      "rmse": 0.012886168845926412,
+      "mape": 4.718420364944905,
+      "directional_accuracy": 0.5,
+      "eligible": true,
+      "note": "",
+      "selected": false
+    },
+    {
+      "code": "lagged_regression",
+      "name": "Lagged price regression",
+      "version": "1.0",
+      "kind": "regression",
+      "params": {
+        "coefficient_on_current_price": 0.4052,
+        "coefficient_on_time": 0.002368,
+        "pairs_used": 17
+      },
+      "origins_scored": 4,
+      "mae": 0.005756741076768282,
+      "rmse": 0.0068597315946164125,
+      "mape": 2.1461840782363106,
+      "directional_accuracy": 0.75,
+      "eligible": true,
+      "note": "",
+      "selected": true
+    }
+  ],
+  "selection_rationale": "Lagged price regression chosen: held-out error (MAE) 0.0058 is 47% lower than the best baseline, Naive (last value) (0.0108), above the 10% needed to prefer a regression model.",
+  "config": {
+    "min_train": 9,
+    "origins": 4,
+    "min_improvement": 0.1,
+    "interval_level": 0.8,
+    "ma_window": 3,
+    "trend_window": 24,
+    "last_observed_price": 0.2798
+  }
+}

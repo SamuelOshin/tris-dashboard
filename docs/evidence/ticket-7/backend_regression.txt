@@ -1,0 +1,98 @@
+..........F............................................................. [ 30%]
+........................................................................ [ 60%]
+........................................................................ [ 90%]
+.......................                                                  [100%]
+================================== FAILURES ===================================
+___________ test_migration_backfills_existing_cases_and_round_trips ___________
+
+    def test_migration_backfills_existing_cases_and_round_trips():
+        """
+        Pre-existing case rows must survive the Ticket 4 migration unchanged and be
+        backfilled to 'financial_exception'; downgrade must remove only the additions.
+        """
+        scratch = "tris_migration_check_test"
+        assert "test" in scratch  # same safety rule as the main test database
+        scratch_url = TEST_DATABASE_URL.rsplit("/", 1)[0] + f"/{scratch}"
+    
+        with psycopg.connect(_admin_conninfo(), autocommit=True) as admin:
+            admin.execute(f'DROP DATABASE IF EXISTS "{scratch}" WITH (FORCE)')
+            admin.execute(f'CREATE DATABASE "{scratch}"')
+    
+        engine = create_engine(scratch_url)
+        try:
+            # Build the full current schema, then step back to the pre-Ticket-4 revision so the
+            # database genuinely looks like v1.4 with a legacy case row in it.
+            SQLModel.metadata.create_all(engine)
+            _alembic(scratch_url, "stamp", MANUFACTURING_REVISION)
+>           _alembic(scratch_url, "downgrade", PREVIOUS_REVISION)
+
+tests\modules\v1\test_case_category_backward_compat.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+db_url = 'postgresql+psycopg://tris_user:tris_password@localhost:5433/tris_migration_check_test'
+args = ('downgrade', 'cbbdff801f48')
+
+    def _alembic(db_url: str, *args: str) -> None:
+        env = {**os.environ, "DATABASE_URL": db_url}
+        result = subprocess.run(
+            [sys.executable, "-m", "alembic", *args],
+            cwd=BACKEND_DIR,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+>       assert result.returncode == 0, f"alembic {' '.join(args)} failed:\n{result.stderr[-2000:]}"
+E       AssertionError: alembic downgrade cbbdff801f48 failed:
+E           File "C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+E             self._handle_dbapi_exception(
+E           File "C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2365, in _handle_dbapi_exception
+E             raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+E           File "C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+E             self.dialect.do_execute(
+E           File "C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 952, in do_execute
+E             cursor.execute(statement, parameters)
+E           File "C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\sqlalchemy\dialects\postgresql\psycopg.py", line 642, in execute
+E             result = self.await_(self._cursor.execute(query, params, **kw))
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+E             return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+E             value = await result
+E                     ^^^^^^^^^^^^
+E           File "C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\psycopg\cursor_async.py", line 117, in execute
+E             raise ex.with_traceback(None)
+E         sqlalchemy.exc.InternalError: (psycopg.errors.DependentObjectsStillExist) cannot drop table materials because other objects depend on it
+E         DETAIL:  constraint forecast_runs_material_id_fkey on table forecast_runs depends on table materials
+E         HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+E         [SQL: 
+E         DROP TABLE materials]
+E         (Background on this error at: https://sqlalche.me/e/20/2j85)
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['C:\\Users\\dell\\Documents\\tris-app\\backend\\.venv\\Scripts\\python.exe', '-m', 'alembic', '...dependent objects too.\n[SQL: \nDROP TABLE materials]\n(Background on this error at: https://sqlalche.me/e/20/2j85)\n').returncode
+
+tests\modules\v1\test_case_category_backward_compat.py:89: AssertionError
+============================== warnings summary ===============================
+tests/modules/v1/test_auth.py::test_successful_login
+  C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\passlib\handlers\argon2.py:716: DeprecationWarning: Accessing argon2.__version__ is deprecated and will be removed in a future release. Use importlib.metadata directly to query for argon2-cffi's packaging metadata.
+    _argon2_cffi.__version__, max_version)
+
+tests/modules/v1/test_auth.py::test_get_me_with_cookie_session_only
+tests/modules/v1/test_auth.py::test_update_me_profile
+  C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\httpx\_client.py:1768: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return await self.request(
+
+tests/modules/v1/test_auth.py::test_update_me_profile
+  C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\httpx\_client.py:1933: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return await self.request(
+
+tests/modules/v1/test_ingestion.py::test_chunk_savepoint_isolation_single_bad_row
+  sys:1: SAWarning: New instance <Supplier at 0x184e74e63f0> with identity key (<class 'app.api.modules.v1.suppliers.models.supplier.Supplier'>, ('SUP-DUP',), None) conflicts with persistent instance <Supplier at 0x184e75d1c70>
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/modules/v1/test_case_category_backward_compat.py::test_migration_backfills_existing_cases_and_round_trips
+1 failed, 238 passed, 5 warnings in 2344.64s (0:39:04)
+pytest exit=1

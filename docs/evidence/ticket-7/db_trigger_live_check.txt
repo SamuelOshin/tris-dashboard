@@ -1,0 +1,2 @@
+ERROR:  forecast_runs rows are immutable: UPDATE and DELETE are prohibited
+CONTEXT:  PL/pgSQL function prevent_forecast_run_mutation() line 3 at RAISE

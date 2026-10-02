@@ -1,0 +1,5 @@
+Name: statsmodels
+Version: 0.15.0
+Location: C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages
+Requires: formulaic, numpy, packaging, pandas, patsy, scipy
+Required-by:

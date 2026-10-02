@@ -14,6 +14,7 @@ from app.api.modules.v1.ingestion.routes.ingestion_routes import (
     router as ingestion_router,
 )
 from app.api.modules.v1.manufacturing.routes.analytics_routes import router as analytics_router
+from app.api.modules.v1.manufacturing.routes.forecast_routes import router as forecast_router
 from app.api.modules.v1.manufacturing.routes.mapping_routes import router as mapping_router
 from app.api.modules.v1.notifications.routes.notification_routes import (
     router as notifications_router,
@@ -49,6 +50,7 @@ api_v1_router.include_router(reconstruction_router)
 api_v1_router.include_router(remediation_router)
 api_v1_router.include_router(mapping_router)
 api_v1_router.include_router(analytics_router)
+api_v1_router.include_router(forecast_router)
 
 
 @api_v1_router.get("/health", tags=["Health"])

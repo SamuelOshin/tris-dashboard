@@ -1,0 +1,33 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 22 items
+
+tests/modules/v1/test_forecasting_engine.py::test_history_requirements_follow_from_the_scoring_design PASSED [  4%]
+tests/modules/v1/test_forecasting_engine.py::test_forecast_horizon_withheld_when_insufficient_data_engine PASSED [  9%]
+tests/modules/v1/test_forecasting_engine.py::test_a_missing_month_ends_the_usable_history_and_is_never_filled PASSED [ 13%]
+tests/modules/v1/test_forecasting_engine.py::test_baseline_models_compute_the_documented_values PASSED [ 18%]
+tests/modules/v1/test_forecasting_engine.py::test_regression_models_use_statsmodels_and_give_a_prediction_band PASSED [ 22%]
+tests/modules/v1/test_forecasting_engine.py::test_a_perfectly_regular_series_is_handled_without_warnings PASSED [ 27%]
+tests/modules/v1/test_forecasting_engine.py::test_non_positive_forecasts_are_rejected_not_reported PASSED [ 31%]
+tests/modules/v1/test_forecasting_engine.py::test_held_out_scores_match_a_hand_calculation PASSED [ 36%]
+tests/modules/v1/test_forecasting_engine.py::test_a_regression_must_clearly_beat_the_baseline_to_be_chosen PASSED [ 40%]
+tests/modules/v1/test_forecasting_engine.py::test_trending_data_selects_a_regression_and_flat_data_a_baseline PASSED [ 45%]
+tests/modules/v1/test_forecasting_engine.py::test_validation_rejects_post_cutoff_data_leakage PASSED [ 50%]
+tests/modules/v1/test_forecasting_engine.py::test_scoring_never_shows_a_model_the_value_it_is_scored_against PASSED [ 54%]
+tests/modules/v1/test_forecasting_engine.py::test_forecasts_are_reproducible_and_the_fingerprint_tracks_the_data PASSED [ 59%]
+tests/modules/v1/test_forecasting_engine.py::test_forecast_horizon_withheld_when_insufficient_data PASSED [ 63%]
+tests/modules/v1/test_forecasting_engine.py::test_a_run_stores_complete_metadata_and_reruns_never_alter_history PASSED [ 68%]
+tests/modules/v1/test_forecasting_engine.py::test_data_after_the_cutoff_cannot_change_a_stored_forecast PASSED [ 72%]
+tests/modules/v1/test_forecasting_engine.py::test_forecast_roles_and_empty_states PASSED [ 77%]
+tests/modules/v1/test_forecasting_engine.py::test_empty_and_unknown_inputs PASSED [ 81%]
+tests/modules/v1/test_forecasting_engine.py::test_an_incomplete_final_month_is_excluded_and_reported PASSED [ 86%]
+tests/modules/v1/test_forecasting_engine.py::test_forecast_run_rows_are_immutable_in_the_database PASSED [ 90%]
+tests/modules/v1/test_forecasting_engine.py::test_a_run_is_only_shown_for_the_dataset_scope_it_was_made_for PASSED [ 95%]
+tests/modules/v1/test_forecasting_engine.py::test_a_known_material_without_purchases_by_the_date_is_not_found PASSED [100%]
+
+============================= 22 passed in 41.18s =============================

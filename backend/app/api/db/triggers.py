@@ -26,6 +26,22 @@ CREATE TRIGGER trg_case_history_immutable
 """
 
 
+FORECAST_RUN_IMMUTABILITY_SQL = """
+CREATE OR REPLACE FUNCTION prevent_forecast_run_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'forecast_runs rows are immutable: UPDATE and DELETE are prohibited';
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_forecast_runs_immutable ON forecast_runs;
+
+CREATE TRIGGER trg_forecast_runs_immutable
+    BEFORE UPDATE OR DELETE ON forecast_runs
+    FOR EACH ROW EXECUTE FUNCTION prevent_forecast_run_mutation();
+"""
+
+
 async def apply_database_triggers(session: AsyncSession) -> None:
     """
     Applies database-level triggers if running on PostgreSQL.
@@ -37,6 +53,9 @@ async def apply_database_triggers(session: AsyncSession) -> None:
             await session.execute(text(CASE_HISTORY_IMMUTABILITY_SQL))
             await session.commit()
             logger.info("Successfully applied case_history immutability trigger")
+            await session.execute(text(FORECAST_RUN_IMMUTABILITY_SQL))
+            await session.commit()
+            logger.info("Successfully applied forecast_runs immutability trigger")
         except Exception as e:
             logger.warning(f"Could not apply PostgreSQL trigger: {e}")
             await session.rollback()

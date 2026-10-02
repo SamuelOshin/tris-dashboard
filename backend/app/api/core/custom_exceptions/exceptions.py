@@ -146,6 +146,13 @@ class IngestionError(CustomDomainException):
         )
 
 
+class DataLeakageError(CustomDomainException):
+    """Raised when data dated after an analysis cutoff is offered to a fit or forecast."""
+
+    def __init__(self, message: str):
+        super().__init__(message=message, code="DATA_LEAKAGE_REJECTED")
+
+
 class DatabaseIntegrityError(CustomDomainException):
     """Raised when a database constraint or immutability trigger is violated."""
 
