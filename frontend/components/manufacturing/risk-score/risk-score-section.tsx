@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/lib/auth-context'
 import { formatTimestamp } from '../material-cost/material-cost-guards'
 import { barWidth, canRunScoring } from './risk-guards'
+import { MaterialCaseAction } from './material-case-action'
 import { RiskBadge } from './risk-badge'
 import { riskApi } from './risk-api'
 import type { FactorScore, MaterialScores } from './types'
@@ -98,6 +99,7 @@ export function RiskScoreSection({ materialId, asOf, dataset, onChanged }: Props
       {current ? (
         <>
           <p className="text-sm text-foreground">{current.summary}</p>
+          {canRunScoring(user?.role) && <MaterialCaseAction score={current} />}
           <ul className="space-y-2">
             {current.factors.map((f) => (
               <Factor key={f.code} f={f} />

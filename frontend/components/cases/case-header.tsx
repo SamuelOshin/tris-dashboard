@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft, UserCheck, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { RiskCase } from '@/lib/api'
+import { categoryLabel, isMaterialCase, snapshotOf } from './material/material-case-guards'
 import {
   getPriorityBadgeStyle,
   getStatusBadgeStyle,
@@ -63,7 +64,9 @@ export function CaseHeader({
           </span>
         </div>
         <p className="text-xs sm:text-sm text-muted-foreground mt-1 ml-9">
-          {ruleDescription || caseData.rule_description || 'Risk exception detected'}
+          {isMaterialCase(caseData)
+            ? `${categoryLabel(caseData)}: ${snapshotOf(caseData)?.summary ?? caseData.material_id}`
+            : ruleDescription || caseData.rule_description || 'Risk exception detected'}
         </p>
       </div>
 

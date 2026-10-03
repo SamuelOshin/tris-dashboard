@@ -37,6 +37,12 @@ class CaseResponse(BaseModel):
     transaction_id: Optional[str] = None
     assigned_to: Optional[str] = None
     department: Optional[str] = None
+    # v2.0 extension: which kind of case this is, and the material context when it is a
+    # material-cost case. Existing financial-exception cases return the defaults.
+    case_category: str = "financial_exception"
+    material_id: Optional[str] = None
+    forecast_horizon: Optional[int] = None
+    projected_exposure_amount: Optional[float] = None
     trigger_signals: List[Dict[str, Any]] = []
     evaluation_snapshot: Dict[str, Any] = {}
 

@@ -26,6 +26,10 @@ async def list_cases(
     status_filter: Optional[str] = Query(None, alias="status"),
     priority_filter: Optional[str] = Query(None, alias="priority"),
     supplier_id: Optional[str] = Query(None),
+    case_category: Optional[str] = Query(
+        None, description="financial_exception or material_cost_risk"
+    ),
+    material_id: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     current_user: Annotated[User, Depends(require_roles(CASE_READ_ROLES))] = None,
@@ -37,6 +41,8 @@ async def list_cases(
         status=status_filter,
         priority=priority_filter,
         supplier_id=supplier_id,
+        case_category=case_category,
+        material_id=material_id,
         skip=skip,
         limit=limit,
     )

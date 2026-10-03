@@ -1,0 +1,17 @@
+{
+ "status": "SUCCESS",
+ "status_code": 200,
+ "message": "Material cases",
+ "data": [
+  {
+   "case_id": "MCR-264D07030A",
+   "case_number": "MCR-2026-264D07",
+   "status": "Closed",
+   "priority": "High",
+   "created_at": "2026-10-03T18:07:20.336198",
+   "score_ids": [
+    "MRS-06a0d8b10d5f"
+   ]
+  }
+ ]
+}

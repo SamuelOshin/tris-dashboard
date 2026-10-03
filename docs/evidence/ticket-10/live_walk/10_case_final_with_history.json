@@ -1,0 +1,364 @@
+{
+ "status": "SUCCESS",
+ "status_code": 200,
+ "message": "Case details retrieved successfully",
+ "data": {
+  "case_id": "MCR-264D07030A",
+  "case_number": "MCR-2026-264D07",
+  "priority": "High",
+  "status": "Closed",
+  "supplier_id": "SUP-004",
+  "transaction_id": null,
+  "assigned_to": "Risk Reviewer",
+  "department": "Procurement",
+  "case_category": "material_cost_risk",
+  "material_id": "SOL-CELL-M10",
+  "forecast_horizon": 90,
+  "projected_exposure_amount": 332.4767,
+  "trigger_signals": [
+   {
+    "rule_code": "MAT-SUPPLIER_CONCENTRATION",
+    "rule_name": "Supplier concentration",
+    "rule_version": 2,
+    "triggered": true,
+    "weight": 15.0,
+    "score": 15.0,
+    "explanation": "SUP-004 accounts for 100% of the spend over the last year. On this factor's scale (50% scores 0, 100% scores 1) that is 1.00, which adds 15.0 points to the score.",
+    "diagnostics": {
+     "source": "material_risk_score",
+     "factor": "supplier_concentration",
+     "value": 100.0,
+     "sub_score": 1.0
+    }
+   },
+   {
+    "rule_code": "MAT-STANDARD_COST_DEVIATION",
+    "rule_name": "Standard cost deviation",
+    "rule_version": 2,
+    "triggered": true,
+    "weight": 10.0,
+    "score": 10.0,
+    "explanation": "The latest price is 22.2% above the standard cost. On this factor's scale (0% scores 0, 15% scores 1) that is 1.00, which adds 10.0 points to the score.",
+    "diagnostics": {
+     "source": "material_risk_score",
+     "factor": "standard_cost_deviation",
+     "value": 22.22,
+     "sub_score": 1.0
+    }
+   },
+   {
+    "rule_code": "MAT-INVENTORY_COVERAGE",
+    "rule_name": "Inventory coverage",
+    "rule_version": 2,
+    "triggered": true,
+    "weight": 8.9,
+    "score": 8.9,
+    "explanation": "Current stock covers about 20 days of usage. On this factor's scale (60 days scores 0, 15 days scores 1) that is 0.89, which adds 8.9 points to the score.",
+    "diagnostics": {
+     "source": "material_risk_score",
+     "factor": "inventory_coverage",
+     "value": 20.0,
+     "sub_score": 0.8888888888888888
+    }
+   },
+   {
+    "rule_code": "MAT-BOM_EXPOSURE",
+    "rule_name": "Product cost exposure",
+    "rule_version": 2,
+    "triggered": true,
+    "weight": 8.3,
+    "score": 8.3,
+    "explanation": "The material is 34% of the material cost of PANEL-72C, the product where it matters most (of 2 using it). On this factor's scale (5% scores 0, 40% scores 1) that is 0.83, which adds 8.3 points to the score.",
+    "diagnostics": {
+     "source": "material_risk_score",
+     "factor": "bom_exposure",
+     "value": 34.10429545620196,
+     "sub_score": 0.8315512987486274
+    }
+   },
+   {
+    "rule_code": "MAT-PREDICTED_INCREASE",
+    "rule_name": "Predicted increase",
+    "rule_version": 2,
+    "triggered": true,
+    "weight": 5.0,
+    "score": 5.0,
+    "explanation": "The stored 90-day forecast is 3.3% above the latest price. On this factor's scale (0% scores 0, 10% scores 1) that is 0.33, which adds 5.0 points to the score.",
+    "diagnostics": {
+     "source": "material_risk_score",
+     "factor": "predicted_increase",
+     "value": 3.3087919942816235,
+     "sub_score": 0.33087919942816235
+    }
+   }
+  ],
+  "evaluation_snapshot": {
+   "source": "material_risk_score",
+   "score_id": "MRS-06a0d8b10d5f",
+   "score": 49.8899,
+   "level": "High",
+   "as_of": "2025-12-12",
+   "weight_version": 2,
+   "method_version": "1.0",
+   "data_coverage_pct": 100.0,
+   "summary": "Score 49.9 of 100 (High). Main drivers: Supplier concentration (15.0), Standard cost deviation (10.0), Inventory coverage (8.9).",
+   "currency": "USD",
+   "factors": [
+    {
+     "code": "price_change",
+     "name": "Price change",
+     "weight": 15,
+     "value": 0.22,
+     "unit": "%",
+     "scale": {
+      "low": 0,
+      "high": 15
+     },
+     "status": "evaluated",
+     "sub_score": 0.014666666666666666,
+     "effective_weight_pct": 15.0,
+     "points": 0.22,
+     "explanation": "The latest monthly price is 0.2% above the price three months ago. On this factor's scale (0% scores 0, 15% scores 1) that is 0.01, which adds 0.2 points to the score."
+    },
+    {
+     "code": "volatility",
+     "name": "Price volatility",
+     "weight": 10,
+     "value": 2.420031586491885,
+     "unit": "%",
+     "scale": {
+      "low": 1,
+      "high": 8
+     },
+     "status": "evaluated",
+     "sub_score": 0.20286165521312644,
+     "effective_weight_pct": 10.0,
+     "points": 2.0286165521312642,
+     "explanation": "Monthly prices moved by a typical 2.4% from one month to the next (over the last 12 changes). On this factor's scale (1% scores 0, 8% scores 1) that is 0.20, which adds 2.0 points to the score."
+    },
+    {
+     "code": "predicted_increase",
+     "name": "Predicted increase",
+     "weight": 15,
+     "value": 3.3087919942816235,
+     "unit": "%",
+     "scale": {
+      "low": 0,
+      "high": 10
+     },
+     "status": "evaluated",
+     "sub_score": 0.33087919942816235,
+     "effective_weight_pct": 15.0,
+     "points": 4.963187991422435,
+     "explanation": "The stored 90-day forecast is 3.3% above the latest price. On this factor's scale (0% scores 0, 10% scores 1) that is 0.33, which adds 5.0 points to the score."
+    },
+    {
+     "code": "bom_exposure",
+     "name": "Product cost exposure",
+     "weight": 10,
+     "value": 34.10429545620196,
+     "unit": "%",
+     "scale": {
+      "low": 5,
+      "high": 40
+     },
+     "status": "evaluated",
+     "sub_score": 0.8315512987486274,
+     "effective_weight_pct": 10.0,
+     "points": 8.315512987486274,
+     "explanation": "The material is 34% of the material cost of PANEL-72C, the product where it matters most (of 2 using it). On this factor's scale (5% scores 0, 40% scores 1) that is 0.83, which adds 8.3 points to the score."
+    },
+    {
+     "code": "demand",
+     "name": "Demand trend",
+     "weight": 5,
+     "value": -6.279116138271079,
+     "unit": "%",
+     "scale": {
+      "low": 0,
+      "high": 30
+     },
+     "status": "evaluated",
+     "sub_score": 0.0,
+     "effective_weight_pct": 5.0,
+     "points": 0.0,
+     "explanation": "Purchased quantity over the latest 3 months is 6% down on the 3 months before. On this factor's scale (0% scores 0, 30% scores 1) that is 0.00, which adds 0.0 points to the score."
+    },
+    {
+     "code": "supplier_concentration",
+     "name": "Supplier concentration",
+     "weight": 15,
+     "value": 100.0,
+     "unit": "%",
+     "scale": {
+      "low": 50,
+      "high": 100
+     },
+     "status": "evaluated",
+     "sub_score": 1.0,
+     "effective_weight_pct": 15.0,
+     "points": 15.0,
+     "explanation": "SUP-004 accounts for 100% of the spend over the last year. On this factor's scale (50% scores 0, 100% scores 1) that is 1.00, which adds 15.0 points to the score."
+    },
+    {
+     "code": "inventory_coverage",
+     "name": "Inventory coverage",
+     "weight": 10,
+     "value": 20.0,
+     "unit": "days",
+     "scale": {
+      "low": 60,
+      "high": 15
+     },
+     "status": "evaluated",
+     "sub_score": 0.8888888888888888,
+     "effective_weight_pct": 10.0,
+     "points": 8.888888888888888,
+     "explanation": "Current stock covers about 20 days of usage. On this factor's scale (60 days scores 0, 15 days scores 1) that is 0.89, which adds 8.9 points to the score."
+    },
+    {
+     "code": "lead_time",
+     "name": "Supplier lead time",
+     "weight": 10,
+     "value": 17.6,
+     "unit": "days",
+     "scale": {
+      "low": 14,
+      "high": 90
+     },
+     "status": "evaluated",
+     "sub_score": 0.047368421052631594,
+     "effective_weight_pct": 10.0,
+     "points": 0.473684210526316,
+     "explanation": "The main supplier's latest lead time is 18 days. On this factor's scale (14 days scores 0, 90 days scores 1) that is 0.05, which adds 0.5 points to the score."
+    },
+    {
+     "code": "standard_cost_deviation",
+     "name": "Standard cost deviation",
+     "weight": 10,
+     "value": 22.22,
+     "unit": "%",
+     "scale": {
+      "low": 0,
+      "high": 15
+     },
+     "status": "evaluated",
+     "sub_score": 1.0,
+     "effective_weight_pct": 10.0,
+     "points": 10.0,
+     "explanation": "The latest price is 22.2% above the standard cost. On this factor's scale (0% scores 0, 15% scores 1) that is 1.00, which adds 10.0 points to the score."
+    }
+   ],
+   "forecast": {
+    "run_id": "FRC-bad54b7b945a",
+    "horizon_days": 90,
+    "model": "Lagged price regression v1.0",
+    "forecast_value": 0.289058,
+    "last_observed_price": 0.2798,
+    "change_pct": 3.31,
+    "currency": "USD"
+   },
+   "exposure": {
+    "horizon_days": 90,
+    "currency": "USD",
+    "projected_exposure": 332.4767,
+    "baseline_spend": 15945.6621,
+    "forecast_spend": 16278.1388,
+    "expected_usage": 56989.5,
+    "usage_basis": {
+     "method": "trailing_purchases",
+     "monthly_usage": 18996.5,
+     "months_used": 6
+    }
+   },
+   "linked_scores": []
+  },
+  "root_cause": "The supplier price list was not renegotiated at the last contract renewal.",
+  "corrective_action": "Fixed-price clause agreed for the next two quarters.",
+  "closure_type": "Process Error / Remedied",
+  "closure_evidence": "contract_amendment_2026.pdf",
+  "verified_by": "Compliance Verifier",
+  "closure_date": "2026-10-03",
+  "follow_up_requirement": "Review the price trend after the next two purchase cycles.",
+  "recurrence_monitoring": "Monthly price check for six months.",
+  "history": [
+   {
+    "history_id": 79,
+    "case_id": "MCR-264D07030A",
+    "actor": "A. Reviewer",
+    "action": "Case Created from Material Risk Score",
+    "previous_status": null,
+    "new_status": "New",
+    "note": "Score 49.9 of 100 (High). Main drivers: Supplier concentration (15.0), Standard cost deviation (10.0), Inventory coverage (8.9). Note: Raised from the material cost review",
+    "timestamp": "2026-10-03T18:07:20.401782"
+   },
+   {
+    "history_id": 80,
+    "case_id": "MCR-264D07030A",
+    "actor": "A. Reviewer",
+    "action": "Status Transition: New -> Assigned",
+    "previous_status": "New",
+    "new_status": "Assigned",
+    "note": "[Owner: Risk Reviewer, Dept: Procurement]",
+    "timestamp": "2026-10-03T18:07:20.614677"
+   },
+   {
+    "history_id": 81,
+    "case_id": "MCR-264D07030A",
+    "actor": "A. Reviewer",
+    "action": "Status Transition: Assigned -> Under Investigation",
+    "previous_status": "Assigned",
+    "new_status": "Under Investigation",
+    "note": "Reviewing supplier price history",
+    "timestamp": "2026-10-03T18:07:20.692752"
+   },
+   {
+    "history_id": 82,
+    "case_id": "MCR-264D07030A",
+    "actor": "A. Reviewer",
+    "action": "Status Transition: Under Investigation -> Corrective Action",
+    "previous_status": "Under Investigation",
+    "new_status": "Corrective Action",
+    "note": null,
+    "timestamp": "2026-10-03T18:07:20.747863"
+   },
+   {
+    "history_id": 83,
+    "case_id": "MCR-264D07030A",
+    "actor": "A. Reviewer",
+    "action": "Status Transition: Corrective Action -> Pending Verification",
+    "previous_status": "Corrective Action",
+    "new_status": "Pending Verification",
+    "note": null,
+    "timestamp": "2026-10-03T18:07:20.803014"
+   },
+   {
+    "history_id": 84,
+    "case_id": "MCR-264D07030A",
+    "actor": "B. Verifier",
+    "action": "Status Transition: Pending Verification -> Closed",
+    "previous_status": "Pending Verification",
+    "new_status": "Closed",
+    "note": null,
+    "timestamp": "2026-10-03T18:07:23.011403"
+   }
+  ],
+  "prior_cases": [
+   {
+    "case_id": "TEST-CASE-002",
+    "case_number": "CASE-2026-002",
+    "status": "Reopened",
+    "priority": "Medium",
+    "transaction_id": "TX-4002",
+    "case_category": "financial_exception",
+    "material_id": null,
+    "root_cause": "Duplicate invoice was entered due to manual data entry error.",
+    "corrective_action": "Duplicate invoice removed. Payment blocked. Supplier account reviewed.",
+    "closure_date": "2026-09-05 00:00:00",
+    "created_at": "2026-09-02T10:00:16.190839"
+   }
+  ],
+  "created_at": "2026-10-03T18:07:20.336198",
+  "updated_at": "2026-10-03T18:07:23.034583"
+ }
+}

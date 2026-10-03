@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import or_, select
 
 from app.api.core.custom_exceptions.exceptions import (
     InvalidStateTransitionError,
@@ -60,6 +60,8 @@ class CaseService:
         supplier_id: Optional[str] = None,
         skip: int = 0,
         limit: int = 100,
+        case_category: Optional[str] = None,
+        material_id: Optional[str] = None,
     ) -> List[RiskCase]:
         """Retrieve filtered cases."""
         statement = select(RiskCase).order_by(RiskCase.created_at.desc())
@@ -70,6 +72,10 @@ class CaseService:
             statement = statement.where(RiskCase.priority == priority)
         if supplier_id:
             statement = statement.where(RiskCase.supplier_id == supplier_id)
+        if case_category:
+            statement = statement.where(RiskCase.case_category == case_category)
+        if material_id:
+            statement = statement.where(RiskCase.material_id == material_id)
 
         statement = statement.offset(skip).limit(limit)
         result = await session.execute(statement)
@@ -96,10 +102,18 @@ class CaseService:
         hist_res = await session.execute(hist_stmt)
         history = list(hist_res.scalars().all())
 
-        # Query prior supplier cases for recurrence tracking (Spec Section 4.K & 6)
+        # Query prior cases for recurrence tracking (Spec Section 4.K & 6): earlier cases of the
+        # same kind on the same supplier or the same material. A missing supplier or material
+        # never matches every case that also has none.
+        same_subject = []
+        if case.supplier_id is not None:
+            same_subject.append(RiskCase.supplier_id == case.supplier_id)
+        if case.material_id is not None:
+            same_subject.append(RiskCase.material_id == case.material_id)
         prior_stmt = (
             select(RiskCase)
-            .where(RiskCase.supplier_id == case.supplier_id)
+            .where(or_(*same_subject) if same_subject else RiskCase.case_id.is_(None))
+            .where(RiskCase.case_category == case.case_category)
             .where(RiskCase.case_id != case_id)
             .order_by(RiskCase.created_at.desc())
         )
@@ -115,6 +129,8 @@ class CaseService:
                 "status": p.status,
                 "priority": p.priority,
                 "transaction_id": p.transaction_id,
+                "case_category": p.case_category,
+                "material_id": p.material_id,
                 "root_cause": p.root_cause,
                 "corrective_action": p.corrective_action,
                 "closure_date": str(p.closure_date) if p.closure_date else None,

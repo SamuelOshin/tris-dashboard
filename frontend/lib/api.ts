@@ -172,6 +172,11 @@ export interface RiskCase {
   supplier_id: string
   transaction_id: string
   assigned_to?: string
+  // v2.0: which kind of case this is (financial_exception unless stated)
+  case_category?: 'financial_exception' | 'material_cost_risk'
+  material_id?: string | null
+  forecast_horizon?: number | null
+  projected_exposure_amount?: number | null
   trigger_signals: RuleSignal[]
   evaluation_snapshot: Record<string, any>
   rule_description?: string

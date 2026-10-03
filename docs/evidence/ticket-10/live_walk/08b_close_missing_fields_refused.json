@@ -1,0 +1,16 @@
+{
+ "status": "ERROR",
+ "status_code": 422,
+ "message": "Verified closure failed: missing mandatory fields ['closure_type', 'closure_evidence', 'verified_by', 'closure_date', 'follow_up_requirement', 'recurrence_monitoring']",
+ "error_code": "VERIFIED_CLOSURE_VALIDATION_ERROR",
+ "errors": {
+  "missing_fields": [
+   "closure_type",
+   "closure_evidence",
+   "verified_by",
+   "closure_date",
+   "follow_up_requirement",
+   "recurrence_monitoring"
+  ]
+ }
+}

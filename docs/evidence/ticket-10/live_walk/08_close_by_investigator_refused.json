@@ -1,0 +1,7 @@
+{
+ "status": "ERROR",
+ "status_code": 403,
+ "message": "Only independent Verifiers or Administrators may verify and close cases.",
+ "error_code": "PERMISSION_DENIED",
+ "errors": {}
+}

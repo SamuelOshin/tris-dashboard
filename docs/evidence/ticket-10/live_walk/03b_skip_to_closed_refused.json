@@ -1,0 +1,7 @@
+{
+ "status": "ERROR",
+ "status_code": 409,
+ "message": "Cannot transition case from 'New' to 'Closed'. Allowed transitions: ['Assigned']",
+ "error_code": "INVALID_STATE_TRANSITION",
+ "errors": {}
+}

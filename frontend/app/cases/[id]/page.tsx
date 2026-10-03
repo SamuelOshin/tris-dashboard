@@ -18,6 +18,10 @@ import { ClosureTab } from '@/components/cases/tabs/closure-tab'
 import { HistoryTab } from '@/components/cases/tabs/history-tab'
 import { RecurrenceTab } from '@/components/cases/tabs/recurrence-tab'
 import { ReconstructionTab } from '@/components/cases/tabs/reconstruction-tab'
+import { MaterialCaseOverview } from '@/components/cases/material/material-case-overview'
+import { MaterialCaseRecurrence } from '@/components/cases/material/material-case-recurrence'
+import { MaterialCaseReplay } from '@/components/cases/material/material-case-replay'
+import { isMaterialCase } from '@/components/cases/material/material-case-guards'
 import { ReopenModal } from '@/components/cases/modals/reopen-modal'
 import { useCaseWorkspace } from '@/components/cases/hooks/use-case-workspace'
 
@@ -123,7 +127,15 @@ export default function CaseDetailPage() {
         />
 
         {/* Feature Tabs */}
-        {activeTab === 'overview' && (
+        {activeTab === 'overview' && isMaterialCase(caseData) && (
+          <MaterialCaseOverview
+            caseData={caseData}
+            onAcceptCase={actions.handleAcceptCase}
+            onViewTimeline={() => setActiveTab('history')}
+          />
+        )}
+
+        {activeTab === 'overview' && !isMaterialCase(caseData) && (
           <OverviewTab
             caseData={caseData}
             primarySignal={primarySignal}
@@ -194,11 +206,19 @@ export default function CaseDetailPage() {
           />
         )}
 
-        {activeTab === 'reconstruction' && (
+        {activeTab === 'reconstruction' && isMaterialCase(caseData) && (
+          <MaterialCaseReplay caseId={caseData.case_id} />
+        )}
+
+        {activeTab === 'reconstruction' && !isMaterialCase(caseData) && (
           <ReconstructionTab caseData={caseData} />
         )}
 
-        {activeTab === 'recurrence' && (
+        {activeTab === 'recurrence' && isMaterialCase(caseData) && (
+          <MaterialCaseRecurrence caseData={caseData} />
+        )}
+
+        {activeTab === 'recurrence' && !isMaterialCase(caseData) && (
           <RecurrenceTab
             caseData={caseData}
             primarySignal={primarySignal}

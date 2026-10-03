@@ -1,0 +1,27 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 17 items
+
+tests/modules/v1/test_material_case_integration.py::test_a_high_risk_material_opens_a_material_cost_case_with_its_context PASSED [  5%]
+tests/modules/v1/test_material_case_integration.py::test_only_high_or_critical_scores_can_open_a_case PASSED [ 11%]
+tests/modules/v1/test_material_case_integration.py::test_an_open_case_is_linked_to_not_duplicated PASSED [ 17%]
+tests/modules/v1/test_material_case_integration.py::test_a_score_cannot_be_linked_to_the_wrong_case PASSED [ 23%]
+tests/modules/v1/test_material_case_integration.py::test_opening_and_reading_cases_follow_the_roles PASSED [ 29%]
+tests/modules/v1/test_material_case_integration.py::test_a_material_case_walks_the_whole_lifecycle_with_the_existing_rules PASSED [ 35%]
+tests/modules/v1/test_material_case_integration.py::test_separation_of_duties_applies_to_a_material_case PASSED [ 41%]
+tests/modules/v1/test_material_case_integration.py::test_no_transition_logic_branches_on_the_case_category PASSED [ 47%]
+tests/modules/v1/test_material_case_integration.py::test_historical_replay_shows_what_was_known_and_reproduces_the_score PASSED [ 52%]
+tests/modules/v1/test_material_case_integration.py::test_context_is_only_for_material_cases PASSED [ 58%]
+tests/modules/v1/test_material_case_integration.py::test_recurrence_finds_earlier_cases_for_the_same_material PASSED [ 64%]
+tests/modules/v1/test_material_case_integration.py::test_cases_without_a_supplier_do_not_list_each_other_as_recurrence PASSED [ 70%]
+tests/modules/v1/test_material_case_integration.py::test_the_case_list_can_be_filtered_by_category_and_material PASSED [ 76%]
+tests/modules/v1/test_material_case_integration.py::test_two_simultaneous_requests_open_only_one_case PASSED [ 82%]
+tests/modules/v1/test_material_case_integration.py::test_a_case_can_only_be_opened_from_the_latest_score PASSED [ 88%]
+tests/modules/v1/test_material_case_integration.py::test_recurrence_stays_within_the_same_kind_of_case PASSED [ 94%]
+tests/modules/v1/test_material_case_integration.py::test_case_numbers_use_the_full_unique_suffix PASSED [100%]
+
+======================= 17 passed in 296.13s (0:04:56) ========================

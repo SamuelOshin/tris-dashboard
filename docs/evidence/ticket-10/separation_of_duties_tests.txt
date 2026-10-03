@@ -1,0 +1,14 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+tests/modules/v1/test_separation_of_duties.py::test_separation_of_duties_blocks_self_verification PASSED [ 25%]
+tests/modules/v1/test_separation_of_duties.py::test_separation_of_duties_allows_independent_verifier PASSED [ 50%]
+tests/modules/v1/test_separation_of_duties.py::test_separation_of_duties_blocks_spoofed_actor_by_investigator PASSED [ 75%]
+tests/modules/v1/test_separation_of_duties.py::test_separation_of_duties_blocks_investigator_as_verified_by PASSED [100%]
+
+============================= 4 passed in 29.25s ==============================
