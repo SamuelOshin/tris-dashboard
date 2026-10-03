@@ -100,8 +100,27 @@ TEST_SUITE_LOCK_KEY = 7_424_001
 """Advisory-lock key serialising pytest sessions that share the test database."""
 
 
+# ── 3b. Fast lane: tests that never touch the database ───────────────────────
+# A test is marked "db" when it uses a database-backed fixture (directly or through another
+# fixture) and "pure" otherwise. `pytest -m pure` (or `-m "not db"`) runs only the pure tests and
+# neither probes, locks nor resets PostgreSQL, so it is safe to run while a database run is in
+# progress and finishes in seconds. Run everything (no -m) before committing.
+_DB_FIXTURES = frozenset({"db_session", "async_client", "client_as"})
+
+
+def pytest_collection_modifyitems(items):
+    for item in items:
+        uses_db = bool(_DB_FIXTURES & set(item.fixturenames))
+        item.add_marker(pytest.mark.db if uses_db else pytest.mark.pure)
+
+
+def _needs_database(request) -> bool:
+    """True when any test selected for this run uses the database."""
+    return any(item.get_closest_marker("db") for item in request.session.items)
+
+
 @pytest.fixture(scope="session", autouse=True)
-def require_postgres():
+def require_postgres(request):
     """
     Probes PostgreSQL once per session and aborts immediately when it is unreachable.
 
@@ -115,6 +134,9 @@ def require_postgres():
     tables, so concurrent sessions deadlock each other and produce spurious failures.
     The lock is released when this session's connection closes, including on a crash.
     """
+    if not _needs_database(request):
+        yield
+        return
     try:
         conn = psycopg.connect(_admin_conninfo(connect_timeout=3), connect_timeout=3)
         conn.autocommit = True
@@ -152,12 +174,15 @@ def require_postgres():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_test_database() -> None:
+def setup_test_database(request) -> None:
     """
     1. Asserts we are connecting to a test database (failsafe guard).
     2. Connects to PostgreSQL admin db ('postgres') to CREATE DATABASE <db>_test if missing.
     3. Recreates the public schema and tables once for the test session.
     """
+    if not _needs_database(request):
+        return  # only pure tests selected: leave the database alone
+
     # HARD SAFETY GUARD: Never drop schemas on non-test databases
     assert "test" in str(test_engine.url.database), (
         "CRITICAL SAFETY GUARD: Refusing to reset database! "
