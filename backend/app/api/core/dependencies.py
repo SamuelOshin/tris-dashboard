@@ -23,6 +23,7 @@ from app.api.core.permissions import (
     NON_READ_ONLY_ROLES,
     PRIVILEGED_ROLES,
     ROLE_LABELS,
+    VALIDATION_RUN_ROLES,
     WRITE_ROLES,
     Role,
 )
@@ -138,5 +139,6 @@ NonReadOnlyUser = Annotated[User, Depends(require_roles(NON_READ_ONLY_ROLES))]
 ManufacturingIngestionUser = Annotated[User, Depends(require_roles(MANUFACTURING_INGESTION_ROLES))]
 ManufacturingViewUser = Annotated[User, Depends(require_roles(MANUFACTURING_VIEW_ROLES))]
 AnalyticsExecutionUser = Annotated[User, Depends(require_roles(ANALYTICS_EXECUTION_ROLES))]
+ValidationRunUser = Annotated[User, Depends(require_roles(VALIDATION_RUN_ROLES))]
 ManufacturingConfigUser = Annotated[User, Depends(require_roles(MANUFACTURING_CONFIG_ROLES))]
 DbSession = Annotated[AsyncSession, Depends(get_db)]

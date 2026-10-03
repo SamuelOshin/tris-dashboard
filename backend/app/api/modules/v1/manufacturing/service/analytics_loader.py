@@ -8,7 +8,7 @@ date and means later data cannot influence an earlier analysis.
 
 from datetime import date
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
@@ -148,7 +148,13 @@ async def load_material_data(
 
     await _attach_operations(session, materials, as_of, dataset_id)
 
-    bom_rows = await session.execute(_scoped(select(BOMEntry), BOMEntry, dataset_id))
+    # BOM lines that start after the as-of date did not exist yet (every consumer ignores them via
+    # active_bom; limiting them here keeps them out of a retrospective run altogether).
+    bom_rows = await session.execute(
+        _scoped(select(BOMEntry), BOMEntry, dataset_id).where(
+            or_(BOMEntry.effective_from.is_(None), BOMEntry.effective_from <= as_of)
+        )
+    )
     all_bom = [
         BomRow(
             b.product_sku,

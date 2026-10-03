@@ -1,0 +1,6 @@
+QA m5 / m6 checks on the dev data (reference run VAL-DDE132A295, evaluated cases)
+smallest unit price in purchase_records: 0.2086 (48 rows below 1.0)
+horizon | evaluated | ties at 1e-5 | ties at 2e-6 | ties at 1e-3 | unscored | unscored missed
+30      | 120       | 65           | 65           | 68           | 0        | 0
+90      | 72        | 30           | 30           | 33           | 0        | 0
+=> the tolerance only needs to cover 6-decimal storage rounding; tightening it 5x changes nothing.

@@ -21,6 +21,7 @@ from app.api.modules.v1.manufacturing.routes.material_case_routes import (
     router as material_case_router,
 )
 from app.api.modules.v1.manufacturing.routes.risk_routes import router as risk_router
+from app.api.modules.v1.manufacturing.routes.validation_routes import router as validation_router
 from app.api.modules.v1.notifications.routes.notification_routes import (
     router as notifications_router,
 )
@@ -58,6 +59,7 @@ api_v1_router.include_router(analytics_router)
 api_v1_router.include_router(forecast_router)
 api_v1_router.include_router(exposure_router)
 api_v1_router.include_router(risk_router)
+api_v1_router.include_router(validation_router)
 api_v1_router.include_router(material_case_router)
 
 

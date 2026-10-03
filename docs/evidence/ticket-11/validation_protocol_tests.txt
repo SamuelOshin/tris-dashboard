@@ -1,0 +1,30 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 20 items
+
+tests/modules/v1/test_validation_protocol.py::test_validation_rejects_post_cutoff_data_leakage PASSED [  5%]
+tests/modules/v1/test_validation_protocol.py::test_later_data_cannot_change_a_frozen_forecast_but_does_change_the_outcome PASSED [ 10%]
+tests/modules/v1/test_validation_protocol.py::test_cutoffs_depend_only_on_the_data_span_and_the_settings PASSED [ 15%]
+tests/modules/v1/test_validation_protocol.py::test_every_forecast_is_stored_before_any_actual_is_read PASSED [ 20%]
+tests/modules/v1/test_validation_protocol.py::test_a_frozen_forecast_can_be_reproduced_from_the_data_before_its_cutoff PASSED [ 25%]
+tests/modules/v1/test_validation_protocol.py::test_a_full_run_stores_every_case_with_an_outcome_or_a_reason PASSED [ 30%]
+tests/modules/v1/test_validation_protocol.py::test_outcome_metrics_match_an_independent_calculation PASSED [ 35%]
+tests/modules/v1/test_validation_protocol.py::test_the_same_cases_are_run_whatever_the_results PASSED [ 40%]
+tests/modules/v1/test_validation_protocol.py::test_false_alarms_and_misses_are_listed_not_hidden PASSED [ 45%]
+tests/modules/v1/test_validation_protocol.py::test_error_metrics_are_hand_calculated PASSED [ 50%]
+tests/modules/v1/test_validation_protocol.py::test_directional_accuracy_ignores_flat_moves_and_counts_wrong_ones PASSED [ 55%]
+tests/modules/v1/test_validation_protocol.py::test_a_flat_forecast_makes_no_directional_call_and_is_counted_apart PASSED [ 60%]
+tests/modules/v1/test_validation_protocol.py::test_comparison_with_the_naive_forecast_reports_beats_ties_and_worse PASSED [ 65%]
+tests/modules/v1/test_validation_protocol.py::test_warning_quality_counts_and_rates PASSED [ 70%]
+tests/modules/v1/test_validation_protocol.py::test_advance_warning_is_measured_from_the_start_of_an_unbroken_run_of_alerts PASSED [ 75%]
+tests/modules/v1/test_validation_protocol.py::test_runs_cases_outcomes_and_summaries_can_never_be_changed_or_deleted PASSED [ 80%]
+tests/modules/v1/test_validation_protocol.py::test_validation_roles_and_inputs PASSED [ 85%]
+tests/modules/v1/test_validation_protocol.py::test_a_naive_forecast_stored_with_rounding_is_a_tie_not_a_win_or_a_loss PASSED [ 90%]
+tests/modules/v1/test_validation_protocol.py::test_a_bom_line_starting_after_the_cutoff_is_never_loaded PASSED [ 95%]
+tests/modules/v1/test_validation_protocol.py::test_a_zero_last_price_is_withheld_with_a_reason_not_a_crash PASSED [100%]
+
+======================== 20 passed in 87.16s (0:01:27) ========================

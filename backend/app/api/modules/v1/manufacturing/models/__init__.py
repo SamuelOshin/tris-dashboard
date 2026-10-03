@@ -21,6 +21,13 @@ from app.api.modules.v1.manufacturing.models.risk_score import (
     MaterialRiskScore,
     MaterialRiskWeightSet,
 )
+from app.api.modules.v1.manufacturing.models.validation import (
+    ValidationCase,
+    ValidationFailure,
+    ValidationOutcome,
+    ValidationRun,
+    ValidationSummary,
+)
 
 __all__ = [
     "BOMEntry",
@@ -37,5 +44,10 @@ __all__ = [
     "ProductionRecord",
     "PurchaseRecord",
     "SupplierOperationsMetric",
+    "ValidationCase",
+    "ValidationOutcome",
+    "ValidationFailure",
+    "ValidationRun",
+    "ValidationSummary",
     "VarianceInput",
 ]

@@ -27,6 +27,8 @@ from app.api.modules.v1.cases.models.risk_case import RiskCase
 from app.api.modules.v1.manufacturing.models import Material
 from tests.conftest import TEST_DATABASE_URL, _admin_conninfo
 
+pytestmark = pytest.mark.db  # also reaches PostgreSQL through its own scratch database
+
 BACKEND_DIR = Path(__file__).resolve().parents[3]
 PREVIOUS_REVISION = "cbbdff801f48"
 LATER_TABLES = {
@@ -34,6 +36,11 @@ LATER_TABLES = {
     "forecast_runs",
     "material_risk_scores",
     "material_risk_weight_sets",
+    "validation_runs",
+    "validation_cases",
+    "validation_outcomes",
+    "validation_summaries",
+    "validation_failures",
 }  # added by Tickets 5 and 7
 NEW_TABLES = {
     "materials",

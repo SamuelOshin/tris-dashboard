@@ -1,0 +1,419 @@
+{
+ "status": "SUCCESS",
+ "status_code": 200,
+ "message": "Validation runs",
+ "data": [
+  {
+   "run_id": "VAL-6AB7B1E298",
+   "status": "completed",
+   "created_at": "2026-10-03T22:48:08.697655+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "Method 1.2: cutoffs three months apart, less overlap",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 3,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 40.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-04-30",
+     "2025-07-31",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.2",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:48:12.604334+00:00",
+   "cases": 104,
+   "evaluated": 72
+  },
+  {
+   "run_id": "VAL-79274BB00A",
+   "status": "completed",
+   "created_at": "2026-10-03T22:48:03.234543+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "Method 1.2: more sensitive warning (25), same cases",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 1,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 25.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-02-28",
+     "2025-03-31",
+     "2025-04-30",
+     "2025-05-31",
+     "2025-06-30",
+     "2025-07-31",
+     "2025-08-31",
+     "2025-09-30",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.2",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:48:07.858408+00:00",
+   "cases": 260,
+   "evaluated": 192
+  },
+  {
+   "run_id": "VAL-DDE132A295",
+   "status": "completed",
+   "created_at": "2026-10-03T22:47:58.406180+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "Reference run, method 1.2: default settings (warning at the High band, 5% rise = event)",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 1,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 40.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-02-28",
+     "2025-03-31",
+     "2025-04-30",
+     "2025-05-31",
+     "2025-06-30",
+     "2025-07-31",
+     "2025-08-31",
+     "2025-09-30",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.2",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:48:02.916213+00:00",
+   "cases": 260,
+   "evaluated": 192
+  },
+  {
+   "run_id": "VAL-ADAD96F982",
+   "status": "completed",
+   "created_at": "2026-10-03T22:46:22.188260+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "Reference run: default settings, grouped gap reasons (method 1.1)",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 1,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 40.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-02-28",
+     "2025-03-31",
+     "2025-04-30",
+     "2025-05-31",
+     "2025-06-30",
+     "2025-07-31",
+     "2025-08-31",
+     "2025-09-30",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.1",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:46:26.885268+00:00",
+   "cases": 260,
+   "evaluated": 192
+  },
+  {
+   "run_id": "VAL-1859BC82B7",
+   "status": "completed",
+   "created_at": "2026-10-03T22:44:50.493443+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "Cutoffs three months apart, to reduce overlap between cases",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 3,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 40.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-04-30",
+     "2025-07-31",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.1",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:44:52.349297+00:00",
+   "cases": 104,
+   "evaluated": 72
+  },
+  {
+   "run_id": "VAL-7796C14E7C",
+   "status": "completed",
+   "created_at": "2026-10-03T22:44:44.718069+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "More sensitive warning (25, the Moderate band), same cases",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 1,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 25.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-02-28",
+     "2025-03-31",
+     "2025-04-30",
+     "2025-05-31",
+     "2025-06-30",
+     "2025-07-31",
+     "2025-08-31",
+     "2025-09-30",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.1",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:44:50.186248+00:00",
+   "cases": 260,
+   "evaluated": 192
+  },
+  {
+   "run_id": "VAL-EBEA9EB217",
+   "status": "completed",
+   "created_at": "2026-10-03T22:44:39.009671+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "Default settings: warning at the High band, 5% rise = risk event",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 1,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 40.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-02-28",
+     "2025-03-31",
+     "2025-04-30",
+     "2025-05-31",
+     "2025-06-30",
+     "2025-07-31",
+     "2025-08-31",
+     "2025-09-30",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.1",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:44:44.428181+00:00",
+   "cases": 260,
+   "evaluated": 192
+  },
+  {
+   "run_id": "VAL-25768D469C",
+   "status": "completed",
+   "created_at": "2026-10-03T22:42:26.311643+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "Cutoffs three months apart, to reduce overlap between cases",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 3,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 40.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-04-30",
+     "2025-07-31",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.0",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:42:29.980173+00:00",
+   "cases": 104,
+   "evaluated": 72
+  },
+  {
+   "run_id": "VAL-7658D0A331",
+   "status": "completed",
+   "created_at": "2026-10-03T22:42:05.622434+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "More sensitive warning (25, the Moderate band), same cases",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 1,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 25.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-02-28",
+     "2025-03-31",
+     "2025-04-30",
+     "2025-05-31",
+     "2025-06-30",
+     "2025-07-31",
+     "2025-08-31",
+     "2025-09-30",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.0",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:42:25.769426+00:00",
+   "cases": 260,
+   "evaluated": 192
+  },
+  {
+   "run_id": "VAL-4C75719443",
+   "status": "completed",
+   "created_at": "2026-10-03T22:41:49.301876+00:00",
+   "created_by": "usr-reviewer-01",
+   "dataset_id": null,
+   "data_end": "2025-12-12",
+   "note": "Default settings: warning at the High band, 5% rise = risk event",
+   "config": {
+    "horizons_days": [
+     30,
+     90
+    ],
+    "cutoff_step_months": 1,
+    "event_threshold_pct": 5.0,
+    "alert_threshold": 40.0,
+    "flat_band_pct": 0.5,
+    "dataset_id": null,
+    "material_ids": [],
+    "cutoffs": [
+     "2025-01-31",
+     "2025-02-28",
+     "2025-03-31",
+     "2025-04-30",
+     "2025-05-31",
+     "2025-06-30",
+     "2025-07-31",
+     "2025-08-31",
+     "2025-09-30",
+     "2025-10-31"
+    ],
+    "last_complete_month": "2025-11-01"
+   },
+   "versions": {
+    "validation_method": "1.0",
+    "forecast_engine": "1.0",
+    "risk_method": "1.0",
+    "risk_weight_version": 2
+   },
+   "completed_at": "2026-10-03T22:42:05.243036+00:00",
+   "cases": 260,
+   "evaluated": 192
+  }
+ ]
+}

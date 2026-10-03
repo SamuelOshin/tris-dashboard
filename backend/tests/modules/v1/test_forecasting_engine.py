@@ -75,6 +75,14 @@ def test_forecast_horizon_withheld_when_insufficient_data_engine():
     assert too_short.status == WITHHELD
 
 
+def test_a_month_priced_at_zero_is_withheld_not_a_division_by_zero():
+    prices = noisy_line(20)
+    prices[10] = 0.0
+    out = engine.run_horizon(month_points(prices), cutoff_for(20), 30, "USD")
+    assert out.status == WITHHELD and out.path == []
+    assert out.reason == engine.PRICE_NOT_POSITIVE_REASON
+
+
 def test_a_missing_month_ends_the_usable_history_and_is_never_filled():
     prices = noisy_line(24)
     points = [p for i, p in enumerate(month_points(prices)) if i != 18]  # month 19 missing

@@ -102,6 +102,12 @@ def select_model(
     )
 
 
+PRICE_NOT_POSITIVE_REASON = (
+    "The usable price history has a month priced at zero or below, so percentage errors "
+    "cannot be calculated."
+)
+
+
 def _withheld(
     horizon_days: int, cutoff: date, cfg: ForecastConfig, available: int, reason: str
 ) -> HorizonOutcome:
@@ -151,6 +157,9 @@ def run_horizon(
             + (" (missing months before them ended the usable run)." if broken else ".")
         )
         return _withheld(horizon_days, cutoff, cfg, len(history), reason)
+
+    if any(p.price <= 0 for p in history):
+        return _withheld(horizon_days, cutoff, cfg, len(history), PRICE_NOT_POSITIVE_REASON)
 
     months = cfg.horizon_months(horizon_days)
     y = np.array([p.price for p in history], dtype=float)

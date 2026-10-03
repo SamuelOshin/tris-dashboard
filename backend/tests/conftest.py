@@ -111,7 +111,12 @@ _DB_FIXTURES = frozenset({"db_session", "async_client", "client_as"})
 def pytest_collection_modifyitems(items):
     for item in items:
         uses_db = bool(_DB_FIXTURES & set(item.fixturenames))
-        item.add_marker(pytest.mark.db if uses_db else pytest.mark.pure)
+        # a test (or module) that reaches PostgreSQL another way marks itself with pytest.mark.db
+        declared = item.get_closest_marker("db") is not None
+        if not (uses_db or declared):
+            item.add_marker(pytest.mark.pure)
+        elif not declared:
+            item.add_marker(pytest.mark.db)
 
 
 def _needs_database(request) -> bool:

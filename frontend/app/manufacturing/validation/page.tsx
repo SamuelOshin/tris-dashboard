@@ -1,4 +1,5 @@
 import { ManufacturingPage } from '@/components/manufacturing/manufacturing-page'
+import { ValidationWorkspace } from '@/components/manufacturing/validation/validation-workspace'
 
 export const metadata = {
   title: 'Validation - TRIS',
@@ -6,5 +7,9 @@ export const metadata = {
 }
 
 export default function ValidationPage() {
-  return <ManufacturingPage pageId="validation" />
+  return (
+    <ManufacturingPage pageId="validation">
+      <ValidationWorkspace />
+    </ManufacturingPage>
+  )
 }

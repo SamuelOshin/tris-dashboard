@@ -1,0 +1,1766 @@
+{
+ "status": "SUCCESS",
+ "status_code": 201,
+ "message": "Validation run stored",
+ "data": {
+  "run_id": "VAL-7658D0A331",
+  "status": "completed",
+  "created_at": "2026-10-03T22:42:05.622434+00:00",
+  "created_by": "usr-reviewer-01",
+  "dataset_id": null,
+  "data_end": "2025-12-12",
+  "note": "More sensitive warning (25, the Moderate band), same cases",
+  "config": {
+   "horizons_days": [
+    30,
+    90
+   ],
+   "cutoff_step_months": 1,
+   "event_threshold_pct": 5.0,
+   "alert_threshold": 25.0,
+   "flat_band_pct": 0.5,
+   "dataset_id": null,
+   "material_ids": [],
+   "cutoffs": [
+    "2025-01-31",
+    "2025-02-28",
+    "2025-03-31",
+    "2025-04-30",
+    "2025-05-31",
+    "2025-06-30",
+    "2025-07-31",
+    "2025-08-31",
+    "2025-09-30",
+    "2025-10-31"
+   ],
+   "last_complete_month": "2025-11-01"
+  },
+  "versions": {
+   "validation_method": "1.0",
+   "forecast_engine": "1.0",
+   "risk_method": "1.0",
+   "risk_weight_version": 2
+  },
+  "completed_at": "2026-10-03T22:42:25.769426+00:00",
+  "metrics": {
+   "by_horizon": {
+    "30": {
+     "cases": 130,
+     "withheld": 10,
+     "not_evaluable": 0,
+     "evaluated": 120,
+     "forecast": {
+      "n": 120,
+      "mae": 0.11293609874705722,
+      "rmse": 0.18154584001662272,
+      "mape_pct": 3.062367047123448,
+      "mape_n": 120,
+      "directional_accuracy": 0.17757009345794392,
+      "directional_n": 107,
+      "naive_mae": 0.09585565967825478,
+      "mae_vs_naive_pct": 17.81891557173978,
+      "beats_naive_share": 0.24166666666666667,
+      "ties_naive": 42
+     },
+     "warning": {
+      "n": 120,
+      "events": 16,
+      "event_rate": 0.13333333333333333,
+      "alerts": 103,
+      "tp": 14,
+      "fp": 89,
+      "fn": 2,
+      "tn": 15,
+      "precision": 0.13592233009708737,
+      "recall": 0.875,
+      "false_positive_rate": 0.8557692307692307,
+      "false_negative_rate": 0.125
+     },
+     "lead_time": {
+      "n": 14,
+      "mean_months": 3.2857142857142856,
+      "median_months": 3.0,
+      "min_months": 1,
+      "max_months": 9
+     },
+     "by_material": [
+      {
+       "material_id": "000000000000100000",
+       "n": 10,
+       "mae": 0.3040552999999999,
+       "rmse": 0.3527414378145839,
+       "mape_pct": 4.052420948597207,
+       "mape_n": 10,
+       "directional_accuracy": 0.0,
+       "directional_n": 9,
+       "naive_mae": 0.24637999999999974,
+       "mae_vs_naive_pct": 23.40908352950737,
+       "beats_naive_share": 0.1,
+       "ties_naive": 4,
+       "events": 3
+      },
+      {
+       "material_id": "000000000000100001",
+       "n": 10,
+       "mae": 0.2016720999999999,
+       "rmse": 0.2403704008023865,
+       "mape_pct": 4.616605578405643,
+       "mape_n": 10,
+       "directional_accuracy": 0.1,
+       "directional_n": 10,
+       "naive_mae": 0.16194999999999998,
+       "mae_vs_naive_pct": 24.527384995368905,
+       "beats_naive_share": 0.0,
+       "ties_naive": 7,
+       "events": 3
+      },
+      {
+       "material_id": "000000000000100002",
+       "n": 10,
+       "mae": 0.005169899999999996,
+       "rmse": 0.006681360677287232,
+       "mape_pct": 2.010346220109138,
+       "mape_n": 10,
+       "directional_accuracy": 0.1111111111111111,
+       "directional_n": 9,
+       "naive_mae": 0.005149999999999993,
+       "mae_vs_naive_pct": 0.38640776699034873,
+       "beats_naive_share": 0.1,
+       "ties_naive": 7,
+       "events": 1
+      },
+      {
+       "material_id": "000000000000100003",
+       "n": 10,
+       "mae": 0.023360099999999974,
+       "rmse": 0.03116594248695202,
+       "mape_pct": 1.9507202962978063,
+       "mape_n": 10,
+       "directional_accuracy": 0.2222222222222222,
+       "directional_n": 9,
+       "naive_mae": 0.01877000000000002,
+       "mae_vs_naive_pct": 24.45444858817234,
+       "beats_naive_share": 0.2,
+       "ties_naive": 5,
+       "events": 0
+      },
+      {
+       "material_id": "000000000000100004",
+       "n": 10,
+       "mae": 0.06177129999999993,
+       "rmse": 0.07697658873384809,
+       "mape_pct": 2.1086852212412164,
+       "mape_n": 10,
+       "directional_accuracy": 0.14285714285714285,
+       "directional_n": 7,
+       "naive_mae": 0.05830999999999995,
+       "mae_vs_naive_pct": 5.936031555479304,
+       "beats_naive_share": 0.2,
+       "ties_naive": 6,
+       "events": 0
+      },
+      {
+       "material_id": "000000000000100005",
+       "n": 10,
+       "mae": 0.07832620000000001,
+       "rmse": 0.09800234041899206,
+       "mape_pct": 3.3718292428255854,
+       "mape_n": 10,
+       "directional_accuracy": 0.5,
+       "directional_n": 10,
+       "naive_mae": 0.07555999999999999,
+       "mae_vs_naive_pct": 3.660931709899451,
+       "beats_naive_share": 0.6,
+       "ties_naive": 0,
+       "events": 1
+      },
+      {
+       "material_id": "SOL-ALU-FRAME",
+       "n": 10,
+       "mae": 0.2035861316736375,
+       "rmse": 0.24144921185063387,
+       "mape_pct": 4.66801872016307,
+       "mape_n": 10,
+       "directional_accuracy": 0.1,
+       "directional_n": 10,
+       "naive_mae": 0.15886889440884708,
+       "mae_vs_naive_pct": 28.147257794663805,
+       "beats_naive_share": 0.4,
+       "ties_naive": 0,
+       "events": 3
+      },
+      {
+       "material_id": "SOL-BACKSHEET",
+       "n": 10,
+       "mae": 0.07832620000000001,
+       "rmse": 0.09800234041899206,
+       "mape_pct": 3.3718292428255854,
+       "mape_n": 10,
+       "directional_accuracy": 0.5,
+       "directional_n": 10,
+       "naive_mae": 0.07555999999999999,
+       "mae_vs_naive_pct": 3.660931709899451,
+       "beats_naive_share": 0.6,
+       "ties_naive": 0,
+       "events": 1
+      },
+      {
+       "material_id": "SOL-CELL-M10",
+       "n": 10,
+       "mae": 0.005169899999999996,
+       "rmse": 0.006681360677287232,
+       "mape_pct": 2.010346220109138,
+       "mape_n": 10,
+       "directional_accuracy": 0.1111111111111111,
+       "directional_n": 9,
+       "naive_mae": 0.005149999999999993,
+       "mae_vs_naive_pct": 0.38640776699034873,
+       "beats_naive_share": 0.1,
+       "ties_naive": 7,
+       "events": 1
+      },
+      {
+       "material_id": "SOL-EVA-FILM",
+       "n": 10,
+       "mae": 0.029624936396959334,
+       "rmse": 0.039362557832519296,
+       "mape_pct": 2.472652568130181,
+       "mape_n": 10,
+       "directional_accuracy": 0.0,
+       "directional_n": 7,
+       "naive_mae": 0.02531445532912511,
+       "mae_vs_naive_pct": 17.027745656746873,
+       "beats_naive_share": 0.2,
+       "ties_naive": 0,
+       "events": 0
+      },
+      {
+       "material_id": "SOL-GLASS-32",
+       "n": 10,
+       "mae": 0.3023998168940902,
+       "rmse": 0.34833147276521453,
+       "mape_pct": 4.006265085535587,
+       "mape_n": 10,
+       "directional_accuracy": 0.1,
+       "directional_n": 10,
+       "naive_mae": 0.26094456640108554,
+       "mae_vs_naive_pct": 15.886611882650104,
+       "beats_naive_share": 0.2,
+       "ties_naive": 0,
+       "events": 3
+      },
+      {
+       "material_id": "SOL-JBOX-IP68",
+       "n": 10,
+       "mae": 0.06177129999999993,
+       "rmse": 0.07697658873384809,
+       "mape_pct": 2.1086852212412164,
+       "mape_n": 10,
+       "directional_accuracy": 0.14285714285714285,
+       "directional_n": 7,
+       "naive_mae": 0.05830999999999995,
+       "mae_vs_naive_pct": 5.936031555479304,
+       "beats_naive_share": 0.2,
+       "ties_naive": 6,
+       "events": 0
+      }
+     ],
+     "models": {
+      "Naive (last value)": 65,
+      "Moving average (3 months)": 23,
+      "Linear trend regression": 16,
+      "Lagged price regression": 12,
+      "Simple exponential smoothing": 4
+     }
+    },
+    "90": {
+     "cases": 130,
+     "withheld": 34,
+     "not_evaluable": 24,
+     "evaluated": 72,
+     "forecast": {
+      "n": 72,
+      "mae": 0.23778975039530423,
+      "rmse": 0.39358602964443085,
+      "mape_pct": 5.477702443405523,
+      "mape_n": 72,
+      "directional_accuracy": 0.22058823529411764,
+      "directional_n": 68,
+      "naive_mae": 0.17785315234558466,
+      "mae_vs_naive_pct": 33.70004819102523,
+      "beats_naive_share": 0.3055555555555556,
+      "ties_naive": 22
+     },
+     "warning": {
+      "n": 72,
+      "events": 24,
+      "event_rate": 0.3333333333333333,
+      "alerts": 64,
+      "tp": 22,
+      "fp": 42,
+      "fn": 2,
+      "tn": 6,
+      "precision": 0.34375,
+      "recall": 0.9166666666666666,
+      "false_positive_rate": 0.875,
+      "false_negative_rate": 0.08333333333333333
+     },
+     "lead_time": {
+      "n": 22,
+      "mean_months": 5.2272727272727275,
+      "median_months": 4.5,
+      "min_months": 3,
+      "max_months": 8
+     },
+     "by_material": [
+      {
+       "material_id": "000000000000100000",
+       "n": 6,
+       "mae": 0.7668291666666663,
+       "rmse": 0.7986794618747245,
+       "mape_pct": 9.705674429415742,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 6,
+       "naive_mae": 0.49544999999999967,
+       "mae_vs_naive_pct": 54.77427927473344,
+       "beats_naive_share": 0.16666666666666666,
+       "ties_naive": 1,
+       "events": 3
+      },
+      {
+       "material_id": "000000000000100001",
+       "n": 6,
+       "mae": 0.48237016666666693,
+       "rmse": 0.5539080426609639,
+       "mape_pct": 10.479249234491014,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 5,
+       "naive_mae": 0.3498333333333333,
+       "mae_vs_naive_pct": 37.88570747975237,
+       "beats_naive_share": 0.0,
+       "ties_naive": 3,
+       "events": 2
+      },
+      {
+       "material_id": "000000000000100002",
+       "n": 6,
+       "mae": 0.010028999999999996,
+       "rmse": 0.012144284609093557,
+       "mape_pct": 3.7735930587715,
+       "mape_n": 6,
+       "directional_accuracy": 0.8333333333333334,
+       "directional_n": 6,
+       "naive_mae": 0.01583333333333332,
+       "mae_vs_naive_pct": -36.658947368421025,
+       "beats_naive_share": 0.8333333333333334,
+       "ties_naive": 0,
+       "events": 4
+      },
+      {
+       "material_id": "000000000000100003",
+       "n": 6,
+       "mae": 0.05014999999999999,
+       "rmse": 0.052221084502973164,
+       "mape_pct": 4.029273124900815,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 6,
+       "naive_mae": 0.04526666666666668,
+       "mae_vs_naive_pct": 10.787923416789358,
+       "beats_naive_share": 0.0,
+       "ties_naive": 4,
+       "events": 1
+      },
+      {
+       "material_id": "000000000000100004",
+       "n": 6,
+       "mae": 0.05325000000000002,
+       "rmse": 0.06228326420476053,
+       "mape_pct": 1.8034071027354814,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 5,
+       "naive_mae": 0.05325000000000002,
+       "mae_vs_naive_pct": 0.0,
+       "beats_naive_share": 0.0,
+       "ties_naive": 6,
+       "events": 0
+      },
+      {
+       "material_id": "000000000000100005",
+       "n": 6,
+       "mae": 0.08128949999999986,
+       "rmse": 0.09489987072962738,
+       "mape_pct": 3.5333786190937904,
+       "mape_n": 6,
+       "directional_accuracy": 0.3333333333333333,
+       "directional_n": 6,
+       "naive_mae": 0.11316666666666648,
+       "mae_vs_naive_pct": -28.168335787923425,
+       "beats_naive_share": 0.5,
+       "ties_naive": 1,
+       "events": 2
+      },
+      {
+       "material_id": "SOL-ALU-FRAME",
+       "n": 6,
+       "mae": 0.4862765211577938,
+       "rmse": 0.5557153382636784,
+       "mape_pct": 10.55747358330403,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 5,
+       "naive_mae": 0.3503162795917893,
+       "mae_vs_naive_pct": 38.8107117729253,
+       "beats_naive_share": 0.16666666666666666,
+       "ties_naive": 0,
+       "events": 2
+      },
+      {
+       "material_id": "SOL-BACKSHEET",
+       "n": 6,
+       "mae": 0.08128949999999986,
+       "rmse": 0.09489987072962738,
+       "mape_pct": 3.5333786190937904,
+       "mape_n": 6,
+       "directional_accuracy": 0.3333333333333333,
+       "directional_n": 6,
+       "naive_mae": 0.11316666666666648,
+       "mae_vs_naive_pct": -28.168335787923425,
+       "beats_naive_share": 0.5,
+       "ties_naive": 1,
+       "events": 2
+      },
+      {
+       "material_id": "SOL-CELL-M10",
+       "n": 6,
+       "mae": 0.010028999999999996,
+       "rmse": 0.012144284609093557,
+       "mape_pct": 3.7735930587715,
+       "mape_n": 6,
+       "directional_accuracy": 0.8333333333333334,
+       "directional_n": 6,
+       "naive_mae": 0.01583333333333332,
+       "mae_vs_naive_pct": -36.658947368421025,
+       "beats_naive_share": 0.8333333333333334,
+       "ties_naive": 0,
+       "events": 4
+      },
+      {
+       "material_id": "SOL-EVA-FILM",
+       "n": 6,
+       "mae": 0.04233066870088875,
+       "rmse": 0.04537629402145797,
+       "mape_pct": 3.4047899462853564,
+       "mape_n": 6,
+       "directional_accuracy": 0.16666666666666666,
+       "directional_n": 6,
+       "naive_mae": 0.039407346061106074,
+       "mae_vs_naive_pct": 7.418217494904877,
+       "beats_naive_share": 0.3333333333333333,
+       "ties_naive": 0,
+       "events": 1
+      },
+      {
+       "material_id": "SOL-GLASS-32",
+       "n": 6,
+       "mae": 0.7363834815516351,
+       "rmse": 0.7579878726579772,
+       "mape_pct": 9.335211441267774,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 6,
+       "naive_mae": 0.48946420249412137,
+       "mae_vs_naive_pct": 50.44685143454988,
+       "beats_naive_share": 0.3333333333333333,
+       "ties_naive": 0,
+       "events": 3
+      },
+      {
+       "material_id": "SOL-JBOX-IP68",
+       "n": 6,
+       "mae": 0.05325000000000002,
+       "rmse": 0.06228326420476053,
+       "mape_pct": 1.8034071027354814,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 5,
+       "naive_mae": 0.05325000000000002,
+       "mae_vs_naive_pct": 0.0,
+       "beats_naive_share": 0.0,
+       "ties_naive": 6,
+       "events": 0
+      }
+     ],
+     "models": {
+      "Naive (last value)": 30,
+      "Lagged price regression": 19,
+      "Linear trend regression": 13,
+      "Moving average (3 months)": 8,
+      "Simple exponential smoothing": 2
+     }
+    }
+   },
+   "cases": 260,
+   "frozen": 216,
+   "evaluated": 192
+  },
+  "limitations": [
+   "Cutoffs are every 1 month(s); neighbouring cutoffs and the 90-day horizon share most of their history and holdout months, so the cases are not independent and the number of cases overstates how much evidence there is.",
+   "The risk signal is judged against a rise in the monthly average purchase price of at least 5%. That is a definition chosen before the run, not the only reasonable one.",
+   "Monthly averages of purchase prices, not daily prices; a forecast cannot be judged within a month.",
+   "MAE and RMSE are in each material's own price units, so the pooled values mix scales and are dominated by high-priced materials; MAPE and the share of cases that beat the naive forecast are the comparable figures, and the per-material table gives each MAE on its own.",
+   "Weights, scales and the warning threshold are judgement, not fitted; changing them changes the false positive and false negative counts.",
+   "The data is synthetic: these results show that the method works as built, not how it would perform on a real company's purchasing."
+  ],
+  "problems": {
+   "not_forecast_or_evaluated": {
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 13 are available.": 12,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 3 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 3 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 14 are available.": 12,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 4 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 4 are available.": 1,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 5 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 5 are available.": 1,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 6 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 6 are available.": 1,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 7 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 7 are available.": 1,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 8 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 8 are available.": 1,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 9 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 9 are available.": 1,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 10 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 10 are available.": 1,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 11 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 11 are available.": 1,
+    "withheld: A 30-day outlook needs 13 consecutive months of purchases; 12 are available.": 1,
+    "withheld: A 90-day outlook needs 15 consecutive months of purchases; 12 are available.": 1,
+    "not evaluable: The holdout month is not complete in the data.": 24
+   },
+   "worse_than_naive_cases": 77,
+   "false_positives": [
+    {
+     "case_id": "VCS-B7D901193137",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 27.7641,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 0.5534269902085942
+    },
+    {
+     "case_id": "VCS-4EF159A938E6",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 43.8249,
+     "forecast_change_pct": -4.31175893732727,
+     "actual_change_pct": 3.0935187661585317
+    },
+    {
+     "case_id": "VCS-9806FDBF1A07",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 37.703,
+     "forecast_change_pct": -0.7504751461988479,
+     "actual_change_pct": 4.8720760233917915
+    },
+    {
+     "case_id": "VCS-6AC1E49997D9",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 35.6463,
+     "forecast_change_pct": 1.1957391343431212,
+     "actual_change_pct": -2.2967324374129183
+    },
+    {
+     "case_id": "VCS-8995E250DF84",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 32.8809,
+     "forecast_change_pct": 1.1957391343431212,
+     "actual_change_pct": -2.2967324374129183
+    },
+    {
+     "case_id": "VCS-0B9178FC92BF",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 36.2465,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 0.5534269902085942
+    },
+    {
+     "case_id": "VCS-797DC1D197BF",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 29.6681,
+     "forecast_change_pct": -0.7504751461988479,
+     "actual_change_pct": 4.8720760233917915
+    },
+    {
+     "case_id": "VCS-D1C7FF2F26B3",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 26.9809,
+     "forecast_change_pct": 0.5730325654359048,
+     "actual_change_pct": -2.4707317781715643
+    },
+    {
+     "case_id": "VCS-EB3E1405BA61",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 30.8991,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -1.100762066045724
+    },
+    {
+     "case_id": "VCS-D906EE7712DB",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 46.6242,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 2.2483569699065953
+    },
+    {
+     "case_id": "VCS-165BFC0424F0",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 44.7488,
+     "forecast_change_pct": -1.8820269752204188,
+     "actual_change_pct": 0.24047677133796075
+    },
+    {
+     "case_id": "VCS-CE1460FC532D",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 31.4648,
+     "forecast_change_pct": 1.697488269390024,
+     "actual_change_pct": 3.726193762075636
+    },
+    {
+     "case_id": "VCS-D103ADA27F49",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 27.7006,
+     "forecast_change_pct": 1.697488269390024,
+     "actual_change_pct": 3.726193762075636
+    },
+    {
+     "case_id": "VCS-8255CE34874C",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 38.8548,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -1.100762066045724
+    },
+    {
+     "case_id": "VCS-921A3CDF5217",
+     "material_id": "SOL-EVA-FILM",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 31.3401,
+     "forecast_change_pct": 8.677411345026087e-06,
+     "actual_change_pct": 2.3309388183732738
+    },
+    {
+     "case_id": "VCS-AEA76698D9C1",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 36.6719,
+     "forecast_change_pct": -1.8820269752204188,
+     "actual_change_pct": 0.24047677133796075
+    },
+    {
+     "case_id": "VCS-815E2046E5C1",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 40.8747,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -1.048714479025703
+    },
+    {
+     "case_id": "VCS-75CD8E026807",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 40.8747,
+     "forecast_change_pct": -2.444181326116368,
+     "actual_change_pct": 1.3278078484438405
+    },
+    {
+     "case_id": "VCS-B5937DDA1A99",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 36.1516,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 2.1104234754189655
+    },
+    {
+     "case_id": "VCS-36709A8DE081",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 36.1516,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 3.3551213406578295
+    },
+    {
+     "case_id": "VCS-82F8003AE675",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 28.1987,
+     "forecast_change_pct": 0.538850452368278,
+     "actual_change_pct": 3.7919105907397554
+    },
+    {
+     "case_id": "VCS-AA64D3BBBDE2",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 27.044,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 3.8052155401809395
+    },
+    {
+     "case_id": "VCS-639F622FA4D8",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 28.0812,
+     "forecast_change_pct": 0.538850452368278,
+     "actual_change_pct": 3.7919105907397554
+    },
+    {
+     "case_id": "VCS-72DC2038CF84",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 27.1831,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 3.8052155401809395
+    },
+    {
+     "case_id": "VCS-41370181FB2F",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 32.8541,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 4.195205479452069
+    },
+    {
+     "case_id": "VCS-3F26C982B999",
+     "material_id": "SOL-EVA-FILM",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 26.3923,
+     "forecast_change_pct": 1.5591398616621177e-06,
+     "actual_change_pct": -3.4742987637982004
+    },
+    {
+     "case_id": "VCS-120E0B12668E",
+     "material_id": "SOL-EVA-FILM",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 26.3923,
+     "forecast_change_pct": -3.0232634402456937,
+     "actual_change_pct": 1.0300328279311932
+    },
+    {
+     "case_id": "VCS-4E1C099362BE",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 30.1614,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 2.1104234754189655
+    },
+    {
+     "case_id": "VCS-EEDDED74FF21",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 30.1614,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 3.3551213406578295
+    },
+    {
+     "case_id": "VCS-1D52343E80C8",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 29.5487,
+     "forecast_change_pct": -1.108463434675444,
+     "actual_change_pct": 2.218570254724739
+    },
+    {
+     "case_id": "VCS-EE7442EA950B",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 34.2045,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.094017094017108
+    },
+    {
+     "case_id": "VCS-39736E1A42E6",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-04-30",
+     "horizon_days": 90,
+     "risk_score": 34.2045,
+     "forecast_change_pct": -0.034188034188031846,
+     "actual_change_pct": 3.358974358974365
+    },
+    {
+     "case_id": "VCS-AB733727934A",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 36.234,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.6888555960366425
+    },
+    {
+     "case_id": "VCS-DEDBAC18AD0E",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-04-30",
+     "horizon_days": 90,
+     "risk_score": 36.234,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.566277367292046
+    },
+    {
+     "case_id": "VCS-F8B4885E3034",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 31.4801,
+     "forecast_change_pct": -1.623509806435075,
+     "actual_change_pct": -2.367217878049832
+    },
+    {
+     "case_id": "VCS-9D9A2103E24A",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-04-30",
+     "horizon_days": 90,
+     "risk_score": 31.4801,
+     "forecast_change_pct": -0.030893475195503672,
+     "actual_change_pct": -1.9570140580267403
+    },
+    {
+     "case_id": "VCS-EAB00A204569",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 33.6153,
+     "forecast_change_pct": -1.623509806435075,
+     "actual_change_pct": -2.367217878049832
+    },
+    {
+     "case_id": "VCS-9EEF4D170E3F",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-04-30",
+     "horizon_days": 90,
+     "risk_score": 33.6153,
+     "forecast_change_pct": -0.030893475195503672,
+     "actual_change_pct": -1.9570140580267403
+    },
+    {
+     "case_id": "VCS-3C6714CB65DA",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 39.9928,
+     "forecast_change_pct": -1.108463434675444,
+     "actual_change_pct": 2.218570254724739
+    },
+    {
+     "case_id": "VCS-FBADA6F0F683",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 36.2052,
+     "forecast_change_pct": -3.407902010490893,
+     "actual_change_pct": 3.9995885701720413
+    },
+    {
+     "case_id": "VCS-2C82E2768910",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 31.7675,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.6888555960366425
+    },
+    {
+     "case_id": "VCS-0B18121DD416",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-04-30",
+     "horizon_days": 90,
+     "risk_score": 31.7675,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.566277367292046
+    },
+    {
+     "case_id": "VCS-C22503EEB55B",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 44.3518,
+     "forecast_change_pct": -4.653580753450203,
+     "actual_change_pct": 2.424468481909736
+    },
+    {
+     "case_id": "VCS-5AEBF6C71822",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 44.3518,
+     "forecast_change_pct": -3.242886449619009,
+     "actual_change_pct": 1.6451750412958877
+    },
+    {
+     "case_id": "VCS-B35EE444ACB7",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 77.099,
+     "forecast_change_pct": 10.91107230629933,
+     "actual_change_pct": 2.4533264347001316
+    },
+    {
+     "case_id": "VCS-6FFB9C899F62",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 55.6704,
+     "forecast_change_pct": -8.654270685120501,
+     "actual_change_pct": -0.19617988186089175
+    },
+    {
+     "case_id": "VCS-61E4F03D0DB6",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 25.657,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.293540750760891
+    },
+    {
+     "case_id": "VCS-B12BE8ED956C",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 25.657,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 4.886709502874531
+    },
+    {
+     "case_id": "VCS-67FBB6A7D47E",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 30.1872,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -0.46207935710697035
+    },
+    {
+     "case_id": "VCS-3D644B6ED347",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 30.1872,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -3.1073162564875245
+    },
+    {
+     "case_id": "VCS-CA339D58E880",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 29.5113,
+     "forecast_change_pct": 1.3981355858024402,
+     "actual_change_pct": 2.437743446102658
+    },
+    {
+     "case_id": "VCS-E74FB7F4BC00",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 32.9428,
+     "forecast_change_pct": 2.999474812902103,
+     "actual_change_pct": -4.07895312705151
+    },
+    {
+     "case_id": "VCS-945BF3F9C472",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 72.1786,
+     "forecast_change_pct": 10.793428276966699,
+     "actual_change_pct": 2.236969437233971
+    },
+    {
+     "case_id": "VCS-DF1BAF39A328",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 55.5119,
+     "forecast_change_pct": -8.597428728975043,
+     "actual_change_pct": 0.3454455380671462
+    },
+    {
+     "case_id": "VCS-2E05779366AC",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 29.9796,
+     "forecast_change_pct": 1.3981355858024402,
+     "actual_change_pct": 2.437743446102658
+    },
+    {
+     "case_id": "VCS-23E63067D0E8",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 32.6485,
+     "forecast_change_pct": 2.999474812902103,
+     "actual_change_pct": -4.07895312705151
+    },
+    {
+     "case_id": "VCS-F05B4E11CBBF",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 40.6803,
+     "forecast_change_pct": -3.9600907881840453,
+     "actual_change_pct": 2.7497899365328538
+    },
+    {
+     "case_id": "VCS-42967F5F16A1",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 40.6803,
+     "forecast_change_pct": -4.736748726150064,
+     "actual_change_pct": 2.740747867356519
+    },
+    {
+     "case_id": "VCS-F709678930B1",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 28.3348,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -0.46207935710697035
+    },
+    {
+     "case_id": "VCS-532C3B7AC934",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 28.3348,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -3.1073162564875245
+    },
+    {
+     "case_id": "VCS-7EAE16760145",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 39.2244,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.3474144209759453
+    },
+    {
+     "case_id": "VCS-A6BC46AB283D",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 39.2244,
+     "forecast_change_pct": -9.888656227239622,
+     "actual_change_pct": 3.597440432837362
+    },
+    {
+     "case_id": "VCS-50C1AA8C8B3B",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 44.0447,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -1.0310579917515272
+    },
+    {
+     "case_id": "VCS-F3BE17C9BA2F",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 44.0447,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -3.158404174732765
+    },
+    {
+     "case_id": "VCS-62FA484F0C6E",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 42.8198,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 0.6451612903225712
+    },
+    {
+     "case_id": "VCS-CA33FC1EBAB8",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 42.8198,
+     "forecast_change_pct": -1.5210626185958254,
+     "actual_change_pct": 1.6318785578747441
+    },
+    {
+     "case_id": "VCS-CFDC90EA1F7D",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 28.7628,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 0.9348134546365072
+    },
+    {
+     "case_id": "VCS-188BD5759B20",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 26.7264,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 0.34312241396710075
+    },
+    {
+     "case_id": "VCS-37EF1C9A234C",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 26.7264,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.5709624247317144
+    },
+    {
+     "case_id": "VCS-7ECEC0324F42",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 27.9858,
+     "forecast_change_pct": 1.5911304793642556,
+     "actual_change_pct": -2.2301973852858037
+    },
+    {
+     "case_id": "VCS-BCE06DA06330",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 47.6538,
+     "forecast_change_pct": 7.023137738038088e-06,
+     "actual_change_pct": -0.6456715398881485
+    },
+    {
+     "case_id": "VCS-3750CB9AC7D3",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 47.6538,
+     "forecast_change_pct": 7.023137738038088e-06,
+     "actual_change_pct": -2.808016617683362
+    },
+    {
+     "case_id": "VCS-1B0943C6392C",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 28.0798,
+     "forecast_change_pct": -0.007733059899173167,
+     "actual_change_pct": -1.9695804494573865
+    },
+    {
+     "case_id": "VCS-B45959B08FF0",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 30.7317,
+     "forecast_change_pct": 1.5911304793642556,
+     "actual_change_pct": -2.2301973852858037
+    },
+    {
+     "case_id": "VCS-D4635E753F2B",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 53.4322,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 0.6451612903225712
+    },
+    {
+     "case_id": "VCS-A3F92CA972C4",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 53.4322,
+     "forecast_change_pct": -1.5210626185958254,
+     "actual_change_pct": 1.6318785578747441
+    },
+    {
+     "case_id": "VCS-085CE6CC08A5",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 36.9227,
+     "forecast_change_pct": -2.677615129620392e-07,
+     "actual_change_pct": 2.586141448868018
+    },
+    {
+     "case_id": "VCS-3FD74CB9D090",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 36.9227,
+     "forecast_change_pct": -7.5589003135741795,
+     "actual_change_pct": 3.437714649782442
+    },
+    {
+     "case_id": "VCS-5C57A72EFCC1",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 25.2145,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 0.34312241396710075
+    },
+    {
+     "case_id": "VCS-63022E95CDA6",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 25.2145,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.5709624247317144
+    },
+    {
+     "case_id": "VCS-463DF6FC1CCE",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 38.2884,
+     "forecast_change_pct": 2.220446049250313e-14,
+     "actual_change_pct": -2.0802320209434733
+    },
+    {
+     "case_id": "VCS-6BB201490576",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 38.2884,
+     "forecast_change_pct": -6.0203146655715685,
+     "actual_change_pct": 2.2367948257276504
+    },
+    {
+     "case_id": "VCS-35726B285306",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 29.1333,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -1.5712038100097803
+    },
+    {
+     "case_id": "VCS-7265AC8A95D7",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 29.1333,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -6.187013649700224
+    },
+    {
+     "case_id": "VCS-BDB3A28B6804",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 39.7346,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -0.2639517345399578
+    },
+    {
+     "case_id": "VCS-DA6586775622",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 45.4069,
+     "forecast_change_pct": 2.6470588235294246,
+     "actual_change_pct": 3.016591251885381
+    },
+    {
+     "case_id": "VCS-97341AC1CC4D",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 30.4892,
+     "forecast_change_pct": 0.7835938146034893,
+     "actual_change_pct": 2.588274208219632
+    },
+    {
+     "case_id": "VCS-40F57E2936C3",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 28.81,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 4.597701149425282
+    },
+    {
+     "case_id": "VCS-6D1608A0D481",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 30.5246,
+     "forecast_change_pct": 2.3954238396164618,
+     "actual_change_pct": -4.480278927871007
+    },
+    {
+     "case_id": "VCS-1E6453250406",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 34.9007,
+     "forecast_change_pct": 6.437637845024824e-06,
+     "actual_change_pct": -1.212292791767855
+    },
+    {
+     "case_id": "VCS-A9ED1275FF23",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 34.9007,
+     "forecast_change_pct": 6.437637845024824e-06,
+     "actual_change_pct": -6.236662101838797
+    },
+    {
+     "case_id": "VCS-402C2C890D8C",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 31.0303,
+     "forecast_change_pct": 2.3954238396164618,
+     "actual_change_pct": -4.480278927871007
+    },
+    {
+     "case_id": "VCS-9E8BE90989F1",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 51.0184,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -0.2639517345399578
+    },
+    {
+     "case_id": "VCS-C3AB96EC7420",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 55.4302,
+     "forecast_change_pct": 2.6470588235294246,
+     "actual_change_pct": 3.016591251885381
+    },
+    {
+     "case_id": "VCS-E4D0EA23E04D",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 39.9845,
+     "forecast_change_pct": 5.662892554880727e-06,
+     "actual_change_pct": -2.529524453824328
+    },
+    {
+     "case_id": "VCS-82B0470356E5",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 39.9845,
+     "forecast_change_pct": -4.2757848270881365,
+     "actual_change_pct": 1.4770711649181534
+    },
+    {
+     "case_id": "VCS-B5CA765F811C",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 28.6296,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 4.391701505838541
+    },
+    {
+     "case_id": "VCS-458B7F4B28BC",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 27.53,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -0.5875364510206427
+    },
+    {
+     "case_id": "VCS-63FCB06AD624",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-08-31",
+     "horizon_days": 90,
+     "risk_score": 27.53,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -8.590560535695001
+    },
+    {
+     "case_id": "VCS-29C8AD69EAEA",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 25.093,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.2476370510396961
+    },
+    {
+     "case_id": "VCS-0415EA896507",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 32.5314,
+     "forecast_change_pct": 0.9165726261486373,
+     "actual_change_pct": 2.5713364501047886
+    },
+    {
+     "case_id": "VCS-00879D6909C7",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-08-31",
+     "horizon_days": 90,
+     "risk_score": 30.5673,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 2.3214573593422605
+    },
+    {
+     "case_id": "VCS-BA4216C9D5E7",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 31.4069,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 4.34391954936586
+    },
+    {
+     "case_id": "VCS-13EA0C99D777",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-08-31",
+     "horizon_days": 90,
+     "risk_score": 31.4069,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.1058506410478008
+    },
+    {
+     "case_id": "VCS-6039B70047E6",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 33.6749,
+     "forecast_change_pct": 3.8280786604006023,
+     "actual_change_pct": 4.412100196194735
+    },
+    {
+     "case_id": "VCS-BD8440AB3295",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 33.3722,
+     "forecast_change_pct": -3.4488653821718174e-06,
+     "actual_change_pct": -0.9759358651460048
+    },
+    {
+     "case_id": "VCS-0D8594E61C59",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-08-31",
+     "horizon_days": 90,
+     "risk_score": 33.3722,
+     "forecast_change_pct": -3.4488653821718174e-06,
+     "actual_change_pct": -9.07972335534657
+    },
+    {
+     "case_id": "VCS-092144372C36",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 29.7895,
+     "forecast_change_pct": 3.8280786604006023,
+     "actual_change_pct": 4.412100196194735
+    },
+    {
+     "case_id": "VCS-6AF7D1DD5A02",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 39.7096,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.2476370510396961
+    },
+    {
+     "case_id": "VCS-B47E9441EFC1",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 30.3395,
+     "forecast_change_pct": 5.886823251088913e-06,
+     "actual_change_pct": 3.446818058028156
+    },
+    {
+     "case_id": "VCS-C667B9D16B77",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-08-31",
+     "horizon_days": 30,
+     "risk_score": 26.7381,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 4.34391954936586
+    },
+    {
+     "case_id": "VCS-876C09B55EAA",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-08-31",
+     "horizon_days": 90,
+     "risk_score": 26.7381,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 1.1058506410478008
+    },
+    {
+     "case_id": "VCS-456616906814",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 30.0502,
+     "forecast_change_pct": 2.220446049250313e-14,
+     "actual_change_pct": 0.016320586536799908
+    },
+    {
+     "case_id": "VCS-401942611DC9",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 27.5059,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -4.126197770679873
+    },
+    {
+     "case_id": "VCS-1668C8FB6AD9",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 25.4695,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 2.0164301717699784
+    },
+    {
+     "case_id": "VCS-860A7AB7459D",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 35.3798,
+     "forecast_change_pct": 1.1503339882121821,
+     "actual_change_pct": -0.5972495088408691
+    },
+    {
+     "case_id": "VCS-175BB2E08E92",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 34.0406,
+     "forecast_change_pct": -0.8617937338544102,
+     "actual_change_pct": -1.3910048353977689
+    },
+    {
+     "case_id": "VCS-98A77BD64303",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 33.1224,
+     "forecast_change_pct": -2.4703411760640392e-06,
+     "actual_change_pct": -4.150598157817809
+    },
+    {
+     "case_id": "VCS-D7CC68784FF6",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 39.9762,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 2.0164301717699784
+    },
+    {
+     "case_id": "VCS-11190E482563",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 29.9568,
+     "forecast_change_pct": -6.255987683445596e-06,
+     "actual_change_pct": 0.6416393825753763
+    },
+    {
+     "case_id": "VCS-BD7DB4C806C4",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 32.1429,
+     "forecast_change_pct": -0.8617937338544102,
+     "actual_change_pct": -1.3910048353977689
+    },
+    {
+     "case_id": "VCS-C7CC7CA8D167",
+     "material_id": "000000000000100000",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 33.2121,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 4.723411199116323
+    },
+    {
+     "case_id": "VCS-C592B3E3E045",
+     "material_id": "000000000000100001",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 36.3791,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -4.093010606472669
+    },
+    {
+     "case_id": "VCS-6C975ED314EF",
+     "material_id": "000000000000100002",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 30.2807,
+     "forecast_change_pct": 0.9147144948755681,
+     "actual_change_pct": 2.4158125915080486
+    },
+    {
+     "case_id": "VCS-6CC53A2F51FA",
+     "material_id": "000000000000100003",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 30.9052,
+     "forecast_change_pct": 1.0075895327693818,
+     "actual_change_pct": 0.35575934856511005
+    },
+    {
+     "case_id": "VCS-8BFCBBCB737D",
+     "material_id": "000000000000100004",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 36.8186,
+     "forecast_change_pct": -0.46685027204943497,
+     "actual_change_pct": -1.736414321219848
+    },
+    {
+     "case_id": "VCS-19117221FADA",
+     "material_id": "000000000000100005",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 44.1142,
+     "forecast_change_pct": -4.9190407277238,
+     "actual_change_pct": 2.1170146785197463
+    },
+    {
+     "case_id": "VCS-524A8A078B95",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 45.7724,
+     "forecast_change_pct": -9.579430881867523e-06,
+     "actual_change_pct": -4.20770132758218
+    },
+    {
+     "case_id": "VCS-B292F072D2CD",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 41.462,
+     "forecast_change_pct": -4.9190407277238,
+     "actual_change_pct": 2.1170146785197463
+    },
+    {
+     "case_id": "VCS-1824F8AABBBF",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 48.346,
+     "forecast_change_pct": 0.9147144948755681,
+     "actual_change_pct": 2.4158125915080486
+    },
+    {
+     "case_id": "VCS-5E402D744222",
+     "material_id": "SOL-JBOX-IP68",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 30.7817,
+     "forecast_change_pct": -0.46685027204943497,
+     "actual_change_pct": -1.736414321219848
+    }
+   ],
+   "false_negatives": [
+    {
+     "case_id": "VCS-BD31BC338797",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 20.3386,
+     "forecast_change_pct": -5.495389820975305e-06,
+     "actual_change_pct": 5.884505803559015
+    },
+    {
+     "case_id": "VCS-F63F8D2103B2",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 18.8809,
+     "forecast_change_pct": -0.24750188896903724,
+     "actual_change_pct": 6.692095548690569
+    },
+    {
+     "case_id": "VCS-1F6EF04A66C8",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 19.6139,
+     "forecast_change_pct": 0.4398231454957102,
+     "actual_change_pct": 14.010489183702601
+    },
+    {
+     "case_id": "VCS-F154DD0A75E3",
+     "material_id": "SOL-EVA-FILM",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 20.3273,
+     "forecast_change_pct": -9.19481045746906e-06,
+     "actual_change_pct": 5.130677951657803
+    }
+   ]
+  }
+ }
+}

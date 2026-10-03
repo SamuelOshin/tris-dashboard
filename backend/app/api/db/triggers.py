@@ -62,6 +62,41 @@ CREATE TRIGGER trg_material_risk_weight_sets_immutable
 """
 
 
+VALIDATION_IMMUTABILITY_SQL = """
+CREATE OR REPLACE FUNCTION prevent_validation_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION '% rows are immutable: UPDATE and DELETE are prohibited', TG_TABLE_NAME;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_validation_runs_immutable ON validation_runs;
+CREATE TRIGGER trg_validation_runs_immutable
+    BEFORE UPDATE OR DELETE ON validation_runs
+    FOR EACH ROW EXECUTE FUNCTION prevent_validation_mutation();
+
+DROP TRIGGER IF EXISTS trg_validation_cases_immutable ON validation_cases;
+CREATE TRIGGER trg_validation_cases_immutable
+    BEFORE UPDATE OR DELETE ON validation_cases
+    FOR EACH ROW EXECUTE FUNCTION prevent_validation_mutation();
+
+DROP TRIGGER IF EXISTS trg_validation_outcomes_immutable ON validation_outcomes;
+CREATE TRIGGER trg_validation_outcomes_immutable
+    BEFORE UPDATE OR DELETE ON validation_outcomes
+    FOR EACH ROW EXECUTE FUNCTION prevent_validation_mutation();
+
+DROP TRIGGER IF EXISTS trg_validation_failures_immutable ON validation_failures;
+CREATE TRIGGER trg_validation_failures_immutable
+    BEFORE UPDATE OR DELETE ON validation_failures
+    FOR EACH ROW EXECUTE FUNCTION prevent_validation_mutation();
+
+DROP TRIGGER IF EXISTS trg_validation_summaries_immutable ON validation_summaries;
+CREATE TRIGGER trg_validation_summaries_immutable
+    BEFORE UPDATE OR DELETE ON validation_summaries
+    FOR EACH ROW EXECUTE FUNCTION prevent_validation_mutation();
+"""
+
+
 async def apply_database_triggers(session: AsyncSession) -> None:
     """
     Applies database-level triggers if running on PostgreSQL.
@@ -79,6 +114,9 @@ async def apply_database_triggers(session: AsyncSession) -> None:
             await session.execute(text(MATERIAL_RISK_IMMUTABILITY_SQL))
             await session.commit()
             logger.info("Successfully applied material risk immutability triggers")
+            await session.execute(text(VALIDATION_IMMUTABILITY_SQL))
+            await session.commit()
+            logger.info("Successfully applied validation immutability triggers")
         except Exception as e:
             logger.warning(f"Could not apply PostgreSQL trigger: {e}")
             await session.rollback()
