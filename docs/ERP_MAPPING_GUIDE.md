@@ -12,6 +12,9 @@ schema (see `DATA_DICTIONARY.md`). Screen: **Manufacturing → ERP/BOM Data Mapp
 All sample files are **synthetic** (a solar-panel manufacturer, 2024–2025) and live in
 `docs/samples/erp_mapping/`. They are not company data.
 
+A second, differently shaped sample set (an industrial-parts workbook with its own column names, used for the
+transferability test) is in `docs/samples/environment_b/`; see `TRANSFERABILITY_TEST.md`.
+
 ## The flow
 
 1. **Choose data and layout.** Pick what the file contains (one of 11 canonical tables), the layout

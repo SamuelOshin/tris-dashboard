@@ -1,0 +1,4794 @@
+{
+ "overview": {
+  "computed_at": "2026-10-03T23:45:03.434351+00:00",
+  "pending_capabilities": [
+   "Cost forecast",
+   "Financial exposure"
+  ],
+  "signal_catalog": [
+   {
+    "code": "rapid_price_increase",
+    "name": "Rapid price increase"
+   },
+   {
+    "code": "abnormal_price",
+    "name": "Price unusual for this material"
+   },
+   {
+    "code": "standard_cost_deviation",
+    "name": "Paying above standard cost"
+   },
+   {
+    "code": "ppv_trend",
+    "name": "Purchase price variance worsening"
+   },
+   {
+    "code": "procurement_anomaly",
+    "name": "Unusual purchase lines"
+   },
+   {
+    "code": "bom_cost_escalation",
+    "name": "Product material cost rising"
+   },
+   {
+    "code": "supplier_concentration",
+    "name": "Dependence on one supplier"
+   },
+   {
+    "code": "inventory_cost_exposure",
+    "name": "Low stock while prices rise"
+   },
+   {
+    "code": "high_spend",
+    "name": "Among the highest-spend materials"
+   },
+   {
+    "code": "lead_time_deterioration",
+    "name": "Supplier lead time or delivery getting worse"
+   }
+  ],
+  "datasets": [
+   "Synthetic Environment A",
+   "Synthetic Environment B"
+  ],
+  "has_data": true,
+  "as_of": "2025-12-08",
+  "first_purchase_date": "2024-01-08",
+  "notice": null,
+  "materials": [
+   {
+    "material_id": "SOL-ALU-FRAME",
+    "description": "Aluminium frame profile",
+    "category": "Metals",
+    "unit_of_measure": "KG",
+    "currency": "USD",
+    "suppliers": [
+     "SUP-006"
+    ],
+    "latest_price": 4.2314,
+    "latest_price_month": "2025-12-01",
+    "price_change_1m_pct": -0.01,
+    "price_change_3m_pct": -8.06,
+    "standard_cost": 3.5609,
+    "vs_standard_pct": 18.83,
+    "history_months": 24,
+    "purchase_lines": 24,
+    "top_supplier": "SUP-006",
+    "top_supplier_share_pct": 100.0,
+    "coverage_days": 14.0,
+    "inventory_value": 2699.63,
+    "latest_lead_time_days": 38.7,
+    "bom_product_count": 1,
+    "spend_window_total": 77081.35,
+    "spend_share_pct": 7.51,
+    "triggered_count": 3,
+    "signals": [
+     {
+      "code": "rapid_price_increase",
+      "name": "Rapid price increase",
+      "status": "clear",
+      "explanation": "Price moved -0.0% (Nov 2025 4.2318 to Dec 2025 4.2314), within the 10% limit."
+     },
+     {
+      "code": "abnormal_price",
+      "name": "Price unusual for this material",
+      "status": "clear",
+      "explanation": "Dec 2025 price 4.2314 is -0.1 standard deviations from the recent average 4.2598; the limit is 2."
+     },
+     {
+      "code": "standard_cost_deviation",
+      "name": "Paying above standard cost",
+      "status": "triggered",
+      "explanation": "Actual price has been at least 5% above standard cost for 3 months in a row (Oct 2025 +23.9%, Nov 2025 +18.8%, Dec 2025 +18.8%)."
+     },
+     {
+      "code": "ppv_trend",
+      "name": "Purchase price variance worsening",
+      "status": "clear",
+      "explanation": "Variance over the last 3 periods: 1,091 \u2192 1,331 \u2192 561 (derived from purchases and standard cost); not a rising overspend."
+     },
+     {
+      "code": "procurement_anomaly",
+      "name": "Unusual purchase lines",
+      "status": "clear",
+      "explanation": "No purchase line in the last 90 days is unusual (3 checked)."
+     },
+     {
+      "code": "bom_cost_escalation",
+      "name": "Product material cost rising",
+      "status": "clear",
+      "explanation": "No product using this material rose 5% or more over 90 days with this material driving it."
+     },
+     {
+      "code": "supplier_concentration",
+      "name": "Dependence on one supplier",
+      "status": "triggered",
+      "explanation": "SUP-006 supplies 100% of the last year's spend (1 supplier); the limit is 70%."
+     },
+     {
+      "code": "inventory_cost_exposure",
+      "name": "Low stock while prices rise",
+      "status": "clear",
+      "explanation": "Stock covers 14 days and the price moved -8.1% over about 90 days; the signal needs under 30 days and +5% or more."
+     },
+     {
+      "code": "high_spend",
+      "name": "Among the highest-spend materials",
+      "status": "clear",
+      "explanation": "Ranks 3 of 6 by last-year spend (7.5% of the total); the top 2 are flagged."
+     },
+     {
+      "code": "lead_time_deterioration",
+      "name": "Supplier lead time or delivery getting worse",
+      "status": "triggered",
+      "explanation": "Worse: SUP-006 lead time 18.4 \u2192 33.9 days (+85%), on-time delivery 94% \u2192 78%."
+     }
+    ],
+    "notes": []
+   },
+   {
+    "material_id": "SOL-BACKSHEET",
+    "description": "Backsheet TPT",
+    "category": "Polymers",
+    "unit_of_measure": "M2",
+    "currency": "USD",
+    "suppliers": [
+     "SUP-002"
+    ],
+    "latest_price": 2.3965,
+    "latest_price_month": "2025-12-01",
+    "price_change_1m_pct": -2.96,
+    "price_change_3m_pct": 4.72,
+    "standard_cost": 2.109,
+    "vs_standard_pct": 13.63,
+    "history_months": 24,
+    "purchase_lines": 24,
+    "top_supplier": "SUP-002",
+    "top_supplier_share_pct": 100.0,
+    "coverage_days": 45.0,
+    "inventory_value": 6448.98,
+    "latest_lead_time_days": 19.1,
+    "bom_product_count": 1,
+    "spend_window_total": 41444.63,
+    "spend_share_pct": 4.04,
+    "triggered_count": 2,
+    "signals": [
+     {
+      "code": "rapid_price_increase",
+      "name": "Rapid price increase",
+      "status": "clear",
+      "explanation": "Price moved -3.0% (Nov 2025 2.4697 to Dec 2025 2.3965), within the 10% limit."
+     },
+     {
+      "code": "abnormal_price",
+      "name": "Price unusual for this material",
+      "status": "clear",
+      "explanation": "Dec 2025 price 2.3965 is 1.2 standard deviations from the recent average 2.2930; the limit is 2."
+     },
+     {
+      "code": "standard_cost_deviation",
+      "name": "Paying above standard cost",
+      "status": "triggered",
+      "explanation": "Actual price has been at least 5% above standard cost for 3 months in a row (Oct 2025 +14.7%, Nov 2025 +17.1%, Dec 2025 +13.6%)."
+     },
+     {
+      "code": "ppv_trend",
+      "name": "Purchase price variance worsening",
+      "status": "clear",
+      "explanation": "Variance over the last 3 periods: 661 \u2192 694 \u2192 380 (derived from purchases and standard cost); not a rising overspend."
+     },
+     {
+      "code": "procurement_anomaly",
+      "name": "Unusual purchase lines",
+      "status": "clear",
+      "explanation": "No purchase line in the last 90 days is unusual (3 checked)."
+     },
+     {
+      "code": "bom_cost_escalation",
+      "name": "Product material cost rising",
+      "status": "clear",
+      "explanation": "No product using this material rose 5% or more over 90 days with this material driving it."
+     },
+     {
+      "code": "supplier_concentration",
+      "name": "Dependence on one supplier",
+      "status": "triggered",
+      "explanation": "SUP-002 supplies 100% of the last year's spend (1 supplier); the limit is 70%."
+     },
+     {
+      "code": "inventory_cost_exposure",
+      "name": "Low stock while prices rise",
+      "status": "clear",
+      "explanation": "Stock covers 45 days and the price moved +4.7% over about 90 days; the signal needs under 30 days and +5% or more."
+     },
+     {
+      "code": "high_spend",
+      "name": "Among the highest-spend materials",
+      "status": "clear",
+      "explanation": "Ranks 5 of 6 by last-year spend (4.0% of the total); the top 2 are flagged."
+     },
+     {
+      "code": "lead_time_deterioration",
+      "name": "Supplier lead time or delivery getting worse",
+      "status": "clear",
+      "explanation": "Stable across 1 supplier: SUP-002 lead time 18.6 \u2192 18.2 days (-2%), on-time delivery 95% \u2192 94%."
+     }
+    ],
+    "notes": []
+   },
+   {
+    "material_id": "SOL-CELL-M10",
+    "description": "Monocrystalline cell M10",
+    "category": "Cells",
+    "unit_of_measure": "PCS",
+    "currency": "USD",
+    "suppliers": [
+     "SUP-004"
+    ],
+    "latest_price": 0.2684,
+    "latest_price_month": "2025-12-01",
+    "price_change_1m_pct": -4.07,
+    "price_change_3m_pct": 0.22,
+    "standard_cost": 0.2196,
+    "vs_standard_pct": 22.22,
+    "history_months": 24,
+    "purchase_lines": 24,
+    "top_supplier": "SUP-004",
+    "top_supplier_share_pct": 100.0,
+    "coverage_days": 20.0,
+    "inventory_value": 3083.92,
+    "latest_lead_time_days": 17.6,
+    "bom_product_count": 1,
+    "spend_window_total": 58202.4,
+    "spend_share_pct": 5.67,
+    "triggered_count": 2,
+    "signals": [
+     {
+      "code": "rapid_price_increase",
+      "name": "Rapid price increase",
+      "status": "clear",
+      "explanation": "Price moved -4.1% (Nov 2025 0.2798 to Dec 2025 0.2684), within the 10% limit."
+     },
+     {
+      "code": "abnormal_price",
+      "name": "Price unusual for this material",
+      "status": "clear",
+      "explanation": "Dec 2025 price 0.2684 is 0.9 standard deviations from the recent average 0.2536; the limit is 2."
+     },
+     {
+      "code": "standard_cost_deviation",
+      "name": "Paying above standard cost",
+      "status": "triggered",
+      "explanation": "Actual price has been at least 5% above standard cost for 3 months in a row (Oct 2025 +24.4%, Nov 2025 +27.4%, Dec 2025 +22.2%)."
+     },
+     {
+      "code": "ppv_trend",
+      "name": "Purchase price variance worsening",
+      "status": "clear",
+      "explanation": "Variance over the last 3 periods: 1,331 \u2192 692 \u2192 751 (derived from purchases and standard cost); not a rising overspend."
+     },
+     {
+      "code": "procurement_anomaly",
+      "name": "Unusual purchase lines",
+      "status": "clear",
+      "explanation": "No purchase line in the last 90 days is unusual (3 checked)."
+     },
+     {
+      "code": "bom_cost_escalation",
+      "name": "Product material cost rising",
+      "status": "clear",
+      "explanation": "No product using this material rose 5% or more over 90 days with this material driving it."
+     },
+     {
+      "code": "supplier_concentration",
+      "name": "Dependence on one supplier",
+      "status": "triggered",
+      "explanation": "SUP-004 supplies 100% of the last year's spend (1 supplier); the limit is 70%."
+     },
+     {
+      "code": "inventory_cost_exposure",
+      "name": "Low stock while prices rise",
+      "status": "clear",
+      "explanation": "Stock covers 20 days and the price moved +0.2% over about 90 days; the signal needs under 30 days and +5% or more."
+     },
+     {
+      "code": "high_spend",
+      "name": "Among the highest-spend materials",
+      "status": "clear",
+      "explanation": "Ranks 4 of 6 by last-year spend (5.7% of the total); the top 2 are flagged."
+     },
+     {
+      "code": "lead_time_deterioration",
+      "name": "Supplier lead time or delivery getting worse",
+      "status": "clear",
+      "explanation": "Stable across 1 supplier: SUP-004 lead time 18.6 \u2192 17.4 days (-7%), on-time delivery 94% \u2192 94%."
+     }
+    ],
+    "notes": []
+   },
+   {
+    "material_id": "SOL-EVA-FILM",
+    "description": "EVA encapsulant film",
+    "category": "Polymers",
+    "unit_of_measure": "M2",
+    "currency": "USD",
+    "suppliers": [
+     "SUP-007"
+    ],
+    "latest_price": 1.3051,
+    "latest_price_month": "2025-12-01",
+    "price_change_1m_pct": 2.81,
+    "price_change_3m_pct": 2.56,
+    "standard_cost": 1.0921,
+    "vs_standard_pct": 19.5,
+    "history_months": 24,
+    "purchase_lines": 24,
+    "top_supplier": "SUP-007",
+    "top_supplier_share_pct": 100.0,
+    "coverage_days": 90.0,
+    "inventory_value": 6648.18,
+    "latest_lead_time_days": 17.4,
+    "bom_product_count": 1,
+    "spend_window_total": 26543.51,
+    "spend_share_pct": 2.59,
+    "triggered_count": 2,
+    "signals": [
+     {
+      "code": "rapid_price_increase",
+      "name": "Rapid price increase",
+      "status": "clear",
+      "explanation": "Price moved +2.8% (Nov 2025 1.2694 to Dec 2025 1.3051), within the 10% limit."
+     },
+     {
+      "code": "abnormal_price",
+      "name": "Price unusual for this material",
+      "status": "clear",
+      "explanation": "Dec 2025 price 1.3051 is 1.9 standard deviations from the recent average 1.1950; the limit is 2."
+     },
+     {
+      "code": "standard_cost_deviation",
+      "name": "Paying above standard cost",
+      "status": "triggered",
+      "explanation": "Actual price has been at least 5% above standard cost for 3 months in a row (Oct 2025 +15.8%, Nov 2025 +16.2%, Dec 2025 +19.5%)."
+     },
+     {
+      "code": "ppv_trend",
+      "name": "Purchase price variance worsening",
+      "status": "clear",
+      "explanation": "Variance over the last 3 periods: 306 \u2192 372 \u2192 260 (derived from purchases and standard cost); not a rising overspend."
+     },
+     {
+      "code": "procurement_anomaly",
+      "name": "Unusual purchase lines",
+      "status": "clear",
+      "explanation": "No purchase line in the last 90 days is unusual (3 checked)."
+     },
+     {
+      "code": "bom_cost_escalation",
+      "name": "Product material cost rising",
+      "status": "clear",
+      "explanation": "No product using this material rose 5% or more over 90 days with this material driving it."
+     },
+     {
+      "code": "supplier_concentration",
+      "name": "Dependence on one supplier",
+      "status": "triggered",
+      "explanation": "SUP-007 supplies 100% of the last year's spend (1 supplier); the limit is 70%."
+     },
+     {
+      "code": "inventory_cost_exposure",
+      "name": "Low stock while prices rise",
+      "status": "clear",
+      "explanation": "Stock covers 90 days and the price moved +2.6% over about 90 days; the signal needs under 30 days and +5% or more."
+     },
+     {
+      "code": "high_spend",
+      "name": "Among the highest-spend materials",
+      "status": "clear",
+      "explanation": "Ranks 6 of 6 by last-year spend (2.6% of the total); the top 2 are flagged."
+     },
+     {
+      "code": "lead_time_deterioration",
+      "name": "Supplier lead time or delivery getting worse",
+      "status": "clear",
+      "explanation": "Stable across 1 supplier: SUP-007 lead time 18.9 \u2192 18.0 days (-5%), on-time delivery 94% \u2192 93%."
+     }
+    ],
+    "notes": []
+   },
+   {
+    "material_id": "SOL-GLASS-32",
+    "description": "Solar glass 3.2 mm",
+    "category": "Glass",
+    "unit_of_measure": "M2",
+    "currency": "USD",
+    "suppliers": [
+     "SUP-003"
+    ],
+    "latest_price": 8.0377,
+    "latest_price_month": "2025-12-01",
+    "price_change_1m_pct": -3.66,
+    "price_change_3m_pct": 0.91,
+    "standard_cost": 6.5704,
+    "vs_standard_pct": 22.33,
+    "history_months": 24,
+    "purchase_lines": 24,
+    "top_supplier": "SUP-003",
+    "top_supplier_share_pct": 100.0,
+    "coverage_days": 70.0,
+    "inventory_value": 31170.2,
+    "latest_lead_time_days": 18.8,
+    "bom_product_count": 1,
+    "spend_window_total": 160381.98,
+    "spend_share_pct": 15.63,
+    "triggered_count": 3,
+    "signals": [
+     {
+      "code": "rapid_price_increase",
+      "name": "Rapid price increase",
+      "status": "clear",
+      "explanation": "Price moved -3.7% (Nov 2025 8.3430 to Dec 2025 8.0377), within the 10% limit."
+     },
+     {
+      "code": "abnormal_price",
+      "name": "Price unusual for this material",
+      "status": "clear",
+      "explanation": "Dec 2025 price 8.0377 is 1.1 standard deviations from the recent average 7.4131; the limit is 2."
+     },
+     {
+      "code": "standard_cost_deviation",
+      "name": "Paying above standard cost",
+      "status": "triggered",
+      "explanation": "Actual price has been at least 5% above standard cost for 3 months in a row (Oct 2025 +21.3%, Nov 2025 +27.0%, Dec 2025 +22.3%)."
+     },
+     {
+      "code": "ppv_trend",
+      "name": "Purchase price variance worsening",
+      "status": "clear",
+      "explanation": "Variance over the last 3 periods: 2,903 \u2192 3,368 \u2192 1,478 (derived from purchases and standard cost); not a rising overspend."
+     },
+     {
+      "code": "procurement_anomaly",
+      "name": "Unusual purchase lines",
+      "status": "clear",
+      "explanation": "No purchase line in the last 90 days is unusual (3 checked)."
+     },
+     {
+      "code": "bom_cost_escalation",
+      "name": "Product material cost rising",
+      "status": "clear",
+      "explanation": "No product using this material rose 5% or more over 90 days with this material driving it."
+     },
+     {
+      "code": "supplier_concentration",
+      "name": "Dependence on one supplier",
+      "status": "triggered",
+      "explanation": "SUP-003 supplies 100% of the last year's spend (1 supplier); the limit is 70%."
+     },
+     {
+      "code": "inventory_cost_exposure",
+      "name": "Low stock while prices rise",
+      "status": "clear",
+      "explanation": "Stock covers 70 days and the price moved +0.9% over about 90 days; the signal needs under 30 days and +5% or more."
+     },
+     {
+      "code": "high_spend",
+      "name": "Among the highest-spend materials",
+      "status": "triggered",
+      "explanation": "Ranks 2 of 6 by last-year spend (15.6% of the total); the top 2 are flagged."
+     },
+     {
+      "code": "lead_time_deterioration",
+      "name": "Supplier lead time or delivery getting worse",
+      "status": "clear",
+      "explanation": "Stable across 1 supplier: SUP-003 lead time 17.8 \u2192 18.7 days (+5%), on-time delivery 94% \u2192 94%."
+     }
+    ],
+    "notes": []
+   },
+   {
+    "material_id": "SOL-JBOX-IP68",
+    "description": "Junction box IP68",
+    "category": "Electrical",
+    "unit_of_measure": "PCS",
+    "currency": "USD",
+    "suppliers": [
+     "SUP-001"
+    ],
+    "latest_price": 2.9964,
+    "latest_price_month": "2025-12-01",
+    "price_change_1m_pct": 2.42,
+    "price_change_3m_pct": -0.76,
+    "standard_cost": 2.813,
+    "vs_standard_pct": 6.52,
+    "history_months": 24,
+    "purchase_lines": 24,
+    "top_supplier": "SUP-001",
+    "top_supplier_share_pct": 100.0,
+    "coverage_days": 60.0,
+    "inventory_value": 118291.88,
+    "latest_lead_time_days": 16.7,
+    "bom_product_count": 1,
+    "spend_window_total": 662348.05,
+    "spend_share_pct": 64.56,
+    "triggered_count": 2,
+    "signals": [
+     {
+      "code": "rapid_price_increase",
+      "name": "Rapid price increase",
+      "status": "clear",
+      "explanation": "Price moved +2.4% (Nov 2025 2.9257 to Dec 2025 2.9964), within the 10% limit."
+     },
+     {
+      "code": "abnormal_price",
+      "name": "Price unusual for this material",
+      "status": "clear",
+      "explanation": "Dec 2025 price 2.9964 is 1.0 standard deviations from the recent average 2.9109; the limit is 2."
+     },
+     {
+      "code": "standard_cost_deviation",
+      "name": "Paying above standard cost",
+      "status": "clear",
+      "explanation": "Actual versus standard cost over the last 3 months: Oct 2025 +5.8%, Nov 2025 +4.0%, Dec 2025 +6.5%; the limit is +5% in every month."
+     },
+     {
+      "code": "ppv_trend",
+      "name": "Purchase price variance worsening",
+      "status": "clear",
+      "explanation": "Variance over the last 3 periods: 3,646 \u2192 1,178 \u2192 4,875 (derived from purchases and standard cost); not a rising overspend."
+     },
+     {
+      "code": "procurement_anomaly",
+      "name": "Unusual purchase lines",
+      "status": "clear",
+      "explanation": "No purchase line in the last 90 days is unusual (3 checked)."
+     },
+     {
+      "code": "bom_cost_escalation",
+      "name": "Product material cost rising",
+      "status": "clear",
+      "explanation": "No product using this material rose 5% or more over 90 days with this material driving it."
+     },
+     {
+      "code": "supplier_concentration",
+      "name": "Dependence on one supplier",
+      "status": "triggered",
+      "explanation": "SUP-001 supplies 100% of the last year's spend (1 supplier); the limit is 70%."
+     },
+     {
+      "code": "inventory_cost_exposure",
+      "name": "Low stock while prices rise",
+      "status": "clear",
+      "explanation": "Stock covers 60 days and the price moved -0.8% over about 90 days; the signal needs under 30 days and +5% or more."
+     },
+     {
+      "code": "high_spend",
+      "name": "Among the highest-spend materials",
+      "status": "triggered",
+      "explanation": "Ranks 1 of 6 by last-year spend (64.6% of the total); the top 2 are flagged."
+     },
+     {
+      "code": "lead_time_deterioration",
+      "name": "Supplier lead time or delivery getting worse",
+      "status": "clear",
+      "explanation": "Stable across 1 supplier: SUP-001 lead time 18.1 \u2192 17.7 days (-2%), on-time delivery 94% \u2192 94%."
+     }
+    ],
+    "notes": []
+   }
+  ],
+  "summary": {
+   "materials_total": 6,
+   "materials_shown": 6,
+   "materials_with_signals": 6,
+   "signals_by_code": {
+    "rapid_price_increase": 0,
+    "abnormal_price": 0,
+    "standard_cost_deviation": 5,
+    "ppv_trend": 0,
+    "procurement_anomaly": 0,
+    "bom_cost_escalation": 0,
+    "supplier_concentration": 6,
+    "inventory_cost_exposure": 0,
+    "high_spend": 2,
+    "lead_time_deterioration": 1
+   },
+   "spend_window_days": 365,
+   "spend_window_total": 1026001.92,
+   "spend_by_currency": {
+    "USD": 1026001.92
+   },
+   "currencies": [
+    "USD"
+   ]
+  },
+  "filter_options": {
+   "categories": [
+    "Cells",
+    "Electrical",
+    "Glass",
+    "Metals",
+    "Polymers"
+   ],
+   "suppliers": [
+    "SUP-001",
+    "SUP-002",
+    "SUP-003",
+    "SUP-004",
+    "SUP-006",
+    "SUP-007"
+   ],
+   "products": [
+    "PANEL-60C"
+   ]
+  },
+  "thresholds": {
+   "rapid_increase_pct": 10.0,
+   "zscore_threshold": 2.0,
+   "zscore_min_history": 6,
+   "zscore_window": 12,
+   "standard_deviation_pct": 5.0,
+   "standard_persistence_months": 3,
+   "ppv_min_periods": 3,
+   "bom_escalation_pct": 5.0,
+   "bom_window_days": 90,
+   "bom_contribution_share": 0.25,
+   "concentration_top_share": 0.7,
+   "concentration_window_days": 365,
+   "low_coverage_days": 30.0,
+   "usage_window_days": 90,
+   "inventory_price_rise_pct": 5.0,
+   "outlier_zscore": 3.0,
+   "outlier_lookback_days": 90,
+   "outlier_min_history": 8,
+   "high_spend_top_fraction": 0.2,
+   "high_spend_min_materials": 5,
+   "spend_window_days": 365,
+   "lead_time_increase_pct": 20.0,
+   "otd_drop": 0.1,
+   "ops_window_days": 90,
+   "ops_min_points": 2
+  }
+ },
+ "forecast_list": {
+  "has_data": true,
+  "as_of": "2025-12-08",
+  "materials": [
+   {
+    "material_id": "SOL-ALU-FRAME",
+    "description": "Aluminium frame profile",
+    "category": "Metals",
+    "currency": "USD",
+    "history_months": 23,
+    "usable_history_months": 23,
+    "supported_horizons_days": [
+     30,
+     90
+    ]
+   },
+   {
+    "material_id": "SOL-BACKSHEET",
+    "description": "Backsheet TPT",
+    "category": "Polymers",
+    "currency": "USD",
+    "history_months": 23,
+    "usable_history_months": 23,
+    "supported_horizons_days": [
+     30,
+     90
+    ]
+   },
+   {
+    "material_id": "SOL-CELL-M10",
+    "description": "Monocrystalline cell M10",
+    "category": "Cells",
+    "currency": "USD",
+    "history_months": 23,
+    "usable_history_months": 23,
+    "supported_horizons_days": [
+     30,
+     90
+    ]
+   },
+   {
+    "material_id": "SOL-EVA-FILM",
+    "description": "EVA encapsulant film",
+    "category": "Polymers",
+    "currency": "USD",
+    "history_months": 23,
+    "usable_history_months": 23,
+    "supported_horizons_days": [
+     30,
+     90
+    ]
+   },
+   {
+    "material_id": "SOL-GLASS-32",
+    "description": "Solar glass 3.2 mm",
+    "category": "Glass",
+    "currency": "USD",
+    "history_months": 23,
+    "usable_history_months": 23,
+    "supported_horizons_days": [
+     30,
+     90
+    ]
+   },
+   {
+    "material_id": "SOL-JBOX-IP68",
+    "description": "Junction box IP68",
+    "category": "Electrical",
+    "currency": "USD",
+    "history_months": 23,
+    "usable_history_months": 23,
+    "supported_horizons_days": [
+     30,
+     90
+    ]
+   }
+  ]
+ },
+ "forecast_runs": [
+  {
+   "material": {
+    "material_id": "SOL-ALU-FRAME",
+    "description": "Aluminium frame profile",
+    "category": "Metals",
+    "unit_of_measure": "KG"
+   },
+   "as_of": "2025-12-08",
+   "currency": "USD",
+   "data_frequency": "monthly",
+   "history": [
+    {
+     "month": "2024-01-01",
+     "unit_price": 3.4273,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-02-01",
+     "unit_price": 3.4847,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-03-01",
+     "unit_price": 3.3874,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-04-01",
+     "unit_price": 3.4898,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-05-01",
+     "unit_price": 3.5808,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-06-01",
+     "unit_price": 3.6402,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-07-01",
+     "unit_price": 3.5919,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-08-01",
+     "unit_price": 3.6592,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-09-01",
+     "unit_price": 3.6212,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-10-01",
+     "unit_price": 3.6446,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-11-01",
+     "unit_price": 3.6468,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-12-01",
+     "unit_price": 3.5572,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-01-01",
+     "unit_price": 3.6535,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-02-01",
+     "unit_price": 3.7319,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-03-01",
+     "unit_price": 3.9601,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-04-01",
+     "unit_price": 4.2446,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-05-01",
+     "unit_price": 4.6386,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-06-01",
+     "unit_price": 4.7524,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-07-01",
+     "unit_price": 4.7034,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-08-01",
+     "unit_price": 4.6295,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-09-01",
+     "unit_price": 4.6023,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-10-01",
+     "unit_price": 4.4124,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-11-01",
+     "unit_price": 4.2318,
+     "in_model_window": true
+    }
+   ],
+   "usable_history_months": 23,
+   "excluded_partial_month": "2025-12-01",
+   "horizons": [
+    {
+     "horizon_days": 30,
+     "horizon_months": 1,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 13,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-ef89b2a6e6d3",
+      "created_at": "2026-10-03T23:45:03.567413+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 30,
+      "horizon_months": 1,
+      "model": {
+       "code": "naive",
+       "name": "Naive (last value)",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:8d2b8b19383f79a3",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2025-12-01",
+       "value": 4.2318,
+       "lower": null,
+       "upper": null,
+       "interval_level": null,
+       "last_observed_price": 4.2318,
+       "change_pct": 0.0
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 4.2318,
+        "lower": null,
+        "upper": null
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.11790000000000012,
+        "rmse": 0.13682052112165044,
+        "mape": 2.689690325970137,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.1775916666666666,
+        "rmse": 0.20462206422247492,
+        "mape": 4.061374047933006,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.95
+        },
+        "origins_scored": 4,
+        "mae": 0.12215941425678012,
+        "rmse": 0.14103007680855803,
+        "mape": 2.7870874437438458,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.065458,
+         "months_used": 22
+        },
+        "origins_scored": 4,
+        "mae": 0.21593698507632708,
+        "rmse": 0.2583623776332262,
+        "mape": 4.94505366939067,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.8219,
+         "coefficient_on_time": 0.012362,
+         "pairs_used": 21
+        },
+        "origins_scored": 4,
+        "mae": 0.22136485256258975,
+        "rmse": 0.22994310682511573,
+        "mape": 4.998172368322446,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       }
+      ],
+      "selection_rationale": "Naive (last value) chosen: held-out error (MAE) 0.1179; the best regression, Linear trend regression, had MAE 0.2159 (83% higher error than the baseline), short of the 10% improvement needed. A more complex model is used only when it is clearly better.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 4.2318
+      }
+     }
+    },
+    {
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 15,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-fc76410df1f8",
+      "created_at": "2026-10-03T23:45:03.567413+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 90,
+      "horizon_months": 3,
+      "model": {
+       "code": "naive",
+       "name": "Naive (last value)",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:8d2b8b19383f79a3",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2026-02-01",
+       "value": 4.2318,
+       "lower": null,
+       "upper": null,
+       "interval_level": null,
+       "last_observed_price": 4.2318,
+       "change_pct": 0.0
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 4.2318,
+        "lower": null,
+        "upper": null
+       },
+       {
+        "month": "2026-01-01",
+        "value": 4.2318,
+        "lower": null,
+        "upper": null
+       },
+       {
+        "month": "2026-02-01",
+        "value": 4.2318,
+        "lower": null,
+        "upper": null
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.21197500000000002,
+        "rmse": 0.2576136205638206,
+        "mape": 4.8627301845941435,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.2886333333333335,
+        "rmse": 0.3243969011017901,
+        "mape": 6.54752109354079,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.95
+        },
+        "origins_scored": 4,
+        "mae": 0.21233584956013685,
+        "rmse": 0.25875065013533405,
+        "mape": 4.8728011987465765,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.067603,
+         "months_used": 20
+        },
+        "origins_scored": 4,
+        "mae": 0.2996661101896909,
+        "rmse": 0.32747181270132075,
+        "mape": 6.762575065057747,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.3711,
+         "coefficient_on_time": 0.061463,
+         "pairs_used": 17
+        },
+        "origins_scored": 4,
+        "mae": 0.7785017162507974,
+        "rmse": 0.7800743960551899,
+        "mape": 17.42143752068224,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       }
+      ],
+      "selection_rationale": "Naive (last value) chosen: held-out error (MAE) 0.2120; the best regression, Linear trend regression, had MAE 0.2997 (41% higher error than the baseline), short of the 10% improvement needed. A more complex model is used only when it is clearly better.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 4.2318
+      }
+     }
+    }
+   ],
+   "computed_at": "2026-10-03T23:45:03.630826+00:00"
+  },
+  {
+   "material": {
+    "material_id": "SOL-BACKSHEET",
+    "description": "Backsheet TPT",
+    "category": "Polymers",
+    "unit_of_measure": "M2"
+   },
+   "as_of": "2025-12-08",
+   "currency": "USD",
+   "data_frequency": "monthly",
+   "history": [
+    {
+     "month": "2024-01-01",
+     "unit_price": 2.0349,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-02-01",
+     "unit_price": 2.0318,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-03-01",
+     "unit_price": 2.0851,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-04-01",
+     "unit_price": 2.0315,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-05-01",
+     "unit_price": 2.0206,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-06-01",
+     "unit_price": 2.0693,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-07-01",
+     "unit_price": 2.0799,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-08-01",
+     "unit_price": 2.1543,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-09-01",
+     "unit_price": 2.1746,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-10-01",
+     "unit_price": 2.2068,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-11-01",
+     "unit_price": 2.1864,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-12-01",
+     "unit_price": 2.2334,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-01-01",
+     "unit_price": 2.2249,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-02-01",
+     "unit_price": 2.1738,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-03-01",
+     "unit_price": 2.2548,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-04-01",
+     "unit_price": 2.3403,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-05-01",
+     "unit_price": 2.2849,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-06-01",
+     "unit_price": 2.3406,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-07-01",
+     "unit_price": 2.2945,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-08-01",
+     "unit_price": 2.1917,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-09-01",
+     "unit_price": 2.2884,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-10-01",
+     "unit_price": 2.4185,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-11-01",
+     "unit_price": 2.4697,
+     "in_model_window": true
+    }
+   ],
+   "usable_history_months": 23,
+   "excluded_partial_month": "2025-12-01",
+   "horizons": [
+    {
+     "horizon_days": 30,
+     "horizon_months": 1,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 13,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-4f831d710f50",
+      "created_at": "2026-10-03T23:45:03.713103+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 30,
+      "horizon_months": 1,
+      "model": {
+       "code": "lagged_regression",
+       "name": "Lagged price regression",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:3c1a7ae376aa2ef9",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2025-12-01",
+       "value": 2.441493,
+       "lower": 2.360392,
+       "upper": 2.522594,
+       "interval_level": 0.8,
+       "last_observed_price": 2.4697,
+       "change_pct": -1.14
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 2.441493,
+        "lower": 2.360392,
+        "upper": 2.522594
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.09520000000000006,
+        "rmse": 0.09933048373988725,
+        "mape": 4.092144119034719,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.11455833333333343,
+        "rmse": 0.13041660063896093,
+        "mape": 4.830785304152407,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.9
+        },
+        "origins_scored": 4,
+        "mae": 0.10254064372650529,
+        "rmse": 0.10718150678510352,
+        "mape": 4.394192824067359,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.016016,
+         "months_used": 22
+        },
+        "origins_scored": 4,
+        "mae": 0.09484408008658018,
+        "rmse": 0.10314023683497996,
+        "mape": 4.09723345535524,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.2534,
+         "coefficient_on_time": 0.012411,
+         "pairs_used": 21
+        },
+        "origins_scored": 4,
+        "mae": 0.0826868650464706,
+        "rmse": 0.09851376489135749,
+        "mape": 3.5737669632124014,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       }
+      ],
+      "selection_rationale": "Lagged price regression chosen: held-out error (MAE) 0.0827 is 13% lower than the best baseline, Naive (last value) (0.0952), above the 10% needed to prefer a regression model.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 2.4697
+      }
+     }
+    },
+    {
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 15,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-6be1a0be5b98",
+      "created_at": "2026-10-03T23:45:03.742300+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 90,
+      "horizon_months": 3,
+      "model": {
+       "code": "lagged_regression",
+       "name": "Lagged price regression",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:3c1a7ae376aa2ef9",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2026-02-01",
+       "value": 2.404197,
+       "lower": 2.318168,
+       "upper": 2.490226,
+       "interval_level": 0.8,
+       "last_observed_price": 2.4697,
+       "change_pct": -2.65
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 2.441493,
+        "lower": 2.360392,
+        "upper": 2.522594
+       },
+       {
+        "month": "2026-01-01",
+        "value": 2.382947,
+        "lower": 2.296085,
+        "upper": 2.469809
+       },
+       {
+        "month": "2026-02-01",
+        "value": 2.404197,
+        "lower": 2.318168,
+        "upper": 2.490226
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.1368499999999998,
+        "rmse": 0.16130024798493017,
+        "mape": 5.729262345329085,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.11027500000000001,
+        "rmse": 0.12413231180209829,
+        "mape": 4.646471452294117,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.9
+        },
+        "origins_scored": 4,
+        "mae": 0.13203476435032502,
+        "rmse": 0.15568512218010358,
+        "mape": 5.534650862422673,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.015733,
+         "months_used": 20
+        },
+        "origins_scored": 4,
+        "mae": 0.09664467940684973,
+        "rmse": 0.10691617568510037,
+        "mape": 4.199695923304647,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": -0.1709,
+         "coefficient_on_time": 0.019815,
+         "pairs_used": 17
+        },
+        "origins_scored": 4,
+        "mae": 0.08950681476857603,
+        "rmse": 0.11070302789074878,
+        "mape": 3.9442979656519355,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       }
+      ],
+      "selection_rationale": "Lagged price regression chosen: held-out error (MAE) 0.0895 is 19% lower than the best baseline, Moving average (3 months) (0.1103), above the 10% needed to prefer a regression model.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 2.4697
+      }
+     }
+    }
+   ],
+   "computed_at": "2026-10-03T23:45:03.799111+00:00"
+  },
+  {
+   "material": {
+    "material_id": "SOL-CELL-M10",
+    "description": "Monocrystalline cell M10",
+    "category": "Cells",
+    "unit_of_measure": "PCS"
+   },
+   "as_of": "2025-12-08",
+   "currency": "USD",
+   "data_frequency": "monthly",
+   "history": [
+    {
+     "month": "2024-01-01",
+     "unit_price": 0.2123,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-02-01",
+     "unit_price": 0.2086,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-03-01",
+     "unit_price": 0.2181,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-04-01",
+     "unit_price": 0.2176,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-05-01",
+     "unit_price": 0.211,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-06-01",
+     "unit_price": 0.2186,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-07-01",
+     "unit_price": 0.2191,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-08-01",
+     "unit_price": 0.2215,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-09-01",
+     "unit_price": 0.2198,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-10-01",
+     "unit_price": 0.2274,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-11-01",
+     "unit_price": 0.2296,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-12-01",
+     "unit_price": 0.2319,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-01-01",
+     "unit_price": 0.2349,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-02-01",
+     "unit_price": 0.2362,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-03-01",
+     "unit_price": 0.2336,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-04-01",
+     "unit_price": 0.2434,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-05-01",
+     "unit_price": 0.2488,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-06-01",
+     "unit_price": 0.2635,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-07-01",
+     "unit_price": 0.2652,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-08-01",
+     "unit_price": 0.2645,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-09-01",
+     "unit_price": 0.2678,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-10-01",
+     "unit_price": 0.2732,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-11-01",
+     "unit_price": 0.2798,
+     "in_model_window": true
+    }
+   ],
+   "usable_history_months": 23,
+   "excluded_partial_month": "2025-12-01",
+   "horizons": [
+    {
+     "horizon_days": 30,
+     "horizon_months": 1,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 13,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-04a42c90f0a3",
+      "created_at": "2026-10-03T23:45:03.913692+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 30,
+      "horizon_months": 1,
+      "model": {
+       "code": "lagged_regression",
+       "name": "Lagged price regression",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:5677100895c1fd20",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2025-12-01",
+       "value": 0.28233,
+       "lower": 0.275382,
+       "upper": 0.289278,
+       "interval_level": 0.8,
+       "last_observed_price": 0.2798,
+       "change_pct": 0.9
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 0.28233,
+        "lower": 0.275382,
+        "upper": 0.289278
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.00399999999999999,
+        "rmse": 0.004585302607244147,
+        "mape": 1.4580787097261378,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.006849999999999995,
+        "rmse": 0.007449198316299237,
+        "mape": 2.505255895195845,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.95
+        },
+        "origins_scored": 4,
+        "mae": 0.0040725932092736394,
+        "rmse": 0.004724835044499686,
+        "mape": 1.4836277599231331,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.00301,
+         "months_used": 22
+        },
+        "origins_scored": 4,
+        "mae": 0.00828955570745038,
+        "rmse": 0.008386456246487777,
+        "mape": 3.0481835818203207,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.645,
+         "coefficient_on_time": 0.00126,
+         "pairs_used": 21
+        },
+        "origins_scored": 4,
+        "mae": 0.00256982828536044,
+        "rmse": 0.0027916059692722752,
+        "mape": 0.9404329015119813,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       }
+      ],
+      "selection_rationale": "Lagged price regression chosen: held-out error (MAE) 0.0026 is 36% lower than the best baseline, Naive (last value) (0.0040), above the 10% needed to prefer a regression model.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 0.2798
+      }
+     }
+    },
+    {
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 15,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-e562abeb54f6",
+      "created_at": "2026-10-03T23:45:03.913692+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 90,
+      "horizon_months": 3,
+      "model": {
+       "code": "lagged_regression",
+       "name": "Lagged price regression",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:5677100895c1fd20",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2026-02-01",
+       "value": 0.289058,
+       "lower": 0.280483,
+       "upper": 0.297632,
+       "interval_level": 0.8,
+       "last_observed_price": 0.2798,
+       "change_pct": 3.31
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 0.28233,
+        "lower": 0.275382,
+        "upper": 0.289278
+       },
+       {
+        "month": "2026-01-01",
+        "value": 0.285514,
+        "lower": 0.277032,
+        "upper": 0.293996
+       },
+       {
+        "month": "2026-02-01",
+        "value": 0.289058,
+        "lower": 0.280483,
+        "upper": 0.297632
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.010824999999999987,
+        "rmse": 0.0118645480318468,
+        "mape": 3.984463229470145,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.016975000000000004,
+        "rmse": 0.01729276502535735,
+        "mape": 6.277417766953018,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.95
+        },
+        "origins_scored": 4,
+        "mae": 0.011194720383209511,
+        "rmse": 0.012160717237786554,
+        "mape": 4.1231514713767705,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.002825,
+         "months_used": 20
+        },
+        "origins_scored": 4,
+        "mae": 0.012784949137549746,
+        "rmse": 0.012886168845926412,
+        "mape": 4.718420364944905,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.4052,
+         "coefficient_on_time": 0.002368,
+         "pairs_used": 17
+        },
+        "origins_scored": 4,
+        "mae": 0.005756741076768282,
+        "rmse": 0.0068597315946164125,
+        "mape": 2.1461840782363106,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       }
+      ],
+      "selection_rationale": "Lagged price regression chosen: held-out error (MAE) 0.0058 is 47% lower than the best baseline, Naive (last value) (0.0108), above the 10% needed to prefer a regression model.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 0.2798
+      }
+     }
+    }
+   ],
+   "computed_at": "2026-10-03T23:45:03.984761+00:00"
+  },
+  {
+   "material": {
+    "material_id": "SOL-EVA-FILM",
+    "description": "EVA encapsulant film",
+    "category": "Polymers",
+    "unit_of_measure": "M2"
+   },
+   "as_of": "2025-12-08",
+   "currency": "USD",
+   "data_frequency": "monthly",
+   "history": [
+    {
+     "month": "2024-01-01",
+     "unit_price": 1.1233,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-02-01",
+     "unit_price": 1.1166,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-03-01",
+     "unit_price": 1.1265,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-04-01",
+     "unit_price": 1.0963,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-05-01",
+     "unit_price": 1.0854,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-06-01",
+     "unit_price": 1.0795,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-07-01",
+     "unit_price": 1.0848,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-08-01",
+     "unit_price": 1.0764,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-09-01",
+     "unit_price": 1.1194,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-10-01",
+     "unit_price": 1.084,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-11-01",
+     "unit_price": 1.0415,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-12-01",
+     "unit_price": 1.0715,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-01-01",
+     "unit_price": 1.1217,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-02-01",
+     "unit_price": 1.1564,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-03-01",
+     "unit_price": 1.1824,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-04-01",
+     "unit_price": 1.17,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-05-01",
+     "unit_price": 1.1828,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-06-01",
+     "unit_price": 1.1981,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-07-01",
+     "unit_price": 1.2093,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-08-01",
+     "unit_price": 1.2406,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-09-01",
+     "unit_price": 1.2725,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-10-01",
+     "unit_price": 1.2649,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-11-01",
+     "unit_price": 1.2694,
+     "in_model_window": true
+    }
+   ],
+   "usable_history_months": 23,
+   "excluded_partial_month": "2025-12-01",
+   "horizons": [
+    {
+     "horizon_days": 30,
+     "horizon_months": 1,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 13,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-f6e78f720b61",
+      "created_at": "2026-10-03T23:45:04.068562+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 30,
+      "horizon_months": 1,
+      "model": {
+       "code": "naive",
+       "name": "Naive (last value)",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:4a662b5d08f11db6",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2025-12-01",
+       "value": 1.2694,
+       "lower": null,
+       "upper": null,
+       "interval_level": null,
+       "last_observed_price": 1.2694,
+       "change_pct": 0.0
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 1.2694,
+        "lower": null,
+        "upper": null
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.018825000000000036,
+        "rmse": 0.022777785230351073,
+        "mape": 1.4962962955116668,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.03363333333333335,
+        "rmse": 0.038074539466099296,
+        "mape": 2.6685791488463,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.95
+        },
+        "origins_scored": 4,
+        "mae": 0.018880939571874755,
+        "rmse": 0.02341095008764032,
+        "mape": 1.500783420201152,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.00791,
+         "months_used": 22
+        },
+        "origins_scored": 4,
+        "mae": 0.05712169343814072,
+        "rmse": 0.05913196638062323,
+        "mape": 4.528947992988135,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.7829,
+         "coefficient_on_time": 0.003105,
+         "pairs_used": 21
+        },
+        "origins_scored": 4,
+        "mae": 0.018209090187745136,
+        "rmse": 0.019106530523098353,
+        "mape": 1.4450151197550407,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       }
+      ],
+      "selection_rationale": "Naive (last value) chosen: held-out error (MAE) 0.0188; the best regression, Lagged price regression, had MAE 0.0182 (3% lower error than the baseline), short of the 10% improvement needed. A more complex model is used only when it is clearly better.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 1.2694
+      }
+     }
+    },
+    {
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 15,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-4e79051bb35f",
+      "created_at": "2026-10-03T23:45:04.099313+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 90,
+      "horizon_months": 3,
+      "model": {
+       "code": "lagged_regression",
+       "name": "Lagged price regression",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:4a662b5d08f11db6",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2026-02-01",
+       "value": 1.314629,
+       "lower": 1.267334,
+       "upper": 1.361925,
+       "interval_level": 0.8,
+       "last_observed_price": 1.2694,
+       "change_pct": 3.56
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 1.282424,
+        "lower": 1.248608,
+        "upper": 1.316239
+       },
+       {
+        "month": "2026-01-01",
+        "value": 1.294759,
+        "lower": 1.247898,
+        "upper": 1.34162
+       },
+       {
+        "month": "2026-02-01",
+        "value": 1.314629,
+        "lower": 1.267334,
+        "upper": 1.361925
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.054149999999999976,
+        "rmse": 0.056561912980379256,
+        "mape": 4.29254677490667,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.06815833333333327,
+        "rmse": 0.06939808875049953,
+        "mape": 5.398284556310512,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.95
+        },
+        "origins_scored": 4,
+        "mae": 0.055050719353612776,
+        "rmse": 0.057333826901923984,
+        "mape": 4.363786956578029,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.006317,
+         "months_used": 20
+        },
+        "origins_scored": 4,
+        "mae": 0.08195040115607671,
+        "rmse": 0.08318106519385216,
+        "mape": 6.495985299353385,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.2941,
+         "coefficient_on_time": 0.008731,
+         "pairs_used": 17
+        },
+        "origins_scored": 4,
+        "mae": 0.03356763062447232,
+        "rmse": 0.03803443335111666,
+        "mape": 2.6634424170679893,
+        "directional_accuracy": 1.0,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       }
+      ],
+      "selection_rationale": "Lagged price regression chosen: held-out error (MAE) 0.0336 is 38% lower than the best baseline, Naive (last value) (0.0541), above the 10% needed to prefer a regression model.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 1.2694
+      }
+     }
+    }
+   ],
+   "computed_at": "2026-10-03T23:45:04.149797+00:00"
+  },
+  {
+   "material": {
+    "material_id": "SOL-GLASS-32",
+    "description": "Solar glass 3.2 mm",
+    "category": "Glass",
+    "unit_of_measure": "M2"
+   },
+   "as_of": "2025-12-08",
+   "currency": "USD",
+   "data_frequency": "monthly",
+   "history": [
+    {
+     "month": "2024-01-01",
+     "unit_price": 6.2476,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-02-01",
+     "unit_price": 6.309,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-03-01",
+     "unit_price": 6.4794,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-04-01",
+     "unit_price": 6.4487,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-05-01",
+     "unit_price": 6.4308,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-06-01",
+     "unit_price": 6.4532,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-07-01",
+     "unit_price": 6.4511,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-08-01",
+     "unit_price": 6.7758,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-09-01",
+     "unit_price": 6.6753,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-10-01",
+     "unit_price": 6.8673,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-11-01",
+     "unit_price": 6.8668,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-12-01",
+     "unit_price": 6.8401,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-01-01",
+     "unit_price": 6.5436,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-02-01",
+     "unit_price": 6.8846,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-03-01",
+     "unit_price": 6.7145,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-04-01",
+     "unit_price": 7.0811,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-05-01",
+     "unit_price": 7.5068,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-06-01",
+     "unit_price": 7.6888,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-07-01",
+     "unit_price": 7.7924,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-08-01",
+     "unit_price": 7.6303,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-09-01",
+     "unit_price": 7.9654,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-10-01",
+     "unit_price": 7.9667,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-11-01",
+     "unit_price": 8.343,
+     "in_model_window": true
+    }
+   ],
+   "usable_history_months": 23,
+   "excluded_partial_month": "2025-12-01",
+   "horizons": [
+    {
+     "horizon_days": 30,
+     "horizon_months": 1,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 13,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-debc136e01be",
+      "created_at": "2026-10-03T23:45:04.238513+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 30,
+      "horizon_months": 1,
+      "model": {
+       "code": "naive",
+       "name": "Naive (last value)",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:fe535f271390b59f",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2025-12-01",
+       "value": 8.343,
+       "lower": null,
+       "upper": null,
+       "interval_level": null,
+       "last_observed_price": 8.343,
+       "change_pct": 0.0
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 8.343,
+        "lower": null,
+        "upper": null
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.21869999999999967,
+        "rmse": 0.2646562865302837,
+        "mape": 2.714513980909121,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.23836666666666662,
+        "rmse": 0.29050923010771573,
+        "mape": 2.927456262071778,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.95
+        },
+        "origins_scored": 4,
+        "mae": 0.2196340605103584,
+        "rmse": 0.26179907042464384,
+        "mape": 2.7253222605204863,
+        "directional_accuracy": 0.5,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.079349,
+         "months_used": 22
+        },
+        "origins_scored": 4,
+        "mae": 0.31265479494189985,
+        "rmse": 0.3402186216002504,
+        "mape": 3.8745297644308208,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.6247,
+         "coefficient_on_time": 0.033581,
+         "pairs_used": 21
+        },
+        "origins_scored": 4,
+        "mae": 0.20257661302404184,
+        "rmse": 0.23553769268198949,
+        "mape": 2.521201528716883,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       }
+      ],
+      "selection_rationale": "Naive (last value) chosen: held-out error (MAE) 0.2187; the best regression, Lagged price regression, had MAE 0.2026 (7% lower error than the baseline), short of the 10% improvement needed. A more complex model is used only when it is clearly better.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 8.343
+      }
+     }
+    },
+    {
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 15,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-d8dd5daf86f6",
+      "created_at": "2026-10-03T23:45:04.238513+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 90,
+      "horizon_months": 3,
+      "model": {
+       "code": "naive",
+       "name": "Naive (last value)",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:fe535f271390b59f",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2026-02-01",
+       "value": 8.343,
+       "lower": null,
+       "upper": null,
+       "interval_level": null,
+       "last_observed_price": 8.343,
+       "change_pct": 0.0
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 8.343,
+        "lower": null,
+        "upper": null
+       },
+       {
+        "month": "2026-01-01",
+        "value": 8.343,
+        "lower": null,
+        "upper": null
+       },
+       {
+        "month": "2026-02-01",
+        "value": 8.343,
+        "lower": null,
+        "upper": null
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.32177500000000014,
+        "rmse": 0.3968883942621653,
+        "mape": 3.9553533541799952,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.5031333333333332,
+        "rmse": 0.5178707786053709,
+        "mape": 6.298520531867931,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.95
+        },
+        "origins_scored": 4,
+        "mae": 0.3417145906930421,
+        "rmse": 0.4029907322657138,
+        "mape": 4.216668933721169,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.071622,
+         "months_used": 20
+        },
+        "origins_scored": 4,
+        "mae": 0.45793794301931356,
+        "rmse": 0.471262892771222,
+        "mape": 5.7123649365774245,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": -0.2102,
+         "coefficient_on_time": 0.091343,
+         "pairs_used": 17
+        },
+        "origins_scored": 4,
+        "mae": 0.7271712673034922,
+        "rmse": 0.7489367872619025,
+        "mape": 9.125370449722814,
+        "directional_accuracy": 0.25,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       }
+      ],
+      "selection_rationale": "Naive (last value) chosen: held-out error (MAE) 0.3218; the best regression, Linear trend regression, had MAE 0.4579 (42% higher error than the baseline), short of the 10% improvement needed. A more complex model is used only when it is clearly better.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 8.343
+      }
+     }
+    }
+   ],
+   "computed_at": "2026-10-03T23:45:04.316038+00:00"
+  },
+  {
+   "material": {
+    "material_id": "SOL-JBOX-IP68",
+    "description": "Junction box IP68",
+    "category": "Electrical",
+    "unit_of_measure": "PCS"
+   },
+   "as_of": "2025-12-08",
+   "currency": "USD",
+   "data_frequency": "monthly",
+   "history": [
+    {
+     "month": "2024-01-01",
+     "unit_price": 2.8105,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-02-01",
+     "unit_price": 2.8062,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-03-01",
+     "unit_price": 2.8612,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-04-01",
+     "unit_price": 3.0261,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-05-01",
+     "unit_price": 2.8532,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-06-01",
+     "unit_price": 2.8701,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-07-01",
+     "unit_price": 2.807,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-08-01",
+     "unit_price": 2.7831,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-09-01",
+     "unit_price": 2.7921,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-10-01",
+     "unit_price": 2.7364,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-11-01",
+     "unit_price": 2.6561,
+     "in_model_window": true
+    },
+    {
+     "month": "2024-12-01",
+     "unit_price": 2.7543,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-01-01",
+     "unit_price": 2.736,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-02-01",
+     "unit_price": 2.8693,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-03-01",
+     "unit_price": 2.8762,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-04-01",
+     "unit_price": 2.9369,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-05-01",
+     "unit_price": 2.9865,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-06-01",
+     "unit_price": 2.9727,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-07-01",
+     "unit_price": 2.9829,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-08-01",
+     "unit_price": 2.8937,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-09-01",
+     "unit_price": 3.0194,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-10-01",
+     "unit_price": 2.9774,
+     "in_model_window": true
+    },
+    {
+     "month": "2025-11-01",
+     "unit_price": 2.9257,
+     "in_model_window": true
+    }
+   ],
+   "usable_history_months": 23,
+   "excluded_partial_month": "2025-12-01",
+   "horizons": [
+    {
+     "horizon_days": 30,
+     "horizon_months": 1,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 13,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-0a72c5342468",
+      "created_at": "2026-10-03T23:45:04.445660+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 30,
+      "horizon_months": 1,
+      "model": {
+       "code": "moving_average",
+       "name": "Moving average (3 months)",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:9941e6290d5a9293",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2025-12-01",
+       "value": 2.974167,
+       "lower": null,
+       "upper": null,
+       "interval_level": null,
+       "last_observed_price": 2.9257,
+       "change_pct": 1.66
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 2.974167,
+        "lower": null,
+        "upper": null
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.07715000000000005,
+        "rmse": 0.08395537505127357,
+        "mape": 2.6058406531876797,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.05162499999999992,
+        "rmse": 0.05914441130731537,
+        "mape": 1.7525007304692257,
+        "directional_accuracy": 1.0,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.75
+        },
+        "origins_scored": 4,
+        "mae": 0.06678485468497652,
+        "rmse": 0.07530314837315778,
+        "mape": 2.2598591275867,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.007113,
+         "months_used": 22
+        },
+        "origins_scored": 4,
+        "mae": 0.04712454146730538,
+        "rmse": 0.06329059567549203,
+        "mape": 1.5736460510605677,
+        "directional_accuracy": 1.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.6214,
+         "coefficient_on_time": 0.00334,
+         "pairs_used": 21
+        },
+        "origins_scored": 4,
+        "mae": 0.07038192571536461,
+        "rmse": 0.07801431868828339,
+        "mape": 2.3776428654411133,
+        "directional_accuracy": 1.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       }
+      ],
+      "selection_rationale": "Moving average (3 months) chosen: held-out error (MAE) 0.0516; the best regression, Linear trend regression, had MAE 0.0471 (9% lower error than the baseline), short of the 10% improvement needed. A more complex model is used only when it is clearly better.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 2.9257
+      }
+     }
+    },
+    {
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "status": "forecast",
+     "reason": null,
+     "required_months": 15,
+     "available_months": 23,
+     "run": {
+      "run_id": "FRC-9cf878014009",
+      "created_at": "2026-10-03T23:45:04.462813+00:00",
+      "created_by": "USR-TEST-001",
+      "as_of": "2025-12-08",
+      "dataset_id": "Synthetic Environment A",
+      "currency": "USD",
+      "horizon_days": 90,
+      "horizon_months": 3,
+      "model": {
+       "code": "moving_average",
+       "name": "Moving average (3 months)",
+       "version": "1.0"
+      },
+      "dataset_version": "sha256:9941e6290d5a9293",
+      "history": {
+       "months": 23,
+       "start": "2024-01-01",
+       "end": "2025-11-01",
+       "frequency": "monthly"
+      },
+      "forecast": {
+       "month": "2026-02-01",
+       "value": 2.974167,
+       "lower": null,
+       "upper": null,
+       "interval_level": null,
+       "last_observed_price": 2.9257,
+       "change_pct": 1.66
+      },
+      "path": [
+       {
+        "month": "2025-12-01",
+        "value": 2.974167,
+        "lower": null,
+        "upper": null
+       },
+       {
+        "month": "2026-01-01",
+        "value": 2.974167,
+        "lower": null,
+        "upper": null
+       },
+       {
+        "month": "2026-02-01",
+        "value": 2.974167,
+        "lower": null,
+        "upper": null
+       }
+      ],
+      "candidates": [
+       {
+        "code": "naive",
+        "name": "Naive (last value)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {},
+        "origins_scored": 4,
+        "mae": 0.04425000000000001,
+        "rmse": 0.0544219165410407,
+        "mape": 1.5080280069353795,
+        "directional_accuracy": 0.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "moving_average",
+        "name": "Moving average (3 months)",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "window": 3
+        },
+        "origins_scored": 4,
+        "mae": 0.030225000000000057,
+        "rmse": 0.035601775080589565,
+        "mape": 1.0220008161470993,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": true
+       },
+       {
+        "code": "exponential_smoothing",
+        "name": "Simple exponential smoothing",
+        "version": "1.0",
+        "kind": "baseline",
+        "params": {
+         "alpha": 0.8
+        },
+        "origins_scored": 4,
+        "mae": 0.03617832624791295,
+        "rmse": 0.04693770369436498,
+        "mape": 1.2313057200948643,
+        "directional_accuracy": 1.0,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "trend_regression",
+        "name": "Linear trend regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "slope_per_month": 0.005056,
+         "months_used": 20
+        },
+        "origins_scored": 4,
+        "mae": 0.06675485337117348,
+        "rmse": 0.08132204178074966,
+        "mape": 2.2392432950453625,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       },
+       {
+        "code": "lagged_regression",
+        "name": "Lagged price regression",
+        "version": "1.0",
+        "kind": "regression",
+        "params": {
+         "coefficient_on_current_price": 0.1883,
+         "coefficient_on_time": 0.006097,
+         "pairs_used": 17
+        },
+        "origins_scored": 4,
+        "mae": 0.040036906051581944,
+        "rmse": 0.05421546679576975,
+        "mape": 1.3456524150315192,
+        "directional_accuracy": 0.75,
+        "eligible": true,
+        "note": "",
+        "selected": false
+       }
+      ],
+      "selection_rationale": "Moving average (3 months) chosen: held-out error (MAE) 0.0302; the best regression, Lagged price regression, had MAE 0.0400 (32% higher error than the baseline), short of the 10% improvement needed. A more complex model is used only when it is clearly better.",
+      "config": {
+       "min_train": 9,
+       "origins": 4,
+       "min_improvement": 0.1,
+       "interval_level": 0.8,
+       "ma_window": 3,
+       "trend_window": 24,
+       "last_observed_price": 2.9257
+      }
+     }
+    }
+   ],
+   "computed_at": "2026-10-03T23:45:04.534890+00:00"
+  }
+ ],
+ "exposure": {
+  "has_data": true,
+  "kind": "baseline",
+  "label": "Exposure from the stored forecast",
+  "method_version": "1.0",
+  "as_of": "2025-12-08",
+  "horizon_days": 90,
+  "horizon_months": 3,
+  "usage_window_months": 6,
+  "scenario": null,
+  "materials": [
+   {
+    "material_id": "SOL-JBOX-IP68",
+    "description": "Junction box IP68",
+    "category": "Electrical",
+    "unit_of_measure": "PCS",
+    "currency": "USD",
+    "forecast": {
+     "run_id": "FRC-9cf878014009",
+     "model": "Moving average (3 months) v1.0",
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "as_of": "2025-12-08",
+     "stored_at": "2026-10-03T23:45:04.462813+00:00"
+    },
+    "baseline_unit_cost": 2.9257,
+    "forecast_unit_cost": 2.9742,
+    "forecast_end_unit_cost": 2.9742,
+    "expected_usage": 58566.0,
+    "usage_basis": {
+     "method": "trailing_purchases",
+     "monthly_usage": 19522.0,
+     "months_used": 6
+    },
+    "baseline_spend": 171346.5462,
+    "forecast_spend": 174185.0645,
+    "projected_exposure": 2838.5183,
+    "exposure_pct": 1.6566,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 61.5095,
+     "lead_time_days": 16.7,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "shares": {
+     "supplier": {
+      "SUP-001": 1.0
+     },
+     "product": {
+      "PANEL-60C": 1.0
+     },
+     "category": {
+      "Electrical": 1.0
+     }
+    }
+   },
+   {
+    "material_id": "SOL-CELL-M10",
+    "description": "Monocrystalline cell M10",
+    "category": "Cells",
+    "unit_of_measure": "PCS",
+    "currency": "USD",
+    "forecast": {
+     "run_id": "FRC-e562abeb54f6",
+     "model": "Lagged price regression v1.0",
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "as_of": "2025-12-08",
+     "stored_at": "2026-10-03T23:45:03.913692+00:00"
+    },
+    "baseline_unit_cost": 0.2798,
+    "forecast_unit_cost": 0.2856,
+    "forecast_end_unit_cost": 0.2891,
+    "expected_usage": 56989.5,
+    "usage_basis": {
+     "method": "trailing_purchases",
+     "monthly_usage": 18996.5,
+     "months_used": 6
+    },
+    "baseline_spend": 15945.6621,
+    "forecast_spend": 16278.1388,
+    "projected_exposure": 332.4767,
+    "exposure_pct": 2.0851,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 18.3975,
+     "lead_time_days": 17.6,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "shares": {
+     "supplier": {
+      "SUP-004": 1.0
+     },
+     "product": {
+      "PANEL-60C": 1.0
+     },
+     "category": {
+      "Cells": 1.0
+     }
+    }
+   },
+   {
+    "material_id": "SOL-EVA-FILM",
+    "description": "EVA encapsulant film",
+    "category": "Polymers",
+    "unit_of_measure": "M2",
+    "currency": "USD",
+    "forecast": {
+     "run_id": "FRC-4e79051bb35f",
+     "model": "Lagged price regression v1.0",
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "as_of": "2025-12-08",
+     "stored_at": "2026-10-03T23:45:04.099313+00:00"
+    },
+    "baseline_unit_cost": 1.2694,
+    "forecast_unit_cost": 1.2973,
+    "forecast_end_unit_cost": 1.3146,
+    "expected_usage": 5326.0,
+    "usage_basis": {
+     "method": "trailing_purchases",
+     "monthly_usage": 1775.3333,
+     "months_used": 6
+    },
+    "baseline_spend": 6760.8244,
+    "forecast_spend": 6909.2636,
+    "projected_exposure": 148.4392,
+    "exposure_pct": 2.1956,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 87.2752,
+     "lead_time_days": 17.4,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "shares": {
+     "supplier": {
+      "SUP-007": 1.0
+     },
+     "product": {
+      "PANEL-60C": 1.0
+     },
+     "category": {
+      "Polymers": 1.0
+     }
+    }
+   },
+   {
+    "material_id": "SOL-ALU-FRAME",
+    "description": "Aluminium frame profile",
+    "category": "Metals",
+    "unit_of_measure": "KG",
+    "currency": "USD",
+    "forecast": {
+     "run_id": "FRC-fc76410df1f8",
+     "model": "Naive (last value) v1.0",
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "as_of": "2025-12-08",
+     "stored_at": "2026-10-03T23:45:03.567413+00:00"
+    },
+    "baseline_unit_cost": 4.2318,
+    "forecast_unit_cost": 4.2318,
+    "forecast_end_unit_cost": 4.2318,
+    "expected_usage": 4536.5,
+    "usage_basis": {
+     "method": "trailing_purchases",
+     "monthly_usage": 1512.1667,
+     "months_used": 6
+    },
+    "baseline_spend": 19197.5607,
+    "forecast_spend": 19197.5607,
+    "projected_exposure": 0.0,
+    "exposure_pct": 0.0,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 12.8331,
+     "lead_time_days": 38.7,
+     "uncovered_days": 25.8669,
+     "uncovered_quantity": 1285.9732
+    },
+    "shares": {
+     "supplier": {
+      "SUP-006": 1.0
+     },
+     "product": {
+      "PANEL-60C": 1.0
+     },
+     "category": {
+      "Metals": 1.0
+     }
+    }
+   },
+   {
+    "material_id": "SOL-GLASS-32",
+    "description": "Solar glass 3.2 mm",
+    "category": "Glass",
+    "unit_of_measure": "M2",
+    "currency": "USD",
+    "forecast": {
+     "run_id": "FRC-d8dd5daf86f6",
+     "model": "Naive (last value) v1.0",
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "as_of": "2025-12-08",
+     "stored_at": "2026-10-03T23:45:04.238513+00:00"
+    },
+    "baseline_unit_cost": 8.343,
+    "forecast_unit_cost": 8.343,
+    "forecast_end_unit_cost": 8.343,
+    "expected_usage": 5715.5,
+    "usage_basis": {
+     "method": "trailing_purchases",
+     "monthly_usage": 1905.1667,
+     "months_used": 6
+    },
+    "baseline_spend": 47684.4165,
+    "forecast_spend": 47684.4165,
+    "projected_exposure": 0.0,
+    "exposure_pct": 0.0,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 61.9137,
+     "lead_time_days": 18.8,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "shares": {
+     "supplier": {
+      "SUP-003": 1.0
+     },
+     "product": {
+      "PANEL-60C": 1.0
+     },
+     "category": {
+      "Glass": 1.0
+     }
+    }
+   },
+   {
+    "material_id": "SOL-BACKSHEET",
+    "description": "Backsheet TPT",
+    "category": "Polymers",
+    "unit_of_measure": "M2",
+    "currency": "USD",
+    "forecast": {
+     "run_id": "FRC-6be1a0be5b98",
+     "model": "Lagged price regression v1.0",
+     "horizon_days": 90,
+     "horizon_months": 3,
+     "as_of": "2025-12-08",
+     "stored_at": "2026-10-03T23:45:03.742300+00:00"
+    },
+    "baseline_unit_cost": 2.4697,
+    "forecast_unit_cost": 2.4095,
+    "forecast_end_unit_cost": 2.4042,
+    "expected_usage": 3901.5,
+    "usage_basis": {
+     "method": "trailing_purchases",
+     "monthly_usage": 1300.5,
+     "months_used": 6
+    },
+    "baseline_spend": 9635.5346,
+    "forecast_spend": 9400.8424,
+    "projected_exposure": -234.6921,
+    "exposure_pct": -2.4357,
+    "supply_cover": {
+     "evaluable": true,
+     "cover_days": 62.9383,
+     "lead_time_days": 19.1,
+     "uncovered_days": 0.0,
+     "uncovered_quantity": 0.0
+    },
+    "shares": {
+     "supplier": {
+      "SUP-002": 1.0
+     },
+     "product": {
+      "PANEL-60C": 1.0
+     },
+     "category": {
+      "Polymers": 1.0
+     }
+    }
+   }
+  ],
+  "not_available": [],
+  "rollups": {
+   "supplier": [
+    {
+     "currency": "USD",
+     "groups": [
+      {
+       "key": "SUP-001",
+       "materials": 1,
+       "baseline_spend": 171346.5462,
+       "forecast_spend": 174185.0645,
+       "projected_exposure": 2838.5183
+      },
+      {
+       "key": "SUP-004",
+       "materials": 1,
+       "baseline_spend": 15945.6621,
+       "forecast_spend": 16278.1388,
+       "projected_exposure": 332.4767
+      },
+      {
+       "key": "SUP-007",
+       "materials": 1,
+       "baseline_spend": 6760.8244,
+       "forecast_spend": 6909.2636,
+       "projected_exposure": 148.4392
+      },
+      {
+       "key": "SUP-006",
+       "materials": 1,
+       "baseline_spend": 19197.5607,
+       "forecast_spend": 19197.5607,
+       "projected_exposure": 0.0
+      },
+      {
+       "key": "SUP-003",
+       "materials": 1,
+       "baseline_spend": 47684.4165,
+       "forecast_spend": 47684.4165,
+       "projected_exposure": 0.0
+      },
+      {
+       "key": "SUP-002",
+       "materials": 1,
+       "baseline_spend": 9635.5346,
+       "forecast_spend": 9400.8424,
+       "projected_exposure": -234.6921
+      }
+     ],
+     "total": {
+      "baseline_spend": 270570.5444,
+      "forecast_spend": 273655.2866,
+      "projected_exposure": 3084.7421
+     }
+    }
+   ],
+   "product": [
+    {
+     "currency": "USD",
+     "groups": [
+      {
+       "key": "PANEL-60C",
+       "materials": 6,
+       "baseline_spend": 270570.5444,
+       "forecast_spend": 273655.2866,
+       "projected_exposure": 3084.7421
+      }
+     ],
+     "total": {
+      "baseline_spend": 270570.5444,
+      "forecast_spend": 273655.2866,
+      "projected_exposure": 3084.7421
+     }
+    }
+   ],
+   "category": [
+    {
+     "currency": "USD",
+     "groups": [
+      {
+       "key": "Electrical",
+       "materials": 1,
+       "baseline_spend": 171346.5462,
+       "forecast_spend": 174185.0645,
+       "projected_exposure": 2838.5183
+      },
+      {
+       "key": "Cells",
+       "materials": 1,
+       "baseline_spend": 15945.6621,
+       "forecast_spend": 16278.1388,
+       "projected_exposure": 332.4767
+      },
+      {
+       "key": "Metals",
+       "materials": 1,
+       "baseline_spend": 19197.5607,
+       "forecast_spend": 19197.5607,
+       "projected_exposure": 0.0
+      },
+      {
+       "key": "Glass",
+       "materials": 1,
+       "baseline_spend": 47684.4165,
+       "forecast_spend": 47684.4165,
+       "projected_exposure": 0.0
+      },
+      {
+       "key": "Polymers",
+       "materials": 2,
+       "baseline_spend": 16396.359,
+       "forecast_spend": 16310.106,
+       "projected_exposure": -86.253
+      }
+     ],
+     "total": {
+      "baseline_spend": 270570.5444,
+      "forecast_spend": 273655.2866,
+      "projected_exposure": 3084.7421
+     }
+    }
+   ]
+  },
+  "computed_at": "2026-10-03T23:45:04.616668+00:00"
+ },
+ "scoring": {
+  "as_of": "2025-12-08",
+  "weight_version": 1,
+  "scored": [
+   {
+    "description": "Aluminium frame profile",
+    "score_id": "MRS-0587ae322503",
+    "material_id": "SOL-ALU-FRAME",
+    "as_of": "2025-12-08",
+    "dataset_id": "Synthetic Environment A",
+    "currency": "USD",
+    "score": 47.2719,
+    "level": "Moderate",
+    "data_coverage_pct": 100.0,
+    "summary": "Score 47.3 of 100 (Moderate). Main drivers: Supplier concentration (15.0), Inventory coverage (10.0), Standard cost deviation (10.0).",
+    "method_version": "1.0",
+    "weight_version": 1,
+    "forecast_run_id": "FRC-fc76410df1f8",
+    "inputs_version": "sha256:15d1c1e6ec762eaf",
+    "created_by": "USR-TEST-001",
+    "created_at": "2026-10-03T23:45:04.714546+00:00"
+   },
+   {
+    "description": "Backsheet TPT",
+    "score_id": "MRS-7ed13cfb7804",
+    "material_id": "SOL-BACKSHEET",
+    "as_of": "2025-12-08",
+    "dataset_id": "Synthetic Environment A",
+    "currency": "USD",
+    "score": 41.8695,
+    "level": "Moderate",
+    "data_coverage_pct": 100.0,
+    "summary": "Score 41.9 of 100 (Moderate). Main drivers: Supplier concentration (15.0), Standard cost deviation (9.1), Demand trend (5.0).",
+    "method_version": "1.0",
+    "weight_version": 1,
+    "forecast_run_id": "FRC-6be1a0be5b98",
+    "inputs_version": "sha256:8a24ca84aaa146a2",
+    "created_by": "USR-TEST-001",
+    "created_at": "2026-10-03T23:45:04.714546+00:00"
+   },
+   {
+    "description": "Monocrystalline cell M10",
+    "score_id": "MRS-c9bc5245a11b",
+    "material_id": "SOL-CELL-M10",
+    "as_of": "2025-12-08",
+    "dataset_id": "Synthetic Environment A",
+    "currency": "USD",
+    "score": 48.9472,
+    "level": "Moderate",
+    "data_coverage_pct": 100.0,
+    "summary": "Score 48.9 of 100 (Moderate). Main drivers: Supplier concentration (15.0), Standard cost deviation (10.0), Inventory coverage (8.9).",
+    "method_version": "1.0",
+    "weight_version": 1,
+    "forecast_run_id": "FRC-e562abeb54f6",
+    "inputs_version": "sha256:3c197047d3a23489",
+    "created_by": "USR-TEST-001",
+    "created_at": "2026-10-03T23:45:04.730233+00:00"
+   },
+   {
+    "description": "EVA encapsulant film",
+    "score_id": "MRS-ef04de150e08",
+    "material_id": "SOL-EVA-FILM",
+    "as_of": "2025-12-08",
+    "dataset_id": "Synthetic Environment A",
+    "currency": "USD",
+    "score": 35.1668,
+    "level": "Moderate",
+    "data_coverage_pct": 100.0,
+    "summary": "Score 35.2 of 100 (Moderate). Main drivers: Supplier concentration (15.0), Standard cost deviation (10.0), Predicted increase (5.3).",
+    "method_version": "1.0",
+    "weight_version": 1,
+    "forecast_run_id": "FRC-4e79051bb35f",
+    "inputs_version": "sha256:7b4e1873b63e91fd",
+    "created_by": "USR-TEST-001",
+    "created_at": "2026-10-03T23:45:04.730786+00:00"
+   },
+   {
+    "description": "Solar glass 3.2 mm",
+    "score_id": "MRS-31373a80768a",
+    "material_id": "SOL-GLASS-32",
+    "as_of": "2025-12-08",
+    "dataset_id": "Synthetic Environment A",
+    "currency": "USD",
+    "score": 36.3819,
+    "level": "Moderate",
+    "data_coverage_pct": 100.0,
+    "summary": "Score 36.4 of 100 (Moderate). Main drivers: Supplier concentration (15.0), Standard cost deviation (10.0), Product cost exposure (6.0).",
+    "method_version": "1.0",
+    "weight_version": 1,
+    "forecast_run_id": "FRC-d8dd5daf86f6",
+    "inputs_version": "sha256:8bf7bef5be29d864",
+    "created_by": "USR-TEST-001",
+    "created_at": "2026-10-03T23:45:04.730786+00:00"
+   },
+   {
+    "description": "Junction box IP68",
+    "score_id": "MRS-a63b96356a21",
+    "material_id": "SOL-JBOX-IP68",
+    "as_of": "2025-12-08",
+    "dataset_id": "Synthetic Environment A",
+    "currency": "USD",
+    "score": 24.2681,
+    "level": "Low",
+    "data_coverage_pct": 100.0,
+    "summary": "Score 24.3 of 100 (Low). Main drivers: Supplier concentration (15.0), Standard cost deviation (4.3), Predicted increase (2.5).",
+    "method_version": "1.0",
+    "weight_version": 1,
+    "forecast_run_id": "FRC-9cf878014009",
+    "inputs_version": "sha256:4bbc5b36d0e2699c",
+    "created_by": "USR-TEST-001",
+    "created_at": "2026-10-03T23:45:04.730786+00:00"
+   }
+  ],
+  "not_scored": []
+ },
+ "validation": {
+  "run_id": "VAL-62C841802F",
+  "status": "completed",
+  "created_at": "2026-10-03T23:45:04.880130+00:00",
+  "created_by": "USR-TEST-001",
+  "dataset_id": "Synthetic Environment A",
+  "data_end": "2025-12-08",
+  "note": null,
+  "config": {
+   "horizons_days": [
+    30,
+    90
+   ],
+   "cutoff_step_months": 1,
+   "event_threshold_pct": 5.0,
+   "alert_threshold": 50.0,
+   "flat_band_pct": 0.5,
+   "dataset_id": "Synthetic Environment A",
+   "material_ids": [],
+   "cutoffs": [
+    "2025-01-31",
+    "2025-02-28",
+    "2025-03-31",
+    "2025-04-30",
+    "2025-05-31",
+    "2025-06-30",
+    "2025-07-31",
+    "2025-08-31",
+    "2025-09-30",
+    "2025-10-31"
+   ],
+   "last_complete_month": "2025-11-01"
+  },
+  "versions": {
+   "validation_method": "1.2",
+   "forecast_engine": "1.0",
+   "risk_method": "1.0",
+   "risk_weight_version": 1
+  },
+  "completed_at": "2026-10-03T23:45:08.147912+00:00",
+  "failure": null,
+  "metrics": {
+   "by_horizon": {
+    "30": {
+     "cases": 60,
+     "withheld": 0,
+     "not_evaluable": 0,
+     "evaluated": 60,
+     "forecast": {
+      "n": 60,
+      "mae": 0.11239248333333329,
+      "rmse": 0.18200286720529976,
+      "mape_pct": 3.018434584579433,
+      "mape_n": 60,
+      "directional_accuracy": 0.43478260869565216,
+      "directional_n": 23,
+      "directional_no_call_n": 31,
+      "naive_mae": 0.09435333333333328,
+      "mae_vs_naive_pct": 19.118720412633404,
+      "beats_naive_share": 0.18333333333333332,
+      "ties_naive_share": 0.5333333333333333,
+      "worse_than_naive_share": 0.2833333333333333,
+      "ties_naive": 32
+     },
+     "warning": {
+      "n": 60,
+      "events": 8,
+      "event_rate": 0.13333333333333333,
+      "alerts": 7,
+      "tp": 1,
+      "fp": 6,
+      "fn": 7,
+      "tn": 46,
+      "precision": 0.14285714285714285,
+      "recall": 0.125,
+      "false_positive_rate": 0.11538461538461539,
+      "false_negative_rate": 0.875,
+      "unscored": 0,
+      "unscored_events": 0
+     },
+     "lead_time": {
+      "n": 1,
+      "mean_months": 1,
+      "median_months": 1,
+      "min_months": 1,
+      "max_months": 1
+     },
+     "by_material": [
+      {
+       "material_id": "SOL-ALU-FRAME",
+       "n": 10,
+       "mae": 0.2016720999999999,
+       "rmse": 0.2403704008023865,
+       "mape_pct": 4.616605578405643,
+       "mape_n": 10,
+       "directional_accuracy": 0.3333333333333333,
+       "directional_n": 3,
+       "directional_no_call_n": 7,
+       "naive_mae": 0.16194999999999998,
+       "mae_vs_naive_pct": 24.527384995368905,
+       "beats_naive_share": 0.0,
+       "ties_naive_share": 0.7,
+       "worse_than_naive_share": 0.3,
+       "ties_naive": 7,
+       "events": 3
+      },
+      {
+       "material_id": "SOL-BACKSHEET",
+       "n": 10,
+       "mae": 0.07832620000000001,
+       "rmse": 0.09800234041899206,
+       "mape_pct": 3.3718292428255854,
+       "mape_n": 10,
+       "directional_accuracy": 0.5555555555555556,
+       "directional_n": 9,
+       "directional_no_call_n": 1,
+       "naive_mae": 0.07555999999999999,
+       "mae_vs_naive_pct": 3.660931709899451,
+       "beats_naive_share": 0.6,
+       "ties_naive_share": 0.0,
+       "worse_than_naive_share": 0.4,
+       "ties_naive": 0,
+       "events": 1
+      },
+      {
+       "material_id": "SOL-CELL-M10",
+       "n": 10,
+       "mae": 0.005169899999999996,
+       "rmse": 0.006681360677287232,
+       "mape_pct": 2.010346220109138,
+       "mape_n": 10,
+       "directional_accuracy": 0.5,
+       "directional_n": 2,
+       "directional_no_call_n": 7,
+       "naive_mae": 0.005149999999999993,
+       "mae_vs_naive_pct": 0.38640776699034873,
+       "beats_naive_share": 0.1,
+       "ties_naive_share": 0.8,
+       "worse_than_naive_share": 0.1,
+       "ties_naive": 8,
+       "events": 1
+      },
+      {
+       "material_id": "SOL-EVA-FILM",
+       "n": 10,
+       "mae": 0.023360099999999974,
+       "rmse": 0.03116594248695202,
+       "mape_pct": 1.9507202962978063,
+       "mape_n": 10,
+       "directional_accuracy": 0.5,
+       "directional_n": 4,
+       "directional_no_call_n": 5,
+       "naive_mae": 0.01877000000000002,
+       "mae_vs_naive_pct": 24.45444858817234,
+       "beats_naive_share": 0.2,
+       "ties_naive_share": 0.5,
+       "worse_than_naive_share": 0.3,
+       "ties_naive": 5,
+       "events": 0
+      },
+      {
+       "material_id": "SOL-GLASS-32",
+       "n": 10,
+       "mae": 0.3040552999999999,
+       "rmse": 0.3527414378145839,
+       "mape_pct": 4.052420948597207,
+       "mape_n": 10,
+       "directional_accuracy": 0.0,
+       "directional_n": 3,
+       "directional_no_call_n": 6,
+       "naive_mae": 0.24637999999999974,
+       "mae_vs_naive_pct": 23.40908352950737,
+       "beats_naive_share": 0.0,
+       "ties_naive_share": 0.6,
+       "worse_than_naive_share": 0.4,
+       "ties_naive": 6,
+       "events": 3
+      },
+      {
+       "material_id": "SOL-JBOX-IP68",
+       "n": 10,
+       "mae": 0.06177129999999993,
+       "rmse": 0.07697658873384809,
+       "mape_pct": 2.1086852212412164,
+       "mape_n": 10,
+       "directional_accuracy": 0.5,
+       "directional_n": 2,
+       "directional_no_call_n": 5,
+       "naive_mae": 0.05830999999999995,
+       "mae_vs_naive_pct": 5.936031555479304,
+       "beats_naive_share": 0.2,
+       "ties_naive_share": 0.6,
+       "worse_than_naive_share": 0.2,
+       "ties_naive": 6,
+       "events": 0
+      }
+     ],
+     "models": {
+      "Naive (last value)": 32,
+      "Moving average (3 months)": 10,
+      "Linear trend regression": 9,
+      "Lagged price regression": 7,
+      "Simple exponential smoothing": 2
+     }
+    },
+    "90": {
+     "cases": 60,
+     "withheld": 12,
+     "not_evaluable": 12,
+     "evaluated": 36,
+     "forecast": {
+      "n": 36,
+      "mae": 0.2406529722222222,
+      "rmse": 0.40009638803768965,
+      "mape_pct": 5.554095928234724,
+      "mape_n": 36,
+      "directional_accuracy": 0.4117647058823529,
+      "directional_n": 17,
+      "directional_no_call_n": 17,
+      "naive_mae": 0.1787999999999999,
+      "mae_vs_naive_pct": 34.593384911757454,
+      "beats_naive_share": 0.25,
+      "ties_naive_share": 0.4166666666666667,
+      "worse_than_naive_share": 0.3333333333333333,
+      "ties_naive": 15
+     },
+     "warning": {
+      "n": 36,
+      "events": 12,
+      "event_rate": 0.3333333333333333,
+      "alerts": 6,
+      "tp": 1,
+      "fp": 5,
+      "fn": 11,
+      "tn": 19,
+      "precision": 0.16666666666666666,
+      "recall": 0.08333333333333333,
+      "false_positive_rate": 0.20833333333333334,
+      "false_negative_rate": 0.9166666666666666,
+      "unscored": 0,
+      "unscored_events": 0
+     },
+     "lead_time": {
+      "n": 1,
+      "mean_months": 3,
+      "median_months": 3,
+      "min_months": 3,
+      "max_months": 3
+     },
+     "by_material": [
+      {
+       "material_id": "SOL-ALU-FRAME",
+       "n": 6,
+       "mae": 0.48237016666666693,
+       "rmse": 0.5539080426609639,
+       "mape_pct": 10.479249234491014,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 2,
+       "directional_no_call_n": 3,
+       "naive_mae": 0.3498333333333333,
+       "mae_vs_naive_pct": 37.88570747975237,
+       "beats_naive_share": 0.0,
+       "ties_naive_share": 0.5,
+       "worse_than_naive_share": 0.5,
+       "ties_naive": 3,
+       "events": 2
+      },
+      {
+       "material_id": "SOL-BACKSHEET",
+       "n": 6,
+       "mae": 0.08128949999999986,
+       "rmse": 0.09489987072962738,
+       "mape_pct": 3.5333786190937904,
+       "mape_n": 6,
+       "directional_accuracy": 0.5,
+       "directional_n": 4,
+       "directional_no_call_n": 2,
+       "naive_mae": 0.11316666666666648,
+       "mae_vs_naive_pct": -28.168335787923425,
+       "beats_naive_share": 0.5,
+       "ties_naive_share": 0.16666666666666666,
+       "worse_than_naive_share": 0.3333333333333333,
+       "ties_naive": 1,
+       "events": 2
+      },
+      {
+       "material_id": "SOL-CELL-M10",
+       "n": 6,
+       "mae": 0.010028999999999996,
+       "rmse": 0.012144284609093557,
+       "mape_pct": 3.7735930587715,
+       "mape_n": 6,
+       "directional_accuracy": 0.8333333333333334,
+       "directional_n": 6,
+       "directional_no_call_n": 0,
+       "naive_mae": 0.01583333333333332,
+       "mae_vs_naive_pct": -36.658947368421025,
+       "beats_naive_share": 0.8333333333333334,
+       "ties_naive_share": 0.0,
+       "worse_than_naive_share": 0.16666666666666666,
+       "ties_naive": 0,
+       "events": 4
+      },
+      {
+       "material_id": "SOL-EVA-FILM",
+       "n": 6,
+       "mae": 0.05014999999999999,
+       "rmse": 0.052221084502973164,
+       "mape_pct": 4.029273124900815,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 1,
+       "directional_no_call_n": 5,
+       "naive_mae": 0.04526666666666668,
+       "mae_vs_naive_pct": 10.787923416789358,
+       "beats_naive_share": 0.0,
+       "ties_naive_share": 0.6666666666666666,
+       "worse_than_naive_share": 0.3333333333333333,
+       "ties_naive": 4,
+       "events": 1
+      },
+      {
+       "material_id": "SOL-GLASS-32",
+       "n": 6,
+       "mae": 0.7668291666666663,
+       "rmse": 0.7986794618747245,
+       "mape_pct": 9.705674429415742,
+       "mape_n": 6,
+       "directional_accuracy": 0.0,
+       "directional_n": 4,
+       "directional_no_call_n": 2,
+       "naive_mae": 0.49544999999999967,
+       "mae_vs_naive_pct": 54.77427927473344,
+       "beats_naive_share": 0.16666666666666666,
+       "ties_naive_share": 0.16666666666666666,
+       "worse_than_naive_share": 0.6666666666666666,
+       "ties_naive": 1,
+       "events": 3
+      },
+      {
+       "material_id": "SOL-JBOX-IP68",
+       "n": 6,
+       "mae": 0.05325000000000002,
+       "rmse": 0.06228326420476053,
+       "mape_pct": 1.8034071027354814,
+       "mape_n": 6,
+       "directional_accuracy": null,
+       "directional_n": 0,
+       "directional_no_call_n": 5,
+       "naive_mae": 0.05325000000000002,
+       "mae_vs_naive_pct": 0.0,
+       "beats_naive_share": 0.0,
+       "ties_naive_share": 1.0,
+       "worse_than_naive_share": 0.0,
+       "ties_naive": 6,
+       "events": 0
+      }
+     ],
+     "models": {
+      "Naive (last value)": 15,
+      "Lagged price regression": 9,
+      "Linear trend regression": 7,
+      "Moving average (3 months)": 4,
+      "Simple exponential smoothing": 1
+     }
+    }
+   },
+   "cases": 120,
+   "frozen": 108,
+   "evaluated": 96
+  },
+  "limitations": [
+   "Cutoffs are every 1 month(s); neighbouring cutoffs and the 90-day horizon share most of their history and holdout months, so the cases are not independent and the number of cases overstates how much evidence there is.",
+   "The risk signal is judged against a rise in the monthly average purchase price of at least 5%. That is a definition chosen before the run, not the only reasonable one.",
+   "Monthly averages of purchase prices, not daily prices; a forecast cannot be judged within a month.",
+   "MAE and RMSE are in each material's own price units, so the pooled values mix scales and are dominated by high-priced materials; MAPE and the share of cases that beat the naive forecast are the comparable figures, and the per-material table gives each MAE on its own.",
+   "Weights, scales and the warning threshold are judgement, not fitted; changing them changes the false positive and false negative counts.",
+   "The data is synthetic: these results show that the method works as built, not how it would perform on a real company's purchasing."
+  ],
+  "problems": {
+   "not_forecast_or_evaluated": {
+    "withheld: not enough history for the 90-day outlook": 12,
+    "not evaluable: The holdout month is not complete in the data.": 12
+   },
+   "worse_than_naive_cases": 29,
+   "false_positives": [
+    {
+     "case_id": "VCS-62CF74F66358",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 77.05,
+     "forecast_change_pct": 10.91107230629933,
+     "actual_change_pct": 2.4533264347001316
+    },
+    {
+     "case_id": "VCS-433FD01342CB",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 60.3833,
+     "forecast_change_pct": -8.654270685120501,
+     "actual_change_pct": -0.19617988186089175
+    },
+    {
+     "case_id": "VCS-76AA12051268",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 51.4639,
+     "forecast_change_pct": -4.653580753450203,
+     "actual_change_pct": 2.424468481909736
+    },
+    {
+     "case_id": "VCS-824F206A6FAE",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 51.4639,
+     "forecast_change_pct": -3.242886449619009,
+     "actual_change_pct": 1.6451750412958877
+    },
+    {
+     "case_id": "VCS-52755254979B",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 53.4674,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -1.0310579917515272
+    },
+    {
+     "case_id": "VCS-52F556327E61",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 53.4674,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -3.158404174732765
+    },
+    {
+     "case_id": "VCS-8DC2C88A4483",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-06-30",
+     "horizon_days": 30,
+     "risk_score": 52.4317,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 0.6451612903225712
+    },
+    {
+     "case_id": "VCS-5ACB5B593E69",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 52.4317,
+     "forecast_change_pct": -1.5210626185958254,
+     "actual_change_pct": 1.6318785578747441
+    },
+    {
+     "case_id": "VCS-1F60545165F9",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-07-31",
+     "horizon_days": 30,
+     "risk_score": 50.0718,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -0.2639517345399578
+    },
+    {
+     "case_id": "VCS-E710FAC477D8",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 54.4835,
+     "forecast_change_pct": 2.6470588235294246,
+     "actual_change_pct": 3.016591251885381
+    },
+    {
+     "case_id": "VCS-0A27E8727548",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-10-31",
+     "horizon_days": 30,
+     "risk_score": 50.245,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": -4.093010606472669
+    }
+   ],
+   "false_negatives": [
+    {
+     "case_id": "VCS-FE5D81234DCC",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-01-31",
+     "horizon_days": 30,
+     "risk_score": 29.0213,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 5.211198728528643
+    },
+    {
+     "case_id": "VCS-5E63B6009CEB",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-02-28",
+     "horizon_days": 30,
+     "risk_score": 29.917,
+     "forecast_change_pct": -2.260698303813069,
+     "actual_change_pct": 6.114847664728429
+    },
+    {
+     "case_id": "VCS-C50056515851",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 45.4945,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 7.184162016110696
+    },
+    {
+     "case_id": "VCS-DAF443DBEB34",
+     "material_id": "SOL-ALU-FRAME",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 45.4945,
+     "forecast_change_pct": -4.50157824297367,
+     "actual_change_pct": 20.007070528521997
+    },
+    {
+     "case_id": "VCS-1EEE519CA61E",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 38.5629,
+     "forecast_change_pct": 4.0646404109589085,
+     "actual_change_pct": 12.799657534246588
+    },
+    {
+     "case_id": "VCS-828C638129F3",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-03-31",
+     "horizon_days": 30,
+     "risk_score": 27.7318,
+     "forecast_change_pct": -0.003976468836097702,
+     "actual_change_pct": 5.45982575024202
+    },
+    {
+     "case_id": "VCS-9913EC2593C4",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-03-31",
+     "horizon_days": 90,
+     "risk_score": 28.5338,
+     "forecast_change_pct": 0.4811676223099193,
+     "actual_change_pct": 14.510387966341497
+    },
+    {
+     "case_id": "VCS-B429F7400E75",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-04-30",
+     "horizon_days": 90,
+     "risk_score": 42.4326,
+     "forecast_change_pct": 2.0776499589153508,
+     "actual_change_pct": 8.956450287592421
+    },
+    {
+     "case_id": "VCS-CE098AEA49B2",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-04-30",
+     "horizon_days": 30,
+     "risk_score": 41.6239,
+     "forecast_change_pct": -2.650718108768435,
+     "actual_change_pct": 6.011777831127918
+    },
+    {
+     "case_id": "VCS-9AF94E40AD00",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-04-30",
+     "horizon_days": 90,
+     "risk_score": 41.6239,
+     "forecast_change_pct": -2.650718108768435,
+     "actual_change_pct": 10.045049497959324
+    },
+    {
+     "case_id": "VCS-839ADAA3ACE1",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-05-31",
+     "horizon_days": 30,
+     "risk_score": 43.2635,
+     "forecast_change_pct": -1.1102230246251565e-14,
+     "actual_change_pct": 5.9083601286173515
+    },
+    {
+     "case_id": "VCS-BBD35625D6CA",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-05-31",
+     "horizon_days": 90,
+     "risk_score": 46.8655,
+     "forecast_change_pct": 2.161173633440505,
+     "actual_change_pct": 6.310289389067525
+    },
+    {
+     "case_id": "VCS-44FF2EB24DA0",
+     "material_id": "SOL-EVA-FILM",
+     "cutoff": "2025-06-30",
+     "horizon_days": 90,
+     "risk_score": 30.4508,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 6.209832234371082
+    },
+    {
+     "case_id": "VCS-BD483F711730",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-07-31",
+     "horizon_days": 90,
+     "risk_score": 35.8082,
+     "forecast_change_pct": 5.258444105469584,
+     "actual_change_pct": 5.404227500544767
+    },
+    {
+     "case_id": "VCS-05EC5F591327",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-08-31",
+     "horizon_days": 90,
+     "risk_score": 36.7732,
+     "forecast_change_pct": 8.01487429848975,
+     "actual_change_pct": 12.684217730528813
+    },
+    {
+     "case_id": "VCS-F76809871A44",
+     "material_id": "SOL-CELL-M10",
+     "cutoff": "2025-08-31",
+     "horizon_days": 90,
+     "risk_score": 46.2714,
+     "forecast_change_pct": 4.49338374291115,
+     "actual_change_pct": 5.784499054820413
+    },
+    {
+     "case_id": "VCS-8726A63E9CF5",
+     "material_id": "SOL-GLASS-32",
+     "cutoff": "2025-08-31",
+     "horizon_days": 90,
+     "risk_score": 39.7539,
+     "forecast_change_pct": 0.0,
+     "actual_change_pct": 9.340392907225148
+    },
+    {
+     "case_id": "VCS-46A1F9E573BE",
+     "material_id": "SOL-BACKSHEET",
+     "cutoff": "2025-09-30",
+     "horizon_days": 30,
+     "risk_score": 27.272,
+     "forecast_change_pct": -1.3196993532599288,
+     "actual_change_pct": 5.685194895997192
+    }
+   ]
+  }
+ },
+ "imports": {
+  "materials": {
+   "import_type": "manufacturing_mapping",
+   "target": "materials",
+   "target_label": "Material master",
+   "source_profile": "generic",
+   "source_profile_label": "Generic CSV / Excel",
+   "profile_id": null,
+   "field_mapping": {
+    "material_id": "material_id",
+    "description": "description",
+    "category": "category",
+    "unit_of_measure": "unit_of_measure"
+   },
+   "defaults": {},
+   "dataset_id": "Synthetic Environment A",
+   "duplicate_strategy": "skip",
+   "sheet": "CSV",
+   "dry_run": false,
+   "rows_total": 6,
+   "rows_accepted": 6,
+   "rows_rejected": 0,
+   "rows_duplicate": 0,
+   "rows_blank": 0,
+   "warnings": [
+    {
+     "code": "default_applied",
+     "field": "is_active",
+     "count": 6,
+     "message": "A default value was used where the file had no value (is_active)"
+    }
+   ],
+   "missing_values": {},
+   "unmapped_optional_fields": [
+    "is_active"
+   ],
+   "field_error_counts": {},
+   "errors_total": 0,
+   "error_log_truncated": false,
+   "circuit_breaker": null
+  },
+  "purchase_records": {
+   "import_type": "manufacturing_mapping",
+   "target": "purchase_records",
+   "target_label": "Purchase records",
+   "source_profile": "generic",
+   "source_profile_label": "Generic CSV / Excel",
+   "profile_id": null,
+   "field_mapping": {
+    "purchase_reference": "po_number",
+    "material_id": "material_id",
+    "supplier_id": "supplier_id",
+    "purchase_date": "order_date",
+    "quantity": "quantity",
+    "unit_price": "unit_price",
+    "currency": "currency"
+   },
+   "defaults": {},
+   "dataset_id": "Synthetic Environment A",
+   "duplicate_strategy": "skip",
+   "sheet": "CSV",
+   "dry_run": false,
+   "rows_total": 144,
+   "rows_accepted": 144,
+   "rows_rejected": 0,
+   "rows_duplicate": 0,
+   "rows_blank": 0,
+   "warnings": [],
+   "missing_values": {},
+   "unmapped_optional_fields": [],
+   "field_error_counts": {},
+   "errors_total": 0,
+   "error_log_truncated": false,
+   "circuit_breaker": null
+  },
+  "inventory_records": {
+   "import_type": "manufacturing_mapping",
+   "target": "inventory_records",
+   "target_label": "Inventory",
+   "source_profile": "generic",
+   "source_profile_label": "Generic CSV / Excel",
+   "profile_id": null,
+   "field_mapping": {
+    "material_id": "material_id",
+    "snapshot_date": "snapshot_date",
+    "quantity_on_hand": "quantity_on_hand",
+    "inventory_value": "inventory_value",
+    "currency": "currency"
+   },
+   "defaults": {},
+   "dataset_id": "Synthetic Environment A",
+   "duplicate_strategy": "skip",
+   "sheet": "CSV",
+   "dry_run": false,
+   "rows_total": 18,
+   "rows_accepted": 18,
+   "rows_rejected": 0,
+   "rows_duplicate": 0,
+   "rows_blank": 0,
+   "warnings": [],
+   "missing_values": {},
+   "unmapped_optional_fields": [
+    "days_of_supply"
+   ],
+   "field_error_counts": {},
+   "errors_total": 0,
+   "error_log_truncated": false,
+   "circuit_breaker": null
+  },
+  "bom_entries": {
+   "import_type": "manufacturing_mapping",
+   "target": "bom_entries",
+   "target_label": "Bill of materials",
+   "source_profile": "generic",
+   "source_profile_label": "Generic CSV / Excel",
+   "profile_id": null,
+   "field_mapping": {
+    "product_sku": "product_sku",
+    "product_description": "product_description",
+    "material_id": "material_id",
+    "bom_quantity": "bom_quantity",
+    "unit_of_measure": "unit_of_measure"
+   },
+   "defaults": {},
+   "dataset_id": "Synthetic Environment A",
+   "duplicate_strategy": "skip",
+   "sheet": "CSV",
+   "dry_run": false,
+   "rows_total": 6,
+   "rows_accepted": 6,
+   "rows_rejected": 0,
+   "rows_duplicate": 0,
+   "rows_blank": 0,
+   "warnings": [],
+   "missing_values": {},
+   "unmapped_optional_fields": [
+    "effective_from",
+    "effective_to"
+   ],
+   "field_error_counts": {},
+   "errors_total": 0,
+   "error_log_truncated": false,
+   "circuit_breaker": null
+  },
+  "material_costs": {
+   "import_type": "manufacturing_mapping",
+   "target": "material_costs",
+   "target_label": "Material costs",
+   "source_profile": "generic",
+   "source_profile_label": "Generic CSV / Excel",
+   "profile_id": null,
+   "field_mapping": {
+    "material_id": "material_id",
+    "version": "version",
+    "effective_from": "effective_from",
+    "effective_to": "effective_to",
+    "standard_cost": "standard_cost",
+    "currency": "currency"
+   },
+   "defaults": {},
+   "dataset_id": "Synthetic Environment A",
+   "duplicate_strategy": "skip",
+   "sheet": "CSV",
+   "dry_run": false,
+   "rows_total": 12,
+   "rows_accepted": 12,
+   "rows_rejected": 0,
+   "rows_duplicate": 0,
+   "rows_blank": 0,
+   "warnings": [],
+   "missing_values": {
+    "effective_to": 6
+   },
+   "unmapped_optional_fields": [
+    "actual_cost",
+    "budget_cost"
+   ],
+   "field_error_counts": {},
+   "errors_total": 0,
+   "error_log_truncated": false,
+   "circuit_breaker": null
+  },
+  "supplier_operations_metrics": {
+   "import_type": "manufacturing_mapping",
+   "target": "supplier_operations_metrics",
+   "target_label": "Supplier operations",
+   "source_profile": "generic",
+   "source_profile_label": "Generic CSV / Excel",
+   "profile_id": null,
+   "field_mapping": {
+    "supplier_id": "supplier_id",
+    "metric_date": "metric_date",
+    "lead_time_days": "lead_time_days",
+    "on_time_delivery_rate": "on_time_delivery_rate"
+   },
+   "defaults": {},
+   "dataset_id": "Synthetic Environment A",
+   "duplicate_strategy": "skip",
+   "sheet": "CSV",
+   "dry_run": false,
+   "rows_total": 84,
+   "rows_accepted": 84,
+   "rows_rejected": 0,
+   "rows_duplicate": 0,
+   "rows_blank": 0,
+   "warnings": [],
+   "missing_values": {},
+   "unmapped_optional_fields": [
+    "material_id"
+   ],
+   "field_error_counts": {},
+   "errors_total": 0,
+   "error_log_truncated": false,
+   "circuit_breaker": null
+  },
+  "production_records": {
+   "import_type": "manufacturing_mapping",
+   "target": "production_records",
+   "target_label": "Production volume",
+   "source_profile": "generic",
+   "source_profile_label": "Generic CSV / Excel",
+   "profile_id": null,
+   "field_mapping": {
+    "product_sku": "product_sku",
+    "period_start": "period_start",
+    "period_end": "period_end",
+    "actual_volume": "actual_volume",
+    "unit_of_measure": "unit_of_measure"
+   },
+   "defaults": {},
+   "dataset_id": "Synthetic Environment A",
+   "duplicate_strategy": "skip",
+   "sheet": "CSV",
+   "dry_run": false,
+   "rows_total": 12,
+   "rows_accepted": 12,
+   "rows_rejected": 0,
+   "rows_duplicate": 0,
+   "rows_blank": 0,
+   "warnings": [],
+   "missing_values": {},
+   "unmapped_optional_fields": [
+    "planned_volume"
+   ],
+   "field_error_counts": {},
+   "errors_total": 0,
+   "error_log_truncated": false,
+   "circuit_breaker": null
+  }
+ }
+}

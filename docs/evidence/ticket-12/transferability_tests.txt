@@ -1,0 +1,40 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dell\Documents\tris-app\backend\.venv\Scripts\python.exe
+rootdir: C:\Users\dell\Documents\tris-app\backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 29 items
+
+tests/modules/v1/test_transferability.py::test_environment_b_is_genuinely_different_from_environment_a PASSED
+tests/modules/v1/test_transferability.py::test_pipeline_code_names_neither_environment PASSED
+tests/modules/v1/test_transferability.py::test_pipeline_code_never_special_cases_a_dataset_material_category_or_unit PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[if dataset_id == "Synthetic Environment B": pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[if dataset_id in ("Synthetic Environment B",): pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[if m.material_id.startswith("4410"): pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[if currency == "EUR": pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[if category.lower() == "seals": pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[if unit_of_measure in ["pcs", "kg"]: pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[rules = CONFIG[dataset_id]] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[rules = CONFIG[category]] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[match category:\n    case 'Seals': pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[if material_id == "4410-0231": pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_branch_scanner_catches_each_way_of_special_casing[if supplier_id != SPECIAL_SUPPLIER: pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_literal_scanner_catches_names_from_either_environment[row["Part No"]] PASSED
+tests/modules/v1/test_transferability.py::test_the_literal_scanner_catches_names_from_either_environment[x = "Fasteners"] PASSED
+tests/modules/v1/test_transferability.py::test_the_literal_scanner_catches_names_from_either_environment[x = "4410-0231"] PASSED
+tests/modules/v1/test_transferability.py::test_the_literal_scanner_catches_names_from_either_environment[x = "Synthetic Environment A"] PASSED
+tests/modules/v1/test_transferability.py::test_the_literal_scanner_catches_names_from_either_environment[x = "sol-glass-32"] PASSED
+tests/modules/v1/test_transferability.py::test_the_literal_scanner_catches_names_from_either_environment[x = "SUP-001"] PASSED
+tests/modules/v1/test_transferability.py::test_the_scanners_leave_ordinary_code_alone[if a.material_id == b.material_id: pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_scanners_leave_ordinary_code_alone[if dataset_id is None: pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_scanners_leave_ordinary_code_alone[if not currency: pass] PASSED
+tests/modules/v1/test_transferability.py::test_the_scanners_leave_ordinary_code_alone[by_id[data.material_id]] PASSED
+tests/modules/v1/test_transferability.py::test_the_scanners_leave_ordinary_code_alone[totals[currency] = totals.get(currency, 0) + 1] PASSED
+tests/modules/v1/test_transferability.py::test_the_scanners_leave_ordinary_code_alone[label = "Material cost"] PASSED
+tests/modules/v1/test_transferability.py::test_the_scanners_leave_ordinary_code_alone[x = {"month": 1}] PASSED
+FUNCTIONS_RUN 185 184 only in one: ['_lock_weight_sets', '_no_data', '_unavailable', 'bom_cost_escalation.<locals>.<genexpr>', 'bom_cost_escalation.<locals>.<lambda>']
+PASSED
+tests/modules/v1/test_transferability.py::test_write_side_by_side_validation_evidence SKIPPED
+
+================== 28 passed, 1 skipped in 206.40s (0:03:26) ==================
