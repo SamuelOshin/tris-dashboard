@@ -27,6 +27,7 @@ from app.api.modules.v1.manufacturing.models import (
     MaterialRiskScore,
     MaterialRiskWeightSet,
 )
+from app.api.modules.v1.manufacturing.service import admin_audit as audit
 from app.api.modules.v1.manufacturing.service import analytics_loader as loader
 from app.api.modules.v1.manufacturing.service import risk_factors as factors
 from app.api.modules.v1.manufacturing.service import risk_scoring_engine as engine
@@ -112,6 +113,15 @@ async def create_weight_set(
         version=latest.version + 1, config=config, note=note, created_by=user.user_id
     )
     session.add(row)
+    audit.record(
+        session,
+        user,
+        audit.RISK_WEIGHTS_CREATED,
+        "risk_weight_set",
+        str(row.version),
+        f"Risk weights version {row.version} saved (High band {config['bands']['high']:g}). "
+        f"Reason: {note}",
+    )
     await session.commit()
     return _weight_dto(row, row.version)
 
@@ -249,6 +259,15 @@ async def run_scoring(
         )
         session.add(row)
         scored.append((result.description, row))
+    audit.record(
+        session,
+        user,
+        audit.RISK_SCORING_RUN,
+        "material_risk_score",
+        material_id,
+        f"Risk scores calculated with weights version {weight_set.version}: "
+        f"{len(scored)} scored, {len(not_scored)} not scored.",
+    )
     await session.commit()
     return {
         "as_of": cutoff.isoformat(),

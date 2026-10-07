@@ -3,6 +3,10 @@ from app.api.modules.v1.manufacturing.models.activity import (
     PurchaseRecord,
     VarianceInput,
 )
+from app.api.modules.v1.manufacturing.models.administration import (
+    DatasetRegistryEntry,
+    ForecastModelSetting,
+)
 from app.api.modules.v1.manufacturing.models.finance import FinancialPlanRecord
 from app.api.modules.v1.manufacturing.models.forecast_run import ForecastRun
 from app.api.modules.v1.manufacturing.models.mapping_profile import MappingProfile
@@ -31,8 +35,10 @@ from app.api.modules.v1.manufacturing.models.validation import (
 
 __all__ = [
     "BOMEntry",
+    "DatasetRegistryEntry",
     "DemandForecast",
     "FinancialPlanRecord",
+    "ForecastModelSetting",
     "ForecastRun",
     "InventoryRecord",
     "MappingProfile",

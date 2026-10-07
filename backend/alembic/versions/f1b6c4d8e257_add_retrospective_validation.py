@@ -6,8 +6,8 @@ Create Date: 2026-10-03 12:00:00.000000
 
 Adds the retrospective validation tables (v2.0, Ticket 11): runs, frozen cases, revealed outcomes,
 summaries and failure records. All five are insert-only: database triggers refuse UPDATE and
-DELETE, so a failed or unsuccessful run is preserved. Checks for existing objects first because
-the application also runs SQLModel create_all() on startup.
+DELETE, so a failed or unsuccessful run is preserved. Checks for existing objects first, so it
+also succeeds on a database that already has them.
 """
 
 from typing import Sequence, Union

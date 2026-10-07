@@ -21,6 +21,7 @@ class ForecastConfig:
     ma_window: int = 3
     trend_window: int = 24  # most recent months used by the regression models
     horizons_days: tuple[int, ...] = (30, 90)
+    disabled_models: tuple[str, ...] = ()  # model codes an administrator has switched off
 
     def horizon_months(self, horizon_days: int) -> int:
         """Monthly data: a 30-day outlook is one month ahead, a 90-day outlook three."""

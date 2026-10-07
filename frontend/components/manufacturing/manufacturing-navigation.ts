@@ -4,6 +4,7 @@ import {
   Factory,
   FileSpreadsheet,
   LineChart,
+  Settings2,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -13,6 +14,7 @@ export type ManufacturingPageId =
   | 'forecasting'
   | 'validation'
   | 'case-studies'
+  | 'administration'
 
 export interface ManufacturingNavItem {
   id: ManufacturingPageId
@@ -20,6 +22,8 @@ export interface ManufacturingNavItem {
   href: string
   icon: LucideIcon
   description: string
+  /** Shown only to administrators (configuration and the audit log). */
+  adminOnly?: boolean
 }
 
 export const MANUFACTURING_NAV_ITEMS: ManufacturingNavItem[] = [
@@ -58,6 +62,14 @@ export const MANUFACTURING_NAV_ITEMS: ManufacturingNavItem[] = [
     icon: BookOpen,
     description: 'Documented end-to-end results and findings',
   },
+  {
+    id: 'administration',
+    name: 'Administration',
+    href: '/manufacturing/administration',
+    icon: Settings2,
+    description: 'Forecast models, risk weights, datasets, saved mappings and the audit log',
+    adminOnly: true,
+  },
 ]
 
 /** Roles that may see the Manufacturing section (Ticket 2 / D7 role model). */
@@ -69,6 +81,12 @@ export const MANUFACTURING_VIEW_ROLES: readonly string[] = [
 
 export function canViewManufacturing(role: string | undefined | null): boolean {
   return !!role && MANUFACTURING_VIEW_ROLES.includes(role.toLowerCase())
+}
+
+/** The pages a role may open: administrators also see the administration page. */
+export function navItemsFor(role: string | undefined | null): ManufacturingNavItem[] {
+  const isAdmin = !!role && role.toLowerCase() === 'admin'
+  return MANUFACTURING_NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin)
 }
 
 export function getManufacturingNavItem(id: ManufacturingPageId): ManufacturingNavItem {

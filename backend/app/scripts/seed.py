@@ -1,6 +1,6 @@
 """
 TRIS Database Seeder CLI Script.
-Initializes tables, seeds demo personas with Argon2id passwords, and ingests synthetic Excel data.
+Seeds demo personas with Argon2id passwords, and ingests synthetic Excel data.
 
 Usage:
     uv run python -m app.scripts.seed --data-file "../test data.xlsx"
@@ -14,13 +14,19 @@ from pathlib import Path
 from sqlmodel import select
 
 from app.api.core.security import get_password_hash
-from app.api.db.database import async_session_factory, create_db_and_tables
+from app.api.db.database import async_session_factory, engine
+from app.api.db.model_registry import ensure_models_registered
+from app.api.db.schema_check import assert_schema_is_current
 from app.api.db.triggers import apply_database_triggers
 from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.ingestion.service.ingestion_service import IngestionService
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger("tris.seed")
+
+# The tables come from the migrations; the seed only needs every model known so relationships and
+# foreign keys resolve (this used to happen as a side effect of creating the tables).
+ensure_models_registered()
 
 DEMO_PERSONAS = [
     {
@@ -195,9 +201,9 @@ async def seed_initial_notifications(session) -> int:
 
 
 async def seed_users_and_triggers() -> int:
-    """Create database tables, seed system users, and apply DB triggers."""
-    logger.info("1. Verifying database tables exist...")
-    await create_db_and_tables()
+    """Seed system users and notifications and apply DB triggers (the schema must be migrated)."""
+    logger.info("1. Verifying the database schema is migrated...")
+    await assert_schema_is_current(engine)  # tables come from `alembic upgrade head`, not from here
 
     async with async_session_factory() as session:
         logger.info("2. Seeding default user personas...")

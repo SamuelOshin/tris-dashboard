@@ -6,7 +6,6 @@ Uses SQLAlchemy 2.0 Async Engine with SQLModel integration.
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlmodel import SQLModel
 
 from app.api.core.config import settings
 
@@ -42,12 +41,3 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
-
-
-async def create_db_and_tables() -> None:
-    """Create all database tables registered with SQLModel metadata."""
-    from app.api.db.model_registry import ensure_models_registered
-
-    ensure_models_registered()
-    async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)

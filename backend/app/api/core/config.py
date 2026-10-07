@@ -25,6 +25,9 @@ class Settings(BaseSettings):
         description="Async PostgreSQL connection string",
     )
     DB_ECHO: bool = False
+    # Run `alembic upgrade head` at start-up (one instance at a time). Off by default; see
+    # app/api/db/auto_migrate.py before turning it on.
+    AUTO_MIGRATE: bool = False
 
     @field_validator("DATABASE_URL", mode="after")
     @classmethod

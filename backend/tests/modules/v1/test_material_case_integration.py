@@ -430,7 +430,9 @@ async def test_two_simultaneous_requests_open_only_one_case(
     async_client: AsyncClient, db_session: AsyncSession
 ):
     score = await high_score(async_client, db_session)
-    user = SimpleNamespace(user_id="USR-INV-001", username="inv_alice", name="Alice Investigator")
+    user = SimpleNamespace(
+        user_id="USR-INV-001", username="inv_alice", name="Alice Investigator", role="reviewer"
+    )
 
     async def attempt():
         async with harness.test_session_factory() as session:

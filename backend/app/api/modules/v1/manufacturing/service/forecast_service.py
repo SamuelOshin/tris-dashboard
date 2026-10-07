@@ -16,7 +16,9 @@ from sqlmodel import select
 from app.api.core.custom_exceptions.exceptions import NotFoundError
 from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.manufacturing.models import ForecastRun
+from app.api.modules.v1.manufacturing.service import admin_audit as audit
 from app.api.modules.v1.manufacturing.service import analytics_loader as loader
+from app.api.modules.v1.manufacturing.service import model_settings_service as model_settings
 from app.api.modules.v1.manufacturing.service.analytics_types import MaterialData, MonthPoint
 from app.api.modules.v1.manufacturing.service.forecast_engine import run_horizon
 from app.api.modules.v1.manufacturing.service.forecast_history import trailing_consecutive_run
@@ -207,7 +209,7 @@ async def run_forecasts(
     material_id: str,
     as_of: date | None = None,
     dataset_id: str | None = None,
-    cfg: ForecastConfig = DEFAULT_FORECAST_CONFIG,
+    cfg: ForecastConfig | None = None,
 ) -> dict[str, Any]:
     """
     Run the 30-day and 90-day forecasts for a material and store each one produced.
@@ -219,6 +221,7 @@ async def run_forecasts(
         NotFoundError: If there is no purchase history or the material is unknown.
         DataLeakageError: If the history contains data after the cutoff (a defect guard).
     """
+    cfg = cfg or await model_settings.effective_config(session)  # switched-off models apply
     cutoff, data = await _load(session, material_id, as_of, dataset_id)
     currency, points, excluded = monthly_history(data, cutoff)
     _require_purchases(data, cutoff, points)
@@ -241,6 +244,16 @@ async def run_forecasts(
         run = _to_run(outcome, user, material_id, dataset_id, currency, points[-1].price)
         session.add(run)
         stored.append((days, outcome, run))
+    audit.record(
+        session,
+        user,
+        audit.FORECAST_RUN,
+        "material",
+        material_id,
+        f"Forecast run for {material_id}: {len(stored)} stored, {len(horizons)} withheld"
+        + (f"; models off: {', '.join(cfg.disabled_models)}" if cfg.disabled_models else "")
+        + ".",
+    )
     await session.commit()
     for days, outcome, run in stored:
         horizons.append(

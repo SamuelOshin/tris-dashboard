@@ -34,6 +34,7 @@ from app.api.modules.v1.manufacturing.models import (
     MaterialRiskScore,
     PurchaseRecord,
 )
+from app.api.modules.v1.manufacturing.service import admin_audit as audit
 from app.api.modules.v1.manufacturing.service import exposure_service
 from app.api.modules.v1.manufacturing.service import risk_scoring_engine as scoring_engine
 from app.api.modules.v1.manufacturing.service.risk_types import Reading
@@ -253,6 +254,15 @@ async def open_case(
             note=f"{score.summary}{f' Note: {note}' if note else ''}",
         )
     )
+    audit.record(
+        session,
+        user,
+        audit.MATERIAL_CASE_OPENED,
+        "risk_case",
+        case.case_id,
+        f"Case {case.case_number} opened for {score.material_id} from risk score "
+        f"{score.score:.1f} ({score.level}).",
+    )
     await session.commit()
     return {"mode": "created", "case": await CaseService.get_case_by_id(case.case_id, session)}
 
@@ -302,6 +312,15 @@ async def _link(
             new_status=case.status,
             note=f"{score.summary}{f' Note: {note}' if note else ''}",
         )
+    )
+    audit.record(
+        session,
+        user,
+        audit.MATERIAL_CASE_OPENED,
+        "risk_case",
+        case.case_id,
+        f"Risk score {score.score:.1f} ({score.level}) for {score.material_id} was linked to "
+        f"the open case {case.case_number}.",
     )
     await session.commit()
     return {"mode": "linked", "case": await CaseService.get_case_by_id(case.case_id, session)}

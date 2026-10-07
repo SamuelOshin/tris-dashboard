@@ -106,7 +106,7 @@ async def test_validation_rejects_post_cutoff_data_leakage(
         return materials, bom
 
     monkeypatch.setattr(validation.loader, "load_material_data", leaky_load)
-    user = SimpleNamespace(user_id="USR-TEST-001")
+    user = SimpleNamespace(user_id="USR-TEST-001", username="test_reviewer", role="reviewer")
     with pytest.raises(DataLeakageError):
         await validation.run_validation(db_session, user, CFG)
     await db_session.rollback()

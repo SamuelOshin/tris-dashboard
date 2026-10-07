@@ -5,8 +5,8 @@ Revises: b5d2e8f4a613
 Create Date: 2026-10-01 18:00:00.000000
 
 Adds the forecast_runs table (v2.0, Ticket 7): immutable stored forecasts with the model
-metadata needed to reproduce and audit them. Checks for existing objects first because the
-application also runs SQLModel create_all() on startup.
+metadata needed to reproduce and audit them. Checks for existing objects first, so it also
+succeeds on a database that already has them.
 """
 
 from typing import Sequence, Union

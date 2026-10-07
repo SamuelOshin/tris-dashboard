@@ -109,9 +109,9 @@ with no purchases up to the chosen date is reported as not found rather than as 
   source exists in this prototype).
 - **Spikes and regime changes** (a supplier change, a one-off shock) are not anticipated; regression models extrapolate
   trends and can overshoot after a reversal.
-- **Not a prediction of risk.** A forecast price is an input to exposure and scoring in later tickets, not a risk verdict.
+- **Not a prediction of risk.** A forecast price is an input to the exposure (`FINANCIAL_EXPOSURE_METHOD.md`) and the risk score (`RISK_SCORING_METHOD.md`), not a risk verdict.
 - **Synthetic data.** Results on the sample dataset demonstrate the method; they are not evidence of accuracy on real
-  company data. Retrospective accuracy measurement across many materials and periods is Ticket 11.
+  company data. Retrospective accuracy measurement across materials and periods is in `VALIDATION_PROTOCOL.md` and `VALIDATION_RESULTS.md`; on the sample data the forecasts were not better than assuming the price stays the same.
 
 ## Configuration
 

@@ -104,7 +104,7 @@ async def get_profile(profile_id: str, _user: ManufacturingIngestionUser, db: Db
 
 
 @router.delete("/profiles/{profile_id}", response_model=None)
-async def delete_profile(profile_id: str, _user: ManufacturingConfigUser, db: DbSession):
+async def delete_profile(profile_id: str, user: ManufacturingConfigUser, db: DbSession):
     """Delete a saved mapping profile (admin)."""
-    await profiles.delete_profile(db, profile_id)
+    await profiles.delete_profile(db, user, profile_id)
     return success_response(status.HTTP_200_OK, "Mapping profile deleted", {})

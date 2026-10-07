@@ -5,8 +5,9 @@ and the `risk_cases` extension (decision D3). Source of truth is the models in
 `backend/app/api/modules/v1/manufacturing/models/` and the migration
 `backend/alembic/versions/a4c7d1e9b302_add_manufacturing_schema_and_case_category.py`.
 
-This document describes **what is stored**. Nothing here is a prediction or a score; those are
-produced by later features and stored separately.
+The first sections describe **what is stored from source systems**: nothing there is a prediction or a score.
+The last section, *Result tables*, describes what the analyses store (forecast runs, risk weights and scores,
+validation runs); those are results, kept apart and never edited.
 
 ## Conventions used by every manufacturing table
 
@@ -190,6 +191,190 @@ Imports reuse the existing `ingestion_jobs` table for telemetry (counts, error l
 made by the mapping tool is identified by `summary_report.import_type = "manufacturing_mapping"` and
 records the mapping and layout it used. Every canonical row an import creates carries the optional
 `dataset_id` the uploader entered. Row-level import rules are in `ERP_MAPPING_GUIDE.md`.
+
+## Result tables (Tickets 7, 9 and 11)
+
+These hold what the analyses produced. They are results, not source facts, and are kept apart from the tables above. Columns are generated from the models; the notes say what each table is for.
+
+### `forecast_runs`
+One stored price forecast for one material and horizon (Ticket 7). Insert-only: a database trigger refuses UPDATE and DELETE. A new run never changes an earlier one.
+
+| Field | Type | Required |
+|:---|:---|:---|
+| `run_id` | text(50), **PK** | Required |
+| `material_id` | text(50), FK to `materials.material_id` | Required |
+| `dataset_id` | text(100) | Optional |
+| `as_of` | date | Required |
+| `currency` | text(10) | Optional |
+| `horizon_days` | integer | Required |
+| `horizon_months` | integer | Required |
+| `model_code` | text(50) | Required |
+| `model_name` | text(100) | Required |
+| `model_version` | text(20) | Required |
+| `dataset_version` | text(40) | Required |
+| `history_months` | integer | Required |
+| `history_start` | date | Required |
+| `history_end` | date | Required |
+| `forecast_month` | date | Required |
+| `forecast_value` | double | Required |
+| `lower_bound` | double | Optional |
+| `upper_bound` | double | Optional |
+| `interval_level` | double | Optional |
+| `path` | JSON | Required |
+| `candidates` | JSON | Required |
+| `selection_rationale` | text(2000) | Required |
+| `config` | JSON | Required |
+| `created_by` | text(50), FK to `users.user_id` | Required |
+| `created_at` | timestamptz | Required |
+
+### `material_risk_weight_sets`
+A versioned set of risk-score weights, bands and scales (Ticket 9). Insert-only; the newest row is the active one. Changing weights adds a row.
+
+| Field | Type | Required |
+|:---|:---|:---|
+| `version` | integer, **PK** | Required |
+| `config` | JSON | Required |
+| `note` | text(500) | Required |
+| `created_by` | text(50) | Required |
+| `created_at` | timestamptz | Required |
+
+### `material_risk_scores`
+One stored risk score for one material on one date, with its factors and the weight version used (Ticket 9). Insert-only.
+
+| Field | Type | Required |
+|:---|:---|:---|
+| `score_id` | text(50), **PK** | Required |
+| `material_id` | text(50), FK to `materials.material_id` | Required |
+| `dataset_id` | text(100) | Optional |
+| `as_of` | date | Required |
+| `currency` | text(10) | Optional |
+| `method_version` | text(20) | Required |
+| `weight_version` | integer, FK to `material_risk_weight_sets.version` | Required |
+| `score` | double | Required |
+| `level` | text(20) | Required |
+| `data_coverage_pct` | double | Required |
+| `factors` | JSON | Required |
+| `summary` | text(1000) | Required |
+| `config` | JSON | Required |
+| `forecast_run_id` | text(50) | Optional |
+| `inputs_version` | text(40) | Required |
+| `created_by` | text(50), FK to `users.user_id` | Required |
+| `created_at` | timestamptz | Required |
+
+### `validation_runs`
+The header of a retrospective validation run: settings, versions and cutoffs (Ticket 11). Insert-only. A run without a summary row did not finish.
+
+| Field | Type | Required |
+|:---|:---|:---|
+| `run_id` | text(50), **PK** | Required |
+| `dataset_id` | text(100) | Optional |
+| `data_end` | date | Required |
+| `config` | JSON | Required |
+| `versions` | JSON | Required |
+| `note` | text(500) | Optional |
+| `created_by` | text(50), FK to `users.user_id` | Required |
+| `created_at` | timestamptz | Required |
+
+### `validation_cases`
+A forecast and warning signal frozen at one cutoff for one material and outlook, stored before any later data is read (Ticket 11). Insert-only.
+
+| Field | Type | Required |
+|:---|:---|:---|
+| `case_id` | text(50), **PK** | Required |
+| `run_id` | text(50), FK to `validation_runs.run_id` | Required |
+| `material_id` | text(50), FK to `materials.material_id` | Required |
+| `cutoff` | date | Required |
+| `horizon_days` | integer | Required |
+| `status` | text(20) | Required |
+| `withheld_reason` | text(500) | Optional |
+| `target_month` | date | Optional |
+| `currency` | text(10) | Optional |
+| `last_observed_price` | double | Optional |
+| `forecast_value` | double | Optional |
+| `lower_bound` | double | Optional |
+| `upper_bound` | double | Optional |
+| `naive_value` | double | Optional |
+| `model_code` | text(50) | Optional |
+| `model_name` | text(100) | Optional |
+| `model_version` | text(20) | Optional |
+| `dataset_version` | text(40) | Optional |
+| `history_months` | integer | Optional |
+| `risk_score` | double | Optional |
+| `risk_level` | text(20) | Optional |
+| `alert` | boolean | Required |
+| `risk_factors` | JSON | Required |
+| `frozen_at` | timestamptz | Required |
+
+### `validation_outcomes`
+What actually happened for a frozen case, written only afterwards; at most one per case (Ticket 11). Insert-only.
+
+| Field | Type | Required |
+|:---|:---|:---|
+| `outcome_id` | text(50), **PK** | Required |
+| `case_id` | text(50), FK to `validation_cases.case_id` | Required |
+| `run_id` | text(50), FK to `validation_runs.run_id` | Required |
+| `status` | text(20) | Required |
+| `reason` | text(500) | Optional |
+| `metrics` | JSON | Required |
+| `classification` | text(2) | Optional |
+| `revealed_at` | timestamptz | Required |
+
+### `validation_summaries`
+The aggregate metrics, limitations and the list of false alarms and misses of a finished run (Ticket 11). Insert-only.
+
+| Field | Type | Required |
+|:---|:---|:---|
+| `run_id` | text(50), **PK**, FK to `validation_runs.run_id` | Required |
+| `metrics` | JSON | Required |
+| `limitations` | JSON | Required |
+| `problems` | JSON | Required |
+| `completed_at` | timestamptz | Required |
+
+### `validation_failures`
+Why a run stopped before it finished (Ticket 11). Insert-only.
+
+| Field | Type | Required |
+|:---|:---|:---|
+| `failure_id` | text(50), **PK** | Required |
+| `run_id` | text(50), FK to `validation_runs.run_id` | Required |
+| `error_type` | text(100) | Required |
+| `message` | text(1000) | Required |
+| `recorded_at` | timestamptz | Required |
+
+## Administration tables
+
+### `forecast_model_settings` — whether a forecast model may be used
+Insert-only (a database trigger refuses UPDATE and DELETE). One row per change; the newest row of a model is its current
+state, and a model with no row is on.
+
+| Field | Type | Required | Notes |
+|:---|:---|:---|:---|
+| `id` | integer, **PK** | Required | |
+| `model_code` | text(50) | Required | For example `lagged_regression`. Baseline models cannot be switched off (checked by the service). |
+| `enabled` | boolean | Required | |
+| `note` | text(500) | Optional | The reason given. |
+| `changed_by` | text(50), FK to `users` | Required | The administrator. |
+| `changed_at` | timestamptz | Required | |
+
+### `dataset_registry` — named datasets
+Created by a dataset's first import. The label is an administrator's statement; a label change is audited.
+
+| Field | Type | Required | Notes |
+|:---|:---|:---|:---|
+| `dataset_id` | text(100), **PK** | Required | The dataset name typed at import. |
+| `label` | text(20) | Required | `unlabelled` (default), `synthetic` or `authorized`. |
+| `source_type` | text(40) | Required | `file upload`. |
+| `description` | text(500) | Optional | |
+| `registered_by` | text(50), FK to `users` | Required | |
+| `registered_at` | timestamptz | Required | |
+| `label_set_by`, `label_set_at` | text(50) FK to `users`, timestamptz | Optional | Who last set the label, and when. |
+
+### `security_audit_log` — the audit log (extended)
+An existing v1.4 table (sign-ins, rule edits, user changes). It now also records the manufacturing actions: `DATA_IMPORT`,
+`MAPPING_PROFILE_SAVED`, `MAPPING_PROFILE_DELETED`, `FORECAST_RUN`, `RISK_WEIGHTS_CREATED`, `RISK_SCORING_RUN`,
+`VALIDATION_RUN`, `VALIDATION_FAILED`, `MATERIAL_CASE_OPENED`, `MODEL_SETTING_CHANGED`, `DATASET_REGISTERED`,
+`DATASET_LABEL_CHANGED`. Each is written with the action it describes, in the same transaction. The table is now insert-only
+(trigger). `occurred_at` is stored as UTC without a zone and returned with `+00:00`.
 
 ## Not implemented
 

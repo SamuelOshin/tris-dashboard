@@ -23,6 +23,8 @@ from app.api.modules.v1.ingestion.models.ingestion_job import IngestionJob
 from app.api.modules.v1.ingestion.service.ingestion_service import IngestionService
 from app.api.modules.v1.manufacturing.models import MappingProfile
 from app.api.modules.v1.manufacturing.schemas.mapping_schemas import MappingRunConfig
+from app.api.modules.v1.manufacturing.service import admin_audit as audit
+from app.api.modules.v1.manufacturing.service import dataset_registry_service as datasets
 from app.api.modules.v1.manufacturing.service.file_parser import (
     ParsedTable,
     parse_source_file,
@@ -269,6 +271,18 @@ async def import_file(
     summary = _summary(result, settings, config, table)
     _apply_result(job, result, summary, _final_status(result))
     status = job.status
+    await datasets.register(session, user, settings.dataset_id)
+    audit.record(
+        session,
+        user,
+        audit.DATA_IMPORT,
+        "ingestion_job",
+        job_id,
+        f"{settings.target.label} imported from {filename or 'a file'}: {status.lower()}, "
+        f"{result.rows_accepted} rows added, {result.rows_rejected} rejected"
+        + (f", dataset '{settings.dataset_id}'" if settings.dataset_id else "")
+        + ".",
+    )
     await session.commit()
     return {
         "job_id": job_id,

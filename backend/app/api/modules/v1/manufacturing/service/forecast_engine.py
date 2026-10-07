@@ -163,7 +163,11 @@ def run_horizon(
 
     months = cfg.horizon_months(horizon_days)
     y = np.array([p.price for p in history], dtype=float)
-    candidates = [_score_candidate(code, y, months, cfg) for code in models.MODELS]
+    candidates = [
+        _score_candidate(code, y, months, cfg)
+        for code in models.MODELS
+        if code not in cfg.disabled_models
+    ]
     chosen, rationale = select_model(candidates, cfg)
 
     path = []
@@ -202,5 +206,6 @@ def run_horizon(
             "interval_level": cfg.interval_level,
             "ma_window": cfg.ma_window,
             "trend_window": cfg.trend_window,
+            "disabled_models": list(cfg.disabled_models),
         },
     )

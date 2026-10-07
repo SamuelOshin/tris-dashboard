@@ -32,7 +32,9 @@ from app.api.modules.v1.manufacturing.models import (
     ValidationRun,
     ValidationSummary,
 )
+from app.api.modules.v1.manufacturing.service import admin_audit as audit
 from app.api.modules.v1.manufacturing.service import analytics_loader as loader
+from app.api.modules.v1.manufacturing.service import model_settings_service as model_settings
 from app.api.modules.v1.manufacturing.service import risk_factors as risk_factors
 from app.api.modules.v1.manufacturing.service import risk_scoring_engine as scoring_engine
 from app.api.modules.v1.manufacturing.service import risk_scoring_service as risk_service
@@ -48,6 +50,7 @@ from app.api.modules.v1.manufacturing.service.forecast_service import monthly_hi
 from app.api.modules.v1.manufacturing.service.forecast_types import (
     DEFAULT_FORECAST_CONFIG,
     FORECAST,
+    ForecastConfig,
 )
 from app.api.modules.v1.manufacturing.service.price_series import month_end
 from app.api.modules.v1.manufacturing.service.risk_types import (
@@ -174,6 +177,7 @@ def freeze_cutoff(
     cfg: ValidationConfig,
     weights: dict,
     alert_threshold: float,
+    forecast_cfg: ForecastConfig = DEFAULT_FORECAST_CONFIG,
 ) -> list[FrozenCase]:
     """
     Make the forecast and risk signal for every material at one cutoff, from the records given.
@@ -194,7 +198,9 @@ def freeze_cutoff(
         if not points:
             continue
         for horizon in cfg.horizons_days:
-            outcome = run_horizon(points, cutoff, horizon, currency)  # also checks for leakage
+            outcome = run_horizon(
+                points, cutoff, horizon, currency, forecast_cfg
+            )  # also checks for leakage
             base = FrozenCase(data.material_id, cutoff, horizon, CASE_WITHHELD, currency=currency)
             if outcome.status != FORECAST:
                 base.withheld_reason = outcome.reason
@@ -307,6 +313,7 @@ async def run_validation(
     cutoffs, last_complete = cutoff_schedule(first, data_end, cfg)
     resolved = {**cfg.to_dict(), "alert_threshold": threshold}
 
+    forecast_cfg = await model_settings.effective_config(session)  # models switched off apply
     run = ValidationRun(
         run_id=f"VAL-{uuid4().hex[:10].upper()}",
         dataset_id=cfg.dataset_id,
@@ -315,6 +322,7 @@ async def run_validation(
             **resolved,
             "cutoffs": [c.isoformat() for c in cutoffs],
             "last_complete_month": last_complete.isoformat(),
+            "forecast_models_off": list(forecast_cfg.disabled_models),
         },
         versions={
             "validation_method": METHOD_VERSION,
@@ -326,17 +334,34 @@ async def run_validation(
         created_by=user.user_id,
     )
     session.add(run)
+    audit.record(
+        session,
+        user,
+        audit.VALIDATION_RUN,
+        "validation_run",
+        run.run_id,
+        f"Validation run {run.run_id} started: {len(cutoffs)} dates, outlooks "
+        f"{list(cfg.horizons_days)}, warning at {threshold:g}"
+        + (
+            f", models off: {', '.join(forecast_cfg.disabled_models)}"
+            if forecast_cfg.disabled_models
+            else ""
+        )
+        + ".",
+    )
     await session.commit()  # the header is kept even if the run stops early
     run_id = run.run_id
     try:
-        return await _run_protocol(session, run, cfg, cutoffs, last_complete, weight_set, threshold)
+        return await _run_protocol(
+            session, run, cfg, cutoffs, last_complete, weight_set, threshold, forecast_cfg
+        )
     except Exception as exc:
         # Not swallowed: the cause is stored with the run (insert-only), then the error goes on.
-        await _record_failure(session, run_id, exc)
+        await _record_failure(session, user, run_id, exc)
         raise
 
 
-async def _record_failure(session: AsyncSession, run_id: str, exc: Exception) -> None:
+async def _record_failure(session: AsyncSession, user: User, run_id: str, exc: Exception) -> None:
     """Keep why a run stopped, next to whatever it had already stored."""
     await session.rollback()
     session.add(
@@ -346,6 +371,14 @@ async def _record_failure(session: AsyncSession, run_id: str, exc: Exception) ->
             error_type=type(exc).__name__,
             message=str(exc)[:1000] or type(exc).__name__,
         )
+    )
+    audit.record(
+        session,
+        user,
+        audit.VALIDATION_FAILED,
+        "validation_run",
+        run_id,
+        f"Validation run {run_id} did not finish: {type(exc).__name__}.",
     )
     await session.commit()
 
@@ -358,6 +391,7 @@ async def _run_protocol(
     last_complete: date,
     weight_set: Any,
     threshold: float,
+    forecast_cfg: ForecastConfig = DEFAULT_FORECAST_CONFIG,
 ) -> dict[str, Any]:
     """Freeze every forecast and signal, then reveal the actuals, judge and summarise."""
     # Freeze: every forecast and signal is stored before any actual is read.
@@ -366,7 +400,7 @@ async def _run_protocol(
         materials, all_bom = await loader.load_material_data(session, cutoff, cfg.dataset_id)
         results = compute_results(materials, all_bom, cutoff, DEFAULT_CONFIG)
         for frozen in freeze_cutoff(
-            materials, results, all_bom, cutoff, cfg, weight_set.config, threshold
+            materials, results, all_bom, cutoff, cfg, weight_set.config, threshold, forecast_cfg
         ):
             row = ValidationCase(
                 case_id=f"VCS-{uuid4().hex[:12].upper()}", run_id=run.run_id, **vars(frozen)

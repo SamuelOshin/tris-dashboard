@@ -13,6 +13,7 @@ from app.api.modules.v1.cases.routes.case_routes import router as cases_router
 from app.api.modules.v1.ingestion.routes.ingestion_routes import (
     router as ingestion_router,
 )
+from app.api.modules.v1.manufacturing.routes.admin_routes import router as admin_router
 from app.api.modules.v1.manufacturing.routes.analytics_routes import router as analytics_router
 from app.api.modules.v1.manufacturing.routes.exposure_routes import router as exposure_router
 from app.api.modules.v1.manufacturing.routes.forecast_routes import router as forecast_router
@@ -60,6 +61,7 @@ api_v1_router.include_router(forecast_router)
 api_v1_router.include_router(exposure_router)
 api_v1_router.include_router(risk_router)
 api_v1_router.include_router(validation_router)
+api_v1_router.include_router(admin_router)
 api_v1_router.include_router(material_case_router)
 
 

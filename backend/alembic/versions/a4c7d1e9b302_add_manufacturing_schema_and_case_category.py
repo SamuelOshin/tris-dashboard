@@ -7,10 +7,9 @@ Create Date: 2026-10-01 10:00:00.000000
 Adds the canonical manufacturing tables (v2.0, Ticket 4) and extends risk_cases with
 case_category (default 'financial_exception') plus three nullable material-cost fields (D3).
 
-The application also runs SQLModel create_all() on startup, which can create the new
-tables before this migration runs. Every step therefore checks for existing objects so the
-migration is safe on both a fresh and an already-synchronised database. Existing risk_cases
-rows are backfilled to 'financial_exception' by the column server default.
+Every step checks for existing objects first, so the migration is safe on both a fresh
+and an already-synchronised database (for example one whose tables were created another way).
+Existing risk_cases rows are backfilled to 'financial_exception' by the column server default.
 """
 
 from typing import Sequence, Union

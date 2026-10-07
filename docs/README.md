@@ -1,5 +1,5 @@
 # 📚 TRIS Project Documentation Hub
-**Trust & Risk Intelligence System (TRIS) v1.4**
+**Trust & Risk Intelligence System (TRIS) v1.4**, with the **v2.0 Material Cost Intelligence extension** on branch `v2.0-manufacturing-extension` (complete up to Ticket 13; not yet merged or tagged)
 
 ---
 
@@ -11,6 +11,21 @@
 - **📖 ReDoc API Reference**: [`https://tris-backend.fastapicloud.dev/redoc`](https://tris-backend.fastapicloud.dev/redoc)
 
 ---
+
+## 🏭 v2.0 Material Cost Intelligence — start here
+
+| Document | What it is |
+|:---|:---|
+| [`DEMO_GUIDE.md`](./DEMO_GUIDE.md) | How to run the demo from sign-in to validation |
+| [`CASE_STUDY_01.md`](./CASE_STUDY_01.md) | One reproducible end-to-end case study (with a script that checks every figure) |
+| [`ARCHITECTURE_MATERIAL_COST_INTELLIGENCE.md`](./ARCHITECTURE_MATERIAL_COST_INTELLIGENCE.md) | Modules, data flow, integrity rules, what is not built |
+| [`UI_NAVIGATION_SPEC.md`](./UI_NAVIGATION_SPEC.md) | Screens, navigation, roles, key actions |
+| [`DATA_DICTIONARY.md`](./DATA_DICTIONARY.md), [`ERP_MAPPING_GUIDE.md`](./ERP_MAPPING_GUIDE.md) | Canonical schema; importing files |
+| [`MATERIAL_DETECTION_METHOD.md`](./MATERIAL_DETECTION_METHOD.md), [`MODEL_METHODOLOGY.md`](./MODEL_METHODOLOGY.md), [`FINANCIAL_EXPOSURE_METHOD.md`](./FINANCIAL_EXPOSURE_METHOD.md), [`RISK_SCORING_METHOD.md`](./RISK_SCORING_METHOD.md), [`MATERIAL_CASE_INTEGRATION.md`](./MATERIAL_CASE_INTEGRATION.md) | How each calculation works and its limits |
+| [`VALIDATION_PROTOCOL.md`](./VALIDATION_PROTOCOL.md), [`VALIDATION_RESULTS.md`](./VALIDATION_RESULTS.md), [`TRANSFERABILITY_TEST.md`](./TRANSFERABILITY_TEST.md) | How it was checked, the real results (including failures), the second environment |
+| [`BASELINE_README.md`](./BASELINE_README.md), [`HANDOVER_AND_CHANGELOG.md`](./HANDOVER_AND_CHANGELOG.md) | What existed before; dated changes, known issues, future work |
+
+Evidence for every ticket (raw test output, screenshots, completion reports) is in `docs/evidence/ticket-N/`.
 
 ## 📑 Complete Documentation Directory
 

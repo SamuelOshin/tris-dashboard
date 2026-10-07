@@ -108,7 +108,7 @@ with the rule engine, and this is checked by tests:
 
 - **Not a prediction.** The score ranks how exposed a material looks today given the data; it is not a forecast of loss.
 - **Weights and scales are judgement, not fitted.** The defaults are a documented starting point. Whether they rank
-  materials usefully is tested by the validation work (Ticket 11), not assumed here.
+  materials usefully is tested by the validation work (`VALIDATION_RESULTS.md`), not assumed here; on the sample data the warning caught few price rises with many false alarms.
 - **Linear scales and a weighted sum** are easy to explain but cannot express interactions (for example low stock
   *and* a long lead time being worse than the sum of both).
 - **Data-dependent.** Without a stored forecast, stock levels, lead times or standard costs, those factors are left out

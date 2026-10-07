@@ -11,6 +11,109 @@
 
 ---
 
+# TRIS v2.0 — Material Cost Intelligence extension (handover and changelog)
+
+> Status: complete on branch `v2.0-manufacturing-extension` up to Ticket 13; not merged and not tagged. The v1.3
+> material below it is the historical handover and is kept as written. Dates are commit dates (git is the record).
+
+## What v2.0 adds
+
+The manufacturing extension described in `ARCHITECTURE_MATERIAL_COST_INTELLIGENCE.md`: file import with column
+mapping, price/BOM/inventory/supplier signals, stored 30/90-day price forecasts, financial exposure and what-if
+scenarios, an explainable versioned risk score, material cost cases in the existing case workflow, retrospective
+validation, a second environment to show the pipeline is not built around one dataset, and the documents and case
+study that go with them. v1.4 behaviour is unchanged (the v1.4 suite still passes; see below).
+
+## Decisions (from the v2.0 instruction)
+
+| | Decision |
+|:--|:--|
+| D0 | Version v2.0; v1.4 frozen at tag `v1.4-baseline`, work on `v2.0-manufacturing-extension`. |
+| D2 | Environment B is a generated industrial-products (precision components, fasteners) dataset. |
+| D5 | Retrospective validation: use only prior data, freeze before revealing actuals, keep failures; a leakage test is mandatory. |
+| D6 | `statsmodels` added for the regression forecast models. |
+| D7 | The four-role v1.4 model is kept; the reviewer absorbs the analyst tasks; one new role, `read_only_reviewer`, is view-only. |
+
+## Changelog (by date)
+
+| Date | Change |
+|:--|:--|
+| 2026-09-30 | Baseline frozen with evidence; `read_only_reviewer` and manufacturing permissions (Ticket 2); pytest sessions serialised with a database lock. |
+| 2026-10-01 | Manufacturing navigation (T3); canonical schema and `case_category` on cases (T4); ERP/BOM mapping engine and screen (T5); detection analytics and the overview page (T6). |
+| 2026-10-02 | Price forecasting with stored immutable runs (T7); financial exposure and scenarios (T8); explainable versioned risk score (T9). |
+| 2026-10-03 | Material cost cases linked to the existing workflow (T10); a `pure` test lane that never touches the database. |
+| 2026-10-04 | Retrospective validation with immutable run/case/outcome/summary/failure tables (T11); two flaws in the first validation metrics found on real data and fixed (versions 1.0 to 1.2, all runs kept); the forecast engine now withholds a history containing a zero price instead of dividing by zero. |
+| 2026-10-05 | Transferability test with Environment B (T12); documentation set, case study and its checker (T13). A baseline migration (`0f3c9a7b5d21`) now creates the original tables and the case-history immutability trigger, and three older migrations tolerate existing objects, so `alembic upgrade head` builds a complete database from nothing (it could not before). The application's start-up `create_all` was removed: start-up and seeding now check the database is at the newest migration and stop with the command to run if not; an opt-in `AUTO_MIGRATE` setting can run the migrations at start-up. The Administration page (model settings, dataset registry, risk-weight editor, audit log) and the audit entries behind it were added (migration `b3d8f2a6c941`). |
+
+Tests: **379 passed, 1 skipped** at Ticket 12 (full suite, about 18 minutes); `pytest -m pure` (no database) runs in
+seconds. Raw output for each ticket is in `docs/evidence/ticket-N/`.
+
+## Known issues and gaps (read these first)
+
+1. **Accuracy.** On the synthetic data the forecasts were not better than "the price stays the same", and the risk
+   warning caught few price rises with many false alarms (`VALIDATION_RESULTS.md`, `TRANSFERABILITY_TEST.md`). The
+   method is sound and honest; it has not been shown to be useful. Do not present it as predictive.
+2. **Administration (work plan Section 10) was built after Ticket 13's first QA**: an admin-only Administration page
+   (forecast models on/off, risk weight versions, dataset registry with a synthetic/authorised label, saved mappings,
+   audit log). Not included: user management there (it stays on Settings & Governance), editing the fixed forecast
+   settings (they belong to a method version), and switching off a baseline model. The audit log records the actions listed
+   in `DATA_DICTIONARY.md`; sign-ins and rule edits were already recorded.
+3. **The Compliance page shows static sample data** (scores, framework status, a "Global Audit Trail" with invented
+   users and dates) from v1.x. It is not real and should be replaced or removed before any real use. The real audit log is
+   on the Administration page.
+4. **Deployment: run the migrations before the new version starts.** FastAPI Cloud has no pre-deploy or start
+   command, so nothing on the platform runs migrations. Release routine: from the `backend` folder run
+   `DATABASE_URL=<production url> uv run alembic upgrade head`, then `fastapi deploy`. The application refuses to start
+   on an out-of-date database, so deploying before migrating takes it down. A production database that was built by the
+   old start-up `create_all` and never migrated needs the same command once before the first v2.0 deploy (it tolerates
+   existing tables). If you would rather not run it by hand, set `AUTO_MIGRATE=true` for the demo: start-up then runs `alembic upgrade head`
+   first, one instance at a time under a PostgreSQL lock, and stops with the error if a migration fails (the step that failed is
+   rolled back, the database stays at the last revision that finished). It is off by default. Use it only for a database whose
+   data can be recreated; keep it off where a bad migration would cost real data.
+   **The schema comes only from migrations.** `alembic upgrade head` builds a complete database from nothing (a
+   baseline migration was added in Ticket 13). The application no longer creates tables at start-up: it checks the
+   database is at the newest migration and refuses to start otherwise, and the seed script does the same check. Anyone
+   with an older database built by the old start-up behaviour should run `alembic upgrade head` (it tolerates existing
+   tables) or `alembic stamp head` if the schema is already current.
+5. **Dataset scope.** Stored forecasts, scores and validation runs belong to "all data" or to one named dataset. Only
+   the Material Cost page can choose a dataset; forecasting, exposure and validation use "all data". A risk run for
+   "all data" does not use forecasts stored for a named dataset.
+6. **Units and currencies are not converted** (BOM and purchase units must agree; euro and dollar are shown
+   separately). On-time delivery must be a fraction 0 to 1; day-first slash dates are not read.
+7. **Fixed 2026-10-07:** the "Coming soon" strip for forecast and exposure was removed from the Material Cost page (both exist on the Forecasting page).
+8. **The "Case Studies / Results" page is a placeholder**; the case study is a document and a script.
+9. **v1.4 "before" screenshots** (deferred in `BASELINE_README.md`) were never captured; the v2.0 screenshot
+   checklist is complete at 18 of 18 once the Administration page exists (items 17 and 18).
+10. **Independent check of the case study:** see `docs/evidence/ticket-13/INDEPENDENT_CHECK.md` for what was and
+    was not done.
+11. **Migrations edited.** The baseline revision was added and three older migrations were changed (existence guards and
+    one parent pointer, nothing else; AGENTS.md says not to edit migrations by hand; the owner signed this change off on 2026-10-05).
+    Their downgrades still drop the objects they create, even when an earlier step skipped creating them. A database
+    first built from the models and then migrated has a duplicate foreign key on `risk_cases.material_id`
+    (`risk_cases_material_id_fkey` and `fk_risk_cases_material_id`), from the Ticket 4 migration naming; harmless but untidy.
+12. Development database: holds demo data from earlier tickets (duplicate demo materials, extra runs, scratch
+    databases `tris_empty_ui`, `tris_case_study`). Safe to delete; stored runs cannot be edited, so use a new database.
+
+## Future work (not started)
+
+Unit and currency conversion; a dataset picker on every
+manufacturing page; a pilot on real purchasing data before any claim of usefulness; forecasting by supplier and
+from demand; an SAP- or Dynamics-style rendering of Environment B; merging and tagging `v2.0` after the final QA
+(Ticket 14).
+
+## How to run and verify
+
+| What | Command |
+|:--|:--|
+| Everything (needs PostgreSQL) | `cd backend && uv run pytest tests/ -q` |
+| Fast lane, no database | `cd backend && uv run pytest -m pure -q` |
+| Case study figures | `uv run pytest tests/modules/v1/test_case_study_reproducible.py` |
+| Transferability | `uv run pytest tests/modules/v1/test_transferability.py` |
+| Lint / format | `uv run ruff check . && uv run ruff format --check .` |
+| Frontend build | `cd frontend && pnpm run build` |
+
+---
+
 ## 1. Executive Summary
 
 TRIS v1.3 introduces a robust, auditable risk architecture designed to withstand strict enterprise regulatory scrutiny. All core business rules, descriptive statistical baselines, and case state transitions have been relocated to an asynchronous Python 3.12 FastAPI backend, managed with `uv` and backed by PostgreSQL with SQLModel.
@@ -49,7 +152,7 @@ tris-app/
 │   │   │   └── utils/              # Standardized response envelopes (success, auth, error)
 │   │   ├── scripts/                # Database seeding script (seed.py)
 │   │   └── main.py                 # FastAPI application entrypoint & lifespan
-│   ├── tests/                      # Automated test suite (78 tests)
+│   ├── tests/                      # Automated test suite (409 tests)
 │   ├── pyproject.toml              # UV package specification
 │   └── docker-compose.yml          # PostgreSQL 16 container specification
 ├── frontend/

@@ -6,8 +6,8 @@ Create Date: 2026-10-01 14:00:00.000000
 
 Adds the mapping_profiles table (v2.0, Ticket 5): reusable ERP/BOM column mappings.
 
-The application also runs SQLModel create_all() on startup, which can create this table
-before the migration runs, so each step checks for existing objects first.
+Each step checks for existing objects first, so it also succeeds on a database that already
+has the table.
 """
 
 from typing import Sequence, Union

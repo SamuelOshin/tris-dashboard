@@ -6,7 +6,7 @@ Create Date: 2026-10-02 12:00:00.000000
 
 Adds the material risk scoring tables (v2.0, Ticket 9): versioned weight sets and stored,
 immutable scores, with database triggers refusing UPDATE and DELETE on both. Checks for existing
-objects first because the application also runs SQLModel create_all() on startup.
+objects first so it also succeeds on a database that already has them.
 """
 
 from typing import Sequence, Union

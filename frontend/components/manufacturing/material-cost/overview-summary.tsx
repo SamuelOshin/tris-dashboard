@@ -1,4 +1,3 @@
-import { ComingSoonBadge } from '../coming-soon-badge'
 import { formatDate, formatMoney, formatTimestamp } from './material-cost-guards'
 import type { Overview } from './types'
 
@@ -53,14 +52,6 @@ export function OverviewSummary({ overview }: { overview: Overview }) {
           hint={`Calculated ${formatTimestamp(overview.computed_at)}`}
         />
       </div>
-      <p className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        Forecast cost and financial exposure columns will appear here once available:
-        {overview.pending_capabilities.map((name) => (
-          <span key={name} className="inline-flex items-center gap-1">
-            {name} <ComingSoonBadge />
-          </span>
-        ))}
-      </p>
     </section>
   )
 }

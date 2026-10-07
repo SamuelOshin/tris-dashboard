@@ -41,7 +41,9 @@ LATER_TABLES = {
     "validation_outcomes",
     "validation_summaries",
     "validation_failures",
-}  # added by Tickets 5 and 7
+    "forecast_model_settings",
+    "dataset_registry",
+}  # added by Tickets 5, 7, 9, 11 and the administration screens
 NEW_TABLES = {
     "materials",
     "material_suppliers",

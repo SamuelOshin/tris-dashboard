@@ -182,5 +182,5 @@ Recorded so the baseline's limits are explicit rather than implied.
 - `v14_baseline_build.txt` is not byte-for-byte raw output: it carries a hand-added header line (capture time, branch, commit) and an `Exit code: 0` footer. The build output between them is unmodified.
 - The first attempted build capture was incomplete and left a stray file; it was discarded and is not part of this baseline.
 - The `v1.4-baseline` tag is **lightweight** (no tag message) and points at commit `72460432`, which is also the tip of `main` and `release/v1.4` at the time of capture.
-- The Ticket 1 commit (`578d6f8`) is one commit ahead of the tag and adds only the three files under `docs/baseline/`. No code changed.
+- The Ticket 1 commit (`578d6f8`) is one commit ahead of the tag and adds only three files under `docs/baseline/` (this README, since moved to `docs/BASELINE_README.md`, and the two raw output files). No code changed.
 - The v2.0 planning documents (`TRIS.docx`, the consolidated instruction and the ticket list) are intentionally left untracked for now.

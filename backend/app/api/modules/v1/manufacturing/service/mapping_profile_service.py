@@ -12,6 +12,7 @@ from app.api.core.custom_exceptions.exceptions import AlreadyExistsError, NotFou
 from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.manufacturing.models import MappingProfile
 from app.api.modules.v1.manufacturing.schemas.mapping_schemas import MappingProfileCreate
+from app.api.modules.v1.manufacturing.service import admin_audit as audit
 from app.api.modules.v1.manufacturing.service.mapping_definition import (
     get_target,
     validate_definition,
@@ -47,6 +48,14 @@ async def create_profile(
         created_by=user.user_id,
     )
     session.add(profile)
+    audit.record(
+        session,
+        user,
+        audit.MAPPING_PROFILE_SAVED,
+        "mapping_profile",
+        profile.profile_id,
+        f"Mapping '{name}' saved for {target.key}.",
+    )
     await session.commit()
     return profile
 
@@ -67,8 +76,16 @@ async def get_profile(session: AsyncSession, profile_id: str) -> MappingProfile:
     return profile
 
 
-async def delete_profile(session: AsyncSession, profile_id: str) -> None:
+async def delete_profile(session: AsyncSession, user: User, profile_id: str) -> None:
     """Delete a profile. Past imports keep their own copy of the mapping they used."""
     profile = await get_profile(session, profile_id)
+    audit.record(
+        session,
+        user,
+        audit.MAPPING_PROFILE_DELETED,
+        "mapping_profile",
+        profile_id,
+        f"Mapping '{profile.name}' deleted.",
+    )
     await session.delete(profile)
     await session.commit()

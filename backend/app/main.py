@@ -10,10 +10,13 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.exc import OperationalError
 
 from app.api.core.config import settings
 from app.api.core.custom_exceptions.register import register_exception_handlers
-from app.api.db.database import create_db_and_tables
+from app.api.db.auto_migrate import run_auto_migration
+from app.api.db.database import engine
+from app.api.db.schema_check import SchemaNotCurrentError, assert_schema_is_current
 from app.api.modules.v1.router import api_v1_router
 from app.api.utils.response_payloads import success_response
 
@@ -28,11 +31,20 @@ logger = logging.getLogger("tris.main")
 async def lifespan(app: FastAPI):
     """Application startup and shutdown events."""
     logger.info("Starting up TRIS Risk Intelligence Engine...")
+    if settings.AUTO_MIGRATE:
+        await run_auto_migration(engine)  # a failure stops start-up with the error
     try:
-        await create_db_and_tables()
-        logger.info("Database models verified and tables initialized.")
-    except Exception as e:
-        logger.warning(f"Database table initialization deferred or connecting to remote DB: {e}")
+        revision = await assert_schema_is_current(engine)
+        logger.info(f"Database schema is current (migration {revision}).")
+    except SchemaNotCurrentError as exc:
+        logger.error(str(exc))
+        raise  # tables are only ever created by migrations: stop rather than run on a wrong schema
+    except (OperationalError, OSError) as exc:
+        # Only "cannot reach the database" is tolerated. An interface error (for example the wrong
+        # event loop on Windows) is not, so an unchecked database is never served; any other failure
+        # of the check (missing migrations folder, no permission to read the version table, ...)
+        # also stops start-up.
+        logger.warning(f"Could not reach the database to check its schema at start-up: {exc}")
     yield
     logger.info("Shutting down TRIS Engine.")
 

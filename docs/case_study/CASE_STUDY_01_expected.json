@@ -1,0 +1,215 @@
+{
+ "imports": {
+  "materials": {
+   "accepted": 6,
+   "rejected": 0,
+   "status": "COMPLETED"
+  },
+  "purchase_records": {
+   "accepted": 144,
+   "rejected": 0,
+   "status": "COMPLETED"
+  },
+  "inventory_records": {
+   "accepted": 18,
+   "rejected": 0,
+   "status": "COMPLETED"
+  },
+  "bom_entries": {
+   "accepted": 6,
+   "rejected": 0,
+   "status": "COMPLETED"
+  },
+  "material_costs": {
+   "accepted": 12,
+   "rejected": 0,
+   "status": "COMPLETED"
+  },
+  "supplier_operations_metrics": {
+   "accepted": 84,
+   "rejected": 0,
+   "status": "COMPLETED"
+  },
+  "production_records": {
+   "accepted": 12,
+   "rejected": 0,
+   "status": "COMPLETED"
+  }
+ },
+ "detection": {
+  "materials": 6,
+  "latest_price": 0.2684,
+  "standard_cost": 0.2196,
+  "vs_standard_pct": 22.22,
+  "price_change_3m_pct": 0.22,
+  "top_supplier_share_pct": 100.0,
+  "coverage_days": 20.0,
+  "triggered": [
+   "standard_cost_deviation",
+   "supplier_concentration"
+  ],
+  "signals_in_detail": 10
+ },
+ "forecast": {
+  "materials": 6,
+  "stored_runs": 12,
+  "SOL-CELL-M10": {
+   "30": {
+    "model": "Lagged price regression",
+    "forecast": 0.2823,
+    "lower": 0.2754,
+    "upper": 0.2893,
+    "last_price": 0.2798,
+    "change_pct": 0.9
+   },
+   "90": {
+    "model": "Lagged price regression",
+    "forecast": 0.2891,
+    "lower": 0.2805,
+    "upper": 0.2976,
+    "last_price": 0.2798,
+    "change_pct": 3.31
+   }
+  }
+ },
+ "exposure": {
+  "baseline_unit_cost": 0.2798,
+  "forecast_unit_cost": 0.2856,
+  "expected_usage": 56989.5,
+  "projected_exposure": 332.4767,
+  "scenario_price_plus_10pct": {
+   "unit_cost": 0.3142,
+   "exposure": 1960.2906,
+   "change_vs_baseline": 1627.8139
+  },
+  "baseline_unchanged_by_scenario": true
+ },
+ "risk_default_weights": {
+  "weight_version": 1,
+  "scores": {
+   "SOL-ALU-FRAME": [
+    47.3,
+    "Moderate"
+   ],
+   "SOL-BACKSHEET": [
+    41.9,
+    "Moderate"
+   ],
+   "SOL-CELL-M10": [
+    48.9,
+    "Moderate"
+   ],
+   "SOL-EVA-FILM": [
+    35.2,
+    "Moderate"
+   ],
+   "SOL-GLASS-32": [
+    36.4,
+    "Moderate"
+   ],
+   "SOL-JBOX-IP68": [
+    24.3,
+    "Low"
+   ]
+  }
+ },
+ "risk_high_band_40": {
+  "weight_version": 2,
+  "scores": {
+   "SOL-ALU-FRAME": [
+    47.3,
+    "High"
+   ],
+   "SOL-BACKSHEET": [
+    41.9,
+    "High"
+   ],
+   "SOL-CELL-M10": [
+    48.9,
+    "High"
+   ],
+   "SOL-EVA-FILM": [
+    35.2,
+    "Moderate"
+   ],
+   "SOL-GLASS-32": [
+    36.4,
+    "Moderate"
+   ],
+   "SOL-JBOX-IP68": [
+    24.3,
+    "Low"
+   ]
+  },
+  "case_material_drivers": [
+   [
+    "supplier_concentration",
+    15.0
+   ],
+   [
+    "standard_cost_deviation",
+    10.0
+   ],
+   [
+    "inventory_coverage",
+    8.9
+   ]
+  ]
+ },
+ "case": {
+  "category": "material_cost_risk",
+  "material_id": "SOL-CELL-M10",
+  "stored_score": 48.9,
+  "replay_reproduces_stored_score": true,
+  "closure_refused": {
+   "reviewer": [
+    403,
+    "PERMISSION_DENIED"
+   ],
+   "participating_admin": [
+    403,
+    "SEPARATION_OF_DUTIES_VIOLATION"
+   ]
+  },
+  "history": [
+   "New",
+   "Assigned",
+   "Under Investigation",
+   "Corrective Action",
+   "Pending Verification",
+   "Closed"
+  ]
+ },
+ "validation": {
+  "method": "1.2",
+  "cutoffs": 10,
+  "by_horizon": {
+   "30": {
+    "cases": 60,
+    "judged": 60,
+    "mape_pct": 3.02,
+    "closer_than_naive": 0.183,
+    "events": 8,
+    "tp_fp_fn_tn": [
+     4,
+     12,
+     4,
+     40
+    ]
+   },
+   "90": {
+    "cases": 60,
+    "judged": 36,
+    "mape_pct": 5.55,
+    "closer_than_naive": 0.25,
+    "events": 12,
+    "tp_fp_fn_tn": [
+     6,
+     7,
+     6,
+     17
+    ]
+   }
+  }
+ }
+}

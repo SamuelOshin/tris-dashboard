@@ -97,6 +97,26 @@ CREATE TRIGGER trg_validation_summaries_immutable
 """
 
 
+ADMINISTRATION_IMMUTABILITY_SQL = """
+CREATE OR REPLACE FUNCTION prevent_administration_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION '% rows are immutable: UPDATE and DELETE are prohibited', TG_TABLE_NAME;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_forecast_model_settings_immutable ON forecast_model_settings;
+CREATE TRIGGER trg_forecast_model_settings_immutable
+    BEFORE UPDATE OR DELETE ON forecast_model_settings
+    FOR EACH ROW EXECUTE FUNCTION prevent_administration_mutation();
+
+DROP TRIGGER IF EXISTS trg_security_audit_log_immutable ON security_audit_log;
+CREATE TRIGGER trg_security_audit_log_immutable
+    BEFORE UPDATE OR DELETE ON security_audit_log
+    FOR EACH ROW EXECUTE FUNCTION prevent_administration_mutation();
+"""
+
+
 async def apply_database_triggers(session: AsyncSession) -> None:
     """
     Applies database-level triggers if running on PostgreSQL.
@@ -117,6 +137,9 @@ async def apply_database_triggers(session: AsyncSession) -> None:
             await session.execute(text(VALIDATION_IMMUTABILITY_SQL))
             await session.commit()
             logger.info("Successfully applied validation immutability triggers")
+            await session.execute(text(ADMINISTRATION_IMMUTABILITY_SQL))
+            await session.commit()
+            logger.info("Successfully applied model settings and audit log immutability triggers")
         except Exception as e:
             logger.warning(f"Could not apply PostgreSQL trigger: {e}")
             await session.rollback()

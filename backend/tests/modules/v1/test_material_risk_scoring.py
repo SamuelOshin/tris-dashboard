@@ -651,7 +651,7 @@ def test_demand_trend_uses_calendar_months_and_counts_empty_months_as_zero():
 async def test_weight_versions_never_collide_under_concurrent_requests(
     db_session: AsyncSession,
 ):
-    user = SimpleNamespace(user_id="USR-TEST-001")
+    user = SimpleNamespace(user_id="USR-TEST-001", username="test_reviewer", role="reviewer")
 
     async def create():
         async with harness.test_session_factory() as session:

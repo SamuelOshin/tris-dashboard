@@ -11,8 +11,8 @@ import {
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/lib/auth-context'
 import {
-  MANUFACTURING_NAV_ITEMS,
   canViewManufacturing,
+  navItemsFor,
 } from '@/components/manufacturing/manufacturing-navigation'
 
 /** Sidebar section for the Manufacturing domain, visible per role (Ticket 2 / D7). */
@@ -28,7 +28,7 @@ export function ManufacturingNavGroup() {
         Manufacturing
       </SidebarGroupLabel>
       <SidebarMenu className="gap-1">
-        {MANUFACTURING_NAV_ITEMS.map((item) => {
+        {navItemsFor(user?.role).map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
           return (
