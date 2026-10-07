@@ -1,0 +1,15 @@
+{
+  "name": "Environment B: Std Costs",
+  "description": "Sheet 'Std Costs' of environment_b_industrial.xlsx matched to material_costs.",
+  "source_profile": "generic",
+  "target": "material_costs",
+  "field_mapping": {
+    "material_id": "Part No",
+    "version": "Rev",
+    "effective_from": "Valid From",
+    "effective_to": "Valid To",
+    "standard_cost": "Planned Cost",
+    "currency": "Cur"
+  },
+  "defaults": {}
+}

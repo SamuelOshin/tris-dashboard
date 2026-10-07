@@ -1,0 +1,14 @@
+{
+  "name": "Generic layout: production volume",
+  "description": "Columns of generic_production.csv matched to the standard production_records fields.",
+  "source_profile": "generic",
+  "target": "production_records",
+  "field_mapping": {
+    "product_sku": "product_sku",
+    "period_start": "period_start",
+    "period_end": "period_end",
+    "actual_volume": "actual_volume",
+    "unit_of_measure": "unit_of_measure"
+  },
+  "defaults": {}
+}

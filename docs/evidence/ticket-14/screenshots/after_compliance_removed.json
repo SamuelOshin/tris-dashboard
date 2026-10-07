@@ -1,0 +1,20 @@
+{
+ "compliance_route_lands_on": "/",
+ "menu_has_audit_trail": false,
+ "menu_items": [
+  "SA",
+  "System Administrator",
+  "admin@tris.internal",
+  "System Administrator",
+  "Risk Management",
+  "ACCOUNT & PREFERENCES",
+  "Account Profile",
+  "Profile & security preferences",
+  "Zero-Trust Access",
+  "Access pattern & off-hours telemetry",
+  "Data Ingestion",
+  "Upload and manage datasets",
+  "SWITCH DEMO ROLE",
+  "Risk reviewerRead-only reviewerCompliance verifierProcess owner"
+ ]
+}

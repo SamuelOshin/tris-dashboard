@@ -122,8 +122,9 @@ re-checked by a test.
 ## 9. Not built (so not claimed)
 
 - **No ERP connection.** SAP-style and Dynamics-style are file-layout presets for uploaded files.
-- **The Compliance page is not connected to real events**: its "Global Audit Trail", scores and framework statuses are
-  static sample content from v1.x. The real audit log is on the Administration page.
+- **The v1.x Compliance page was taken out of navigation** (2026-10-07): its "Global Audit Trail", scores and framework
+  statuses were fixed sample content, not real events. `/compliance` now redirects to the dashboard and the menu item is
+  gone. The real audit log is on the Administration page.
 - **Administration is for forecast models, risk weights, datasets, saved mappings and the audit log.** It does not manage
   users (that stays on Settings & Governance), cannot change the fixed forecast settings (they belong to a method
   version) and cannot switch off the baseline models.

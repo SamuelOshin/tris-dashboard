@@ -1,0 +1,15 @@
+{
+  "name": "Environment B: Assemblies",
+  "description": "Sheet 'Assemblies' of environment_b_industrial.xlsx matched to bom_entries.",
+  "source_profile": "generic",
+  "target": "bom_entries",
+  "field_mapping": {
+    "product_sku": "Assembly",
+    "product_description": "Assembly Name",
+    "material_id": "Component",
+    "bom_quantity": "Per Assembly",
+    "unit_of_measure": "Meas Unit",
+    "effective_from": "Valid From"
+  },
+  "defaults": {}
+}

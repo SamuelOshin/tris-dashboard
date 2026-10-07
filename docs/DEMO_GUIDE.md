@@ -55,8 +55,8 @@ method works as built and that on this data it adds no demonstrated skill over a
 
 - **"Is it connected to SAP?"** No. The SAP-style and Dynamics-style options are layouts of an uploaded file.
 - **"Where is the audit log?"** **Manufacturing → Administration → Audit log** (administrators): imports, runs,
-  weight changes, model switches, dataset labels, opened cases and sign-ins, filterable, with who and when. The Compliance
-  page is different: it shows static sample content, not real events; do not show it as an audit log.
+  weight changes, model switches, dataset labels, opened cases and sign-ins, filterable, with who and when. The old v1.x
+  Compliance page showed fixed sample content, so it was taken out of navigation; do not go looking for it.
 - **"Can I change the risk weights?"** Yes, on **Administration → Risk weights**: edit the weights and bands, give a reason
   and save a new version; earlier versions and scores stay as they were.
 - **"Where are the forecast and the exposure?"** On the Forecasting & Scenarios page; the Material Cost table shows

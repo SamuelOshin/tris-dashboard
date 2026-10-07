@@ -1,0 +1,16 @@
+{
+  "name": "Generic layout: purchase records",
+  "description": "Columns of generic_purchases.csv matched to the standard purchase_records fields.",
+  "source_profile": "generic",
+  "target": "purchase_records",
+  "field_mapping": {
+    "purchase_reference": "po_number",
+    "material_id": "material_id",
+    "supplier_id": "supplier_id",
+    "purchase_date": "order_date",
+    "quantity": "quantity",
+    "unit_price": "unit_price",
+    "currency": "currency"
+  },
+  "defaults": {}
+}

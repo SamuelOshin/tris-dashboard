@@ -1,0 +1,14 @@
+{
+  "name": "Generic layout: bill of materials",
+  "description": "Columns of generic_bom.csv matched to the standard bom_entries fields.",
+  "source_profile": "generic",
+  "target": "bom_entries",
+  "field_mapping": {
+    "product_sku": "product_sku",
+    "product_description": "product_description",
+    "material_id": "material_id",
+    "bom_quantity": "bom_quantity",
+    "unit_of_measure": "unit_of_measure"
+  },
+  "defaults": {}
+}

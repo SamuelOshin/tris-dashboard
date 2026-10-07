@@ -1,0 +1,13 @@
+{
+  "name": "Environment B: Parts",
+  "description": "Sheet 'Parts' of environment_b_industrial.xlsx matched to materials.",
+  "source_profile": "generic",
+  "target": "materials",
+  "field_mapping": {
+    "material_id": "Part No",
+    "description": "Part Description",
+    "category": "Commodity",
+    "unit_of_measure": "Stock UoM"
+  },
+  "defaults": {}
+}

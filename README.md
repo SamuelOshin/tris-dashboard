@@ -23,19 +23,22 @@
 
 ---
 
-## 🔑 Core Demo Evaluation Personas & Credentials
+## 🔑 Demo Evaluation Roles
 
-The live deployment and database seeding scripts provide **four pre-configured core personas** mapping directly to the TRIS v1.4 Role-Based Access Control (RBAC) and Separation-of-Duties (SoD) governance model:
+The seed script creates five demo users, one for each role in the TRIS Role-Based Access Control (RBAC) and Separation-of-Duties (SoD)
+model. **Passwords are not listed here.** On a demonstration deployment (`DEMO_LOGIN_ENABLED=true`) the sign-in page offers a
+**Demo environment: sign in as** panel with one button per role, and the user menu has **Switch demo role**. Otherwise the
+owner shares the passwords outside the repository (the seed script `backend/app/scripts/seed.py` defines the demo users).
 
-| Persona Role | Username | Email Address | Password | Department | Operational Clearance & Governance Boundaries |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Risk Reviewer**<br/>*(Primary Investigator)* | `reviewer` | `reviewer@tris.internal` | `password123` | Finance | **Primary Investigation Clearance**: Investigates high-risk anomalies, attaches evidence, documents root causes and corrective actions, and transitions cases to `Pending Verification`.<br/>⚠️ **Enforced SoD Boundary**: Strictly prohibited from self-verifying or closing cases. |
-| **Compliance Verifier**<br/>*(Independent Approver)* | `verifier` | `verifier@tris.internal` | `password123` | Compliance | **Independent Verification Authority**: Evaluates submitted 8-field closure packages, verifies evidence, executes final verified closure (`Closed`), or returns cases for re-investigation (`Reopened`).<br/>⚠️ **Enforced SoD Boundary**: Cannot verify cases they investigated. |
-| **Process Owner**<br/>*(Business Operations)* | `process_owner` | `process_owner@tris.internal` | `password123` | Operations | **Process Oversight & Simulation**: Evaluates policy deviations, inspects point-in-time timeline reconstructions (`TX-TEMP-001`), and executes Remediation Replay simulations against proposed corrective controls. |
-| **System Administrator**<br/>*(Superadmin)* | `admin` | `admin@tris.internal` | `admin123` | Risk Management | **Administrative & Governance Control**: Full User Management suite (`/dashboard/settings`), Argon2id password management, role provisioning, account lock/unlock, rule weight/threshold adjustments, and security audit event monitoring. |
-| **Read-Only Reviewer**<br/>*(v2.0 test account)* | `readonly_qa` | `readonly.qa@tris.internal` | `password123` | Operations | **View-only access**: can open dashboards, cases and the Manufacturing section, but every write is refused with `403 PERMISSION_DENIED` (cannot ingest, run analytics, edit rules, or change any case or record). |
+| Role | Username | What it can do |
+| :--- | :--- | :--- |
+| **Risk Reviewer** *(primary investigator)* | `reviewer` | Investigates high-risk anomalies, attaches evidence, documents root causes and corrective actions; imports manufacturing data, runs forecasts, scoring and validation, and opens material cost cases. |
+| **Compliance Verifier** *(independent approver)* | `verifier` | Evaluates submitted 8-field closure packages and executes the final verified closure; cannot verify a case they investigated. No Manufacturing section. |
+| **Process Owner** *(business operations)* | `process_owner` | Process oversight and simulation: inspects point-in-time timeline reconstructions and replays proposed controls. No Manufacturing section. |
+| **System Administrator** *(superadmin)* | `admin` | User management (`/dashboard/settings`), role provisioning, and the Administration page (forecast models, risk weights, dataset labels, saved mappings, audit log). |
+| **Read-Only Reviewer** *(added in v2.0)* | `readonly` | Can open dashboards, cases and the Manufacturing section; every write is refused with `403 PERMISSION_DENIED`. |
 
-> **About the Read-Only Reviewer account**: it is a local test account used to verify the `read_only_reviewer` role added in v2.0. It is **not created by the seed script**; it was provisioned manually through *Settings & Governance → User Administration* in the local development database. Recreate it the same way on a fresh database (role: *Read-Only Reviewer*), then set the password above. Do not use this password anywhere other than a local or evaluation environment.
+Do not reuse these accounts, or demo sign-in, anywhere that holds real data.
 
 ---
 

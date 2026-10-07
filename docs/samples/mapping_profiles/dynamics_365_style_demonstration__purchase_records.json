@@ -1,0 +1,16 @@
+{
+  "name": "Dynamics 365-style demonstration: purchase records",
+  "description": "Columns of dynamics_style_purchases.csv matched to the standard purchase_records fields.",
+  "source_profile": "dynamics_style",
+  "target": "purchase_records",
+  "field_mapping": {
+    "purchase_reference": "PurchId",
+    "material_id": "ItemNumber",
+    "supplier_id": "VendAccount",
+    "purchase_date": "OrderDate",
+    "quantity": "PurchQty",
+    "unit_price": "PurchPrice",
+    "currency": "CurrencyCode"
+  },
+  "defaults": {}
+}

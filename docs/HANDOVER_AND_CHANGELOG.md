@@ -59,9 +59,9 @@ seconds. Raw output for each ticket is in `docs/evidence/ticket-N/`.
    audit log). Not included: user management there (it stays on Settings & Governance), editing the fixed forecast
    settings (they belong to a method version), and switching off a baseline model. The audit log records the actions listed
    in `DATA_DICTIONARY.md`; sign-ins and rule edits were already recorded.
-3. **The Compliance page shows static sample data** (scores, framework status, a "Global Audit Trail" with invented
-   users and dates) from v1.x. It is not real and should be replaced or removed before any real use. The real audit log is
-   on the Administration page.
+3. **The v1.x Compliance page was removed from navigation (2026-10-07).** It showed fixed sample data (scores, framework
+   status, a "Global Audit Trail" with invented users and dates). `/compliance` redirects to the dashboard and the user menu
+   no longer links to it; the components remain in the code. The real audit log is on the Administration page.
 4. **Deployment: run the migrations before the new version starts.** FastAPI Cloud has no pre-deploy or start
    command, so nothing on the platform runs migrations. Release routine: from the `backend` folder run
    `DATABASE_URL=<production url> uv run alembic upgrade head`, then `fastapi deploy`. The application refuses to start
@@ -103,6 +103,25 @@ successful sign-in does not reset the count, and there is no limit per IP addres
 that user locked out for 15 minutes at a time; the pause ends by itself. The demo sign-in does not use the throttle because it takes no
 password. The login page and the top bar say "evaluation environment, synthetic data" unless `NEXT_PUBLIC_EVALUATION_LABEL=off`
 is set for the frontend of a deployment that holds real data.
+
+## Developer handover note: what is built, what is a demonstration, what is planned
+
+**Built and working (checked by tests and in the browser).** File import with column mapping and an error log; saved mapping
+profiles; price, deviation, BOM, supplier and stock signals computed from the imported data; stored 30- and 90-day price forecasts
+with their model, version and data fingerprint; financial exposure and roll-ups by supplier, product and category; what-if scenarios that
+are never stored; an explainable, versioned 0 to 100 risk score; material cost cases in the existing case workflow with separation of
+duties; retrospective validation with stored runs, false alarms and misses; a second environment through the same pipeline; the
+Administration page and an audit log; the dashboard summary; a login throttle and a sign-out record.
+
+**Demonstrations, not integrations.** The SAP-style and Dynamics 365-style layouts are file-import demonstrations: nothing here
+connects to an ERP system, and no screen says it does. Both environments are synthetic. One-click demo sign-in exists to let
+reviewers try each role and is meant only for a deployment with synthetic data. The validation results show the method running end to
+end; on this data the forecasts were not better than assuming the price stays the same, and the risk warning is not shown to be reliable.
+
+**Planned, not started.** A live, authorised ERP connector; unit and currency conversion; a pilot on real purchasing data before any
+claim of usefulness; forecasting by supplier or from demand; a dataset picker on every manufacturing page; a real compliance page (the v1.x
+Compliance page, which showed static sample content, was taken out of navigation); per-IP limits and server-side token revocation (a signed-in session stays valid until it
+expires, up to 60 minutes, even after sign-out).
 
 ## Future work (not started)
 

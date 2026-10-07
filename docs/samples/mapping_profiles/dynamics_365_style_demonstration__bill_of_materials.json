@@ -1,0 +1,15 @@
+{
+  "name": "Dynamics 365-style demonstration: bill of materials",
+  "description": "Columns of dynamics_style_bom.csv matched to the standard bom_entries fields.",
+  "source_profile": "dynamics_style",
+  "target": "bom_entries",
+  "field_mapping": {
+    "product_sku": "ProductNumber",
+    "product_description": "ProductName",
+    "material_id": "ItemNumber",
+    "bom_quantity": "BOMQuantity",
+    "unit_of_measure": "UnitId",
+    "effective_from": "FromDate"
+  },
+  "defaults": {}
+}

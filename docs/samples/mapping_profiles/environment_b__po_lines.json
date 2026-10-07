@@ -1,0 +1,16 @@
+{
+  "name": "Environment B: PO Lines",
+  "description": "Sheet 'PO Lines' of environment_b_industrial.xlsx matched to purchase_records.",
+  "source_profile": "generic",
+  "target": "purchase_records",
+  "field_mapping": {
+    "purchase_reference": "PO Line",
+    "material_id": "Part No",
+    "supplier_id": "Vendor Code",
+    "purchase_date": "Date Placed",
+    "quantity": "Qty Ordered",
+    "unit_price": "Cost Each",
+    "currency": "Cur"
+  },
+  "defaults": {}
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Generic layout: inventory",
+  "description": "Columns of generic_inventory.csv matched to the standard inventory_records fields.",
+  "source_profile": "generic",
+  "target": "inventory_records",
+  "field_mapping": {
+    "material_id": "material_id",
+    "snapshot_date": "snapshot_date",
+    "quantity_on_hand": "quantity_on_hand",
+    "inventory_value": "inventory_value",
+    "currency": "currency"
+  },
+  "defaults": {}
+}

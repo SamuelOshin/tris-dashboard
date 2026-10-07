@@ -130,5 +130,5 @@ time it was calculated; missing data shows a reason and never a plausible-lookin
 
 - The Forecasting, Exposure and Validation pages use "all data" and have no dataset picker; only the Material Cost
   page can narrow to one dataset.
-- The Compliance page (`/compliance`) shows static sample figures and a sample audit trail from v1.x; it is not
-  connected to real events.
+- The v1.x Compliance page (`/compliance`) showed static sample figures and a sample audit trail, not real events. It
+  was taken out of navigation on 2026-10-07: the route redirects to the dashboard and the user menu no longer links to it.

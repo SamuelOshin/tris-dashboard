@@ -1,0 +1,582 @@
+{
+ "admin": {
+  "/": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/risk-cases": {
+   "http": 200,
+   "lands_on": "/risk-cases",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/suppliers": {
+   "http": 200,
+   "lands_on": "/suppliers",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/ingestion": {
+   "http": 200,
+   "lands_on": "/ingestion",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/zero-trust": {
+   "http": 200,
+   "lands_on": "/zero-trust",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/settings": {
+   "http": 200,
+   "lands_on": "/dashboard/settings",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/reports": {
+   "http": 200,
+   "lands_on": "/dashboard/reports",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/correlation": {
+   "http": 200,
+   "lands_on": "/dashboard/correlation",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/fraud-detection": {
+   "http": 200,
+   "lands_on": "/fraud-detection",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/developer-tests": {
+   "http": 200,
+   "lands_on": "/developer-tests",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/compliance": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/cases/TEST-CASE-001": {
+   "http": 200,
+   "lands_on": "/cases/TEST-CASE-001",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/material-cost": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/erp-mapping": {
+   "http": 200,
+   "lands_on": "/manufacturing/erp-mapping",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/forecasting": {
+   "http": 200,
+   "lands_on": "/manufacturing/forecasting",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/validation": {
+   "http": 200,
+   "lands_on": "/manufacturing/validation",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/case-studies": {
+   "http": 200,
+   "lands_on": "/manufacturing/case-studies",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/administration": {
+   "http": 200,
+   "lands_on": "/manufacturing/administration",
+   "access_restricted": false,
+   "not_found": false
+  }
+ },
+ "reviewer": {
+  "/": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/risk-cases": {
+   "http": 200,
+   "lands_on": "/risk-cases",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/suppliers": {
+   "http": 200,
+   "lands_on": "/suppliers",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/ingestion": {
+   "http": 200,
+   "lands_on": "/ingestion",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/zero-trust": {
+   "http": 200,
+   "lands_on": "/zero-trust",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/settings": {
+   "http": 200,
+   "lands_on": "/dashboard/settings",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/reports": {
+   "http": 200,
+   "lands_on": "/dashboard/reports",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/correlation": {
+   "http": 200,
+   "lands_on": "/dashboard/correlation",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/fraud-detection": {
+   "http": 200,
+   "lands_on": "/fraud-detection",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/developer-tests": {
+   "http": 200,
+   "lands_on": "/developer-tests",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/compliance": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/cases/TEST-CASE-001": {
+   "http": 200,
+   "lands_on": "/cases/TEST-CASE-001",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/material-cost": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/erp-mapping": {
+   "http": 200,
+   "lands_on": "/manufacturing/erp-mapping",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/forecasting": {
+   "http": 200,
+   "lands_on": "/manufacturing/forecasting",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/validation": {
+   "http": 200,
+   "lands_on": "/manufacturing/validation",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/case-studies": {
+   "http": 200,
+   "lands_on": "/manufacturing/case-studies",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/administration": {
+   "http": 200,
+   "lands_on": "/manufacturing/administration",
+   "access_restricted": true,
+   "not_found": false
+  }
+ },
+ "read_only_reviewer": {
+  "/": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/risk-cases": {
+   "http": 200,
+   "lands_on": "/risk-cases",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/suppliers": {
+   "http": 200,
+   "lands_on": "/suppliers",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/ingestion": {
+   "http": 200,
+   "lands_on": "/ingestion",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/zero-trust": {
+   "http": 200,
+   "lands_on": "/zero-trust",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/settings": {
+   "http": 200,
+   "lands_on": "/dashboard/settings",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/reports": {
+   "http": 200,
+   "lands_on": "/dashboard/reports",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/correlation": {
+   "http": 200,
+   "lands_on": "/dashboard/correlation",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/fraud-detection": {
+   "http": 200,
+   "lands_on": "/fraud-detection",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/developer-tests": {
+   "http": 200,
+   "lands_on": "/developer-tests",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/compliance": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/cases/TEST-CASE-001": {
+   "http": 200,
+   "lands_on": "/cases/TEST-CASE-001",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/material-cost": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/erp-mapping": {
+   "http": 200,
+   "lands_on": "/manufacturing/erp-mapping",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/forecasting": {
+   "http": 200,
+   "lands_on": "/manufacturing/forecasting",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/validation": {
+   "http": 200,
+   "lands_on": "/manufacturing/validation",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/case-studies": {
+   "http": 200,
+   "lands_on": "/manufacturing/case-studies",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing/administration": {
+   "http": 200,
+   "lands_on": "/manufacturing/administration",
+   "access_restricted": true,
+   "not_found": false
+  }
+ },
+ "verifier": {
+  "/": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/risk-cases": {
+   "http": 200,
+   "lands_on": "/risk-cases",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/suppliers": {
+   "http": 200,
+   "lands_on": "/suppliers",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/ingestion": {
+   "http": 200,
+   "lands_on": "/ingestion",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/zero-trust": {
+   "http": 200,
+   "lands_on": "/zero-trust",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/settings": {
+   "http": 200,
+   "lands_on": "/dashboard/settings",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/reports": {
+   "http": 200,
+   "lands_on": "/dashboard/reports",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/correlation": {
+   "http": 200,
+   "lands_on": "/dashboard/correlation",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/fraud-detection": {
+   "http": 200,
+   "lands_on": "/fraud-detection",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/developer-tests": {
+   "http": 200,
+   "lands_on": "/developer-tests",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/compliance": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/cases/TEST-CASE-001": {
+   "http": 200,
+   "lands_on": "/cases/TEST-CASE-001",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/material-cost": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/erp-mapping": {
+   "http": 200,
+   "lands_on": "/manufacturing/erp-mapping",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/forecasting": {
+   "http": 200,
+   "lands_on": "/manufacturing/forecasting",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/validation": {
+   "http": 200,
+   "lands_on": "/manufacturing/validation",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/case-studies": {
+   "http": 200,
+   "lands_on": "/manufacturing/case-studies",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/administration": {
+   "http": 200,
+   "lands_on": "/manufacturing/administration",
+   "access_restricted": true,
+   "not_found": false
+  }
+ },
+ "process_owner": {
+  "/": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/risk-cases": {
+   "http": 200,
+   "lands_on": "/risk-cases",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/suppliers": {
+   "http": 200,
+   "lands_on": "/suppliers",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/ingestion": {
+   "http": 200,
+   "lands_on": "/ingestion",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/zero-trust": {
+   "http": 200,
+   "lands_on": "/zero-trust",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/settings": {
+   "http": 200,
+   "lands_on": "/dashboard/settings",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/reports": {
+   "http": 200,
+   "lands_on": "/dashboard/reports",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/dashboard/correlation": {
+   "http": 200,
+   "lands_on": "/dashboard/correlation",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/fraud-detection": {
+   "http": 200,
+   "lands_on": "/fraud-detection",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/developer-tests": {
+   "http": 200,
+   "lands_on": "/developer-tests",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/compliance": {
+   "http": 200,
+   "lands_on": "/",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/cases/TEST-CASE-001": {
+   "http": 200,
+   "lands_on": "/cases/TEST-CASE-001",
+   "access_restricted": false,
+   "not_found": false
+  },
+  "/manufacturing": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/material-cost": {
+   "http": 200,
+   "lands_on": "/manufacturing/material-cost",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/erp-mapping": {
+   "http": 200,
+   "lands_on": "/manufacturing/erp-mapping",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/forecasting": {
+   "http": 200,
+   "lands_on": "/manufacturing/forecasting",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/validation": {
+   "http": 200,
+   "lands_on": "/manufacturing/validation",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/case-studies": {
+   "http": 200,
+   "lands_on": "/manufacturing/case-studies",
+   "access_restricted": true,
+   "not_found": false
+  },
+  "/manufacturing/administration": {
+   "http": 200,
+   "lands_on": "/manufacturing/administration",
+   "access_restricted": true,
+   "not_found": false
+  }
+ }
+}

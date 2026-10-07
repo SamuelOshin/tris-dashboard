@@ -1,0 +1,586 @@
+{
+ "roles": {
+  "admin": {
+   "demo_login": 200,
+   "pages": {
+    "/": {
+     "http": 200,
+     "final_path": "/",
+     "no_access": false,
+     "not_found": false
+    },
+    "/risk-cases": {
+     "http": 200,
+     "final_path": "/risk-cases",
+     "no_access": false,
+     "not_found": false
+    },
+    "/suppliers": {
+     "http": 200,
+     "final_path": "/suppliers",
+     "no_access": false,
+     "not_found": false
+    },
+    "/ingestion": {
+     "http": 200,
+     "final_path": "/ingestion",
+     "no_access": false,
+     "not_found": false
+    },
+    "/zero-trust": {
+     "http": 200,
+     "final_path": "/zero-trust",
+     "no_access": false,
+     "not_found": false
+    },
+    "/dashboard/settings": {
+     "http": 200,
+     "final_path": "/dashboard/settings",
+     "no_access": false,
+     "not_found": false
+    },
+    "/compliance": {
+     "http": 200,
+     "final_path": "/compliance",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/material-cost": {
+     "http": 200,
+     "final_path": "/manufacturing/material-cost",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/erp-mapping": {
+     "http": 200,
+     "final_path": "/manufacturing/erp-mapping",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/forecasting": {
+     "http": 200,
+     "final_path": "/manufacturing/forecasting",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/validation": {
+     "http": 200,
+     "final_path": "/manufacturing/validation",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/case-studies": {
+     "http": 200,
+     "final_path": "/manufacturing/case-studies",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/administration": {
+     "http": 200,
+     "final_path": "/manufacturing/administration",
+     "no_access": false,
+     "not_found": false
+    }
+   },
+   "sidebar": [
+    "/",
+    "/dashboard/settings",
+    "/ingestion",
+    "/manufacturing/administration",
+    "/manufacturing/case-studies",
+    "/manufacturing/erp-mapping",
+    "/manufacturing/forecasting",
+    "/manufacturing/material-cost",
+    "/manufacturing/validation",
+    "/risk-cases",
+    "/suppliers",
+    "/zero-trust"
+   ]
+  },
+  "reviewer": {
+   "demo_login": 200,
+   "pages": {
+    "/": {
+     "http": 200,
+     "final_path": "/",
+     "no_access": false,
+     "not_found": false
+    },
+    "/risk-cases": {
+     "http": 200,
+     "final_path": "/risk-cases",
+     "no_access": false,
+     "not_found": false
+    },
+    "/suppliers": {
+     "http": 200,
+     "final_path": "/suppliers",
+     "no_access": false,
+     "not_found": false
+    },
+    "/ingestion": {
+     "http": 200,
+     "final_path": "/ingestion",
+     "no_access": false,
+     "not_found": false
+    },
+    "/zero-trust": {
+     "http": 200,
+     "final_path": "/zero-trust",
+     "no_access": false,
+     "not_found": false
+    },
+    "/dashboard/settings": {
+     "http": 200,
+     "final_path": "/dashboard/settings",
+     "no_access": false,
+     "not_found": false
+    },
+    "/compliance": {
+     "http": 200,
+     "final_path": "/compliance",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/material-cost": {
+     "http": 200,
+     "final_path": "/manufacturing/material-cost",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/erp-mapping": {
+     "http": 200,
+     "final_path": "/manufacturing/erp-mapping",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/forecasting": {
+     "http": 200,
+     "final_path": "/manufacturing/forecasting",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/validation": {
+     "http": 200,
+     "final_path": "/manufacturing/validation",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/case-studies": {
+     "http": 200,
+     "final_path": "/manufacturing/case-studies",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/administration": {
+     "http": 200,
+     "final_path": "/manufacturing/administration",
+     "no_access": false,
+     "not_found": false
+    }
+   },
+   "sidebar": [
+    "/",
+    "/dashboard/settings",
+    "/ingestion",
+    "/manufacturing/case-studies",
+    "/manufacturing/erp-mapping",
+    "/manufacturing/forecasting",
+    "/manufacturing/material-cost",
+    "/manufacturing/validation",
+    "/risk-cases",
+    "/suppliers",
+    "/zero-trust"
+   ]
+  },
+  "read_only_reviewer": {
+   "demo_login": 200,
+   "pages": {
+    "/": {
+     "http": 200,
+     "final_path": "/",
+     "no_access": false,
+     "not_found": false
+    },
+    "/risk-cases": {
+     "http": 200,
+     "final_path": "/risk-cases",
+     "no_access": false,
+     "not_found": false
+    },
+    "/suppliers": {
+     "http": 200,
+     "final_path": "/suppliers",
+     "no_access": false,
+     "not_found": false
+    },
+    "/ingestion": {
+     "http": 200,
+     "final_path": "/ingestion",
+     "no_access": false,
+     "not_found": false
+    },
+    "/zero-trust": {
+     "http": 200,
+     "final_path": "/zero-trust",
+     "no_access": false,
+     "not_found": false
+    },
+    "/dashboard/settings": {
+     "http": 200,
+     "final_path": "/dashboard/settings",
+     "no_access": false,
+     "not_found": false
+    },
+    "/compliance": {
+     "http": 200,
+     "final_path": "/compliance",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/material-cost": {
+     "http": 200,
+     "final_path": "/manufacturing/material-cost",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/erp-mapping": {
+     "http": 200,
+     "final_path": "/manufacturing/erp-mapping",
+     "no_access": true,
+     "not_found": false
+    },
+    "/manufacturing/forecasting": {
+     "http": 200,
+     "final_path": "/manufacturing/forecasting",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/validation": {
+     "http": 200,
+     "final_path": "/manufacturing/validation",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/case-studies": {
+     "http": 200,
+     "final_path": "/manufacturing/case-studies",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/administration": {
+     "http": 200,
+     "final_path": "/manufacturing/administration",
+     "no_access": false,
+     "not_found": false
+    }
+   },
+   "sidebar": [
+    "/",
+    "/dashboard/settings",
+    "/ingestion",
+    "/manufacturing/case-studies",
+    "/manufacturing/erp-mapping",
+    "/manufacturing/forecasting",
+    "/manufacturing/material-cost",
+    "/manufacturing/validation",
+    "/risk-cases",
+    "/suppliers",
+    "/zero-trust"
+   ]
+  },
+  "verifier": {
+   "demo_login": 200,
+   "pages": {
+    "/": {
+     "http": 200,
+     "final_path": "/",
+     "no_access": false,
+     "not_found": false
+    },
+    "/risk-cases": {
+     "http": 200,
+     "final_path": "/risk-cases",
+     "no_access": false,
+     "not_found": false
+    },
+    "/suppliers": {
+     "http": 200,
+     "final_path": "/suppliers",
+     "no_access": false,
+     "not_found": false
+    },
+    "/ingestion": {
+     "http": 200,
+     "final_path": "/ingestion",
+     "no_access": false,
+     "not_found": false
+    },
+    "/zero-trust": {
+     "http": 200,
+     "final_path": "/zero-trust",
+     "no_access": false,
+     "not_found": false
+    },
+    "/dashboard/settings": {
+     "http": 200,
+     "final_path": "/dashboard/settings",
+     "no_access": false,
+     "not_found": false
+    },
+    "/compliance": {
+     "http": 200,
+     "final_path": "/compliance",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/material-cost": {
+     "http": 200,
+     "final_path": "/manufacturing/material-cost",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/erp-mapping": {
+     "http": 200,
+     "final_path": "/manufacturing/erp-mapping",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/forecasting": {
+     "http": 200,
+     "final_path": "/manufacturing/forecasting",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/validation": {
+     "http": 200,
+     "final_path": "/manufacturing/validation",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/case-studies": {
+     "http": 200,
+     "final_path": "/manufacturing/case-studies",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/administration": {
+     "http": 200,
+     "final_path": "/manufacturing/administration",
+     "no_access": false,
+     "not_found": false
+    }
+   },
+   "sidebar": [
+    "/",
+    "/dashboard/settings",
+    "/ingestion",
+    "/risk-cases",
+    "/suppliers",
+    "/zero-trust"
+   ]
+  },
+  "process_owner": {
+   "demo_login": 200,
+   "pages": {
+    "/": {
+     "http": 200,
+     "final_path": "/login",
+     "no_access": false,
+     "not_found": false
+    },
+    "/risk-cases": {
+     "http": 200,
+     "final_path": "/risk-cases",
+     "no_access": false,
+     "not_found": false
+    },
+    "/suppliers": {
+     "http": 200,
+     "final_path": "/suppliers",
+     "no_access": false,
+     "not_found": false
+    },
+    "/ingestion": {
+     "http": 200,
+     "final_path": "/ingestion",
+     "no_access": false,
+     "not_found": false
+    },
+    "/zero-trust": {
+     "http": 200,
+     "final_path": "/zero-trust",
+     "no_access": false,
+     "not_found": false
+    },
+    "/dashboard/settings": {
+     "http": 200,
+     "final_path": "/dashboard/settings",
+     "no_access": false,
+     "not_found": false
+    },
+    "/compliance": {
+     "http": 200,
+     "final_path": "/compliance",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/material-cost": {
+     "http": 200,
+     "final_path": "/manufacturing/material-cost",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/erp-mapping": {
+     "http": 200,
+     "final_path": "/manufacturing/erp-mapping",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/forecasting": {
+     "http": 200,
+     "final_path": "/manufacturing/forecasting",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/validation": {
+     "http": 200,
+     "final_path": "/manufacturing/validation",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/case-studies": {
+     "http": 200,
+     "final_path": "/manufacturing/case-studies",
+     "no_access": false,
+     "not_found": false
+    },
+    "/manufacturing/administration": {
+     "http": 200,
+     "final_path": "/manufacturing/administration",
+     "no_access": false,
+     "not_found": false
+    }
+   },
+   "sidebar": [
+    "/",
+    "/dashboard/settings",
+    "/ingestion",
+    "/risk-cases",
+    "/suppliers",
+    "/zero-trust"
+   ]
+  }
+ },
+ "layout": {
+  "1366": {
+   "/": {
+    "page_overflow_px": 0
+   },
+   "/risk-cases": {
+    "page_overflow_px": 0
+   },
+   "/suppliers": {
+    "page_overflow_px": 0
+   },
+   "/ingestion": {
+    "page_overflow_px": 0
+   },
+   "/zero-trust": {
+    "page_overflow_px": 0
+   },
+   "/dashboard/settings": {
+    "page_overflow_px": 0
+   },
+   "/compliance": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/material-cost": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/erp-mapping": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/forecasting": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/validation": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/case-studies": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/administration": {
+    "page_overflow_px": 0
+   }
+  },
+  "1440": {
+   "/": {
+    "page_overflow_px": 0
+   },
+   "/risk-cases": {
+    "page_overflow_px": 0
+   },
+   "/suppliers": {
+    "page_overflow_px": 0
+   },
+   "/ingestion": {
+    "page_overflow_px": 0
+   },
+   "/zero-trust": {
+    "page_overflow_px": 0
+   },
+   "/dashboard/settings": {
+    "page_overflow_px": 0
+   },
+   "/compliance": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/material-cost": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/erp-mapping": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/forecasting": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/validation": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/case-studies": {
+    "page_overflow_px": 0
+   },
+   "/manufacturing/administration": {
+    "page_overflow_px": 0
+   }
+  }
+ },
+ "console_hits": [
+  {
+   "where": "login",
+   "type": "verbose",
+   "text": "[DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o"
+  },
+  {
+   "where": "login",
+   "type": "verbose",
+   "text": "[DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o"
+  }
+ ],
+ "url_hits": [],
+ "logout": {
+  "lands_on": "/login",
+  "protected_page_after_logout": "/login",
+  "me_without_cookie": 401,
+  "old_token_still_accepted": true
+ },
+ "login": {
+  "messages": {
+   "admin@tris.internal": "Invalid username or password",
+   "nobody@example.com": "Invalid username or password"
+  },
+  "same_message": true,
+  "stays_on_login": true
+ }
+}

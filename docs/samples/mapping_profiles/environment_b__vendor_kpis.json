@@ -1,0 +1,13 @@
+{
+  "name": "Environment B: Vendor KPIs",
+  "description": "Sheet 'Vendor KPIs' of environment_b_industrial.xlsx matched to supplier_operations_metrics.",
+  "source_profile": "generic",
+  "target": "supplier_operations_metrics",
+  "field_mapping": {
+    "supplier_id": "Vendor Code",
+    "metric_date": "Month",
+    "lead_time_days": "Lead Days",
+    "on_time_delivery_rate": "Delivered On Time"
+  },
+  "defaults": {}
+}

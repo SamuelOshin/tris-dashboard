@@ -1,0 +1,14 @@
+{
+  "name": "Environment B: Stock",
+  "description": "Sheet 'Stock' of environment_b_industrial.xlsx matched to inventory_records.",
+  "source_profile": "generic",
+  "target": "inventory_records",
+  "field_mapping": {
+    "material_id": "Part No",
+    "snapshot_date": "Count Date",
+    "quantity_on_hand": "Units In Stock",
+    "inventory_value": "Stock Value",
+    "currency": "Cur"
+  },
+  "defaults": {}
+}

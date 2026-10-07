@@ -1,0 +1,16 @@
+{
+  "name": "SAP-style demonstration: purchase records",
+  "description": "Columns of sap_style_purchases.csv matched to the standard purchase_records fields.",
+  "source_profile": "sap_style",
+  "target": "purchase_records",
+  "field_mapping": {
+    "purchase_reference": "EBELN",
+    "material_id": "MATNR",
+    "supplier_id": "LIFNR",
+    "purchase_date": "BEDAT",
+    "quantity": "MENGE",
+    "unit_price": "NETPR",
+    "currency": "WAERS"
+  },
+  "defaults": {}
+}

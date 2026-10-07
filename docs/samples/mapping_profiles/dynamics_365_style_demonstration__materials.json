@@ -1,0 +1,13 @@
+{
+  "name": "Dynamics 365-style demonstration: materials",
+  "description": "Columns of dynamics_style_materials.csv matched to the standard materials fields.",
+  "source_profile": "dynamics_style",
+  "target": "materials",
+  "field_mapping": {
+    "material_id": "ItemNumber",
+    "description": "ProductName",
+    "category": "ItemGroupId",
+    "unit_of_measure": "UnitId"
+  },
+  "defaults": {}
+}

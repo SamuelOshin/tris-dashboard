@@ -1,0 +1,13 @@
+{
+  "name": "SAP-style demonstration: materials",
+  "description": "Columns of sap_style_materials.csv matched to the standard materials fields.",
+  "source_profile": "sap_style",
+  "target": "materials",
+  "field_mapping": {
+    "material_id": "MATNR",
+    "description": "MAKTX",
+    "category": "MATKL",
+    "unit_of_measure": "MEINS"
+  },
+  "defaults": {}
+}

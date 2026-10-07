@@ -1,5 +1,11 @@
 # TRIS v1.4 — Test Execution & Acceptance Report
 
+> **v2.0 addendum (2026-10-07).** This report is the v1.4 baseline run and is unchanged below. The v2.0 full run of the same
+> suite plus the manufacturing extension is **431 passed, 1 skipped, 0 failed** (`docs/evidence/ticket-14/backend_regression.txt`).
+> Every one of the 127 baseline tests still passes (`docs/evidence/ticket-14/regression_diff.txt`). The one skipped test is an
+> evidence-writing test that runs only when `TRANSFER_EVIDENCE_DIR` is set.
+
+
 **Execution Timestamp**: `2026-09-29T21:20Z` (suite completed)
 **Test Runner**: `pytest 9.1.1` · `Python 3.12.10` · `FastAPI 0.141.1` · `SQLModel 0.0.22`
 **Database**: PostgreSQL 16 (required — no SQLite fallback; the suite provisions `tris_db_test` and resets its schema)

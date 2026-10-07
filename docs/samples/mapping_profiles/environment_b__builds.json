@@ -1,0 +1,14 @@
+{
+  "name": "Environment B: Builds",
+  "description": "Sheet 'Builds' of environment_b_industrial.xlsx matched to production_records.",
+  "source_profile": "generic",
+  "target": "production_records",
+  "field_mapping": {
+    "product_sku": "Assembly",
+    "period_start": "From",
+    "period_end": "To",
+    "actual_volume": "Built",
+    "unit_of_measure": "Meas Unit"
+  },
+  "defaults": {}
+}

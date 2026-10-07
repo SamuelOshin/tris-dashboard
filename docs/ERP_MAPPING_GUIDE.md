@@ -93,6 +93,20 @@ their own copy of the mapping they used.
 
 These limits are enforced on the server, not only in the interface.
 
+### Profile definitions that ship with the repository
+
+`docs/samples/mapping_profiles/` holds 19 ready-made profile definitions: the generic layout for each of the seven
+canonical files, the SAP-style and Dynamics 365-style demonstrations for the sample files, and the seven sheets of Environment B.
+Each file is the exact body that the save-profile request accepts. As an administrator, load one with (signed in, the session
+cookie in `cookies.txt`):
+
+```bash
+curl -b cookies.txt -H "Content-Type: application/json"   -d @docs/samples/mapping_profiles/sap_style_demonstration__purchase_records.json   http://localhost:8000/api/v1/manufacturing/mapping/profiles
+```
+
+They were produced by `docs/evidence/ticket-14/export_mapping_profiles.py` from the application's own column suggestions and from
+`ENVIRONMENT_B_MAPPINGS`. Profiles you save in the application live in its database and are not in these files.
+
 ## Worked examples (synthetic files)
 
 | Example | Files | What it shows |

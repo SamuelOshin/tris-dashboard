@@ -668,7 +668,7 @@ export default function IngestionPage() {
               {[
                 { label: 'Suppliers', val: report.suppliers_loaded ?? 8, sub: 'Loaded clean', href: '/suppliers' },
                 { label: 'Transactions', val: report.transactions_loaded ?? 19, sub: 'Invoices imported', href: '/suppliers' },
-                { label: 'Approvals', val: report.approvals_loaded ?? 15, sub: 'Approval history', href: '/compliance' },
+                { label: 'Approvals', val: report.approvals_loaded ?? 15, sub: 'Approval history', href: '/suppliers' },
                 { label: 'Access Events', val: report.access_events_loaded ?? 10, sub: 'Activity logs', href: '/zero-trust' },
                 { label: 'Detection Rules', val: report.rules_loaded ?? 6, sub: 'Rules evaluated', href: '/dashboard/settings' },
                 { label: 'Seeded Cases', val: report.cases_loaded ?? 2, sub: 'Cases flagged', href: '/fraud-detection' },

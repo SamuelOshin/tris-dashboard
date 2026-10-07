@@ -1,0 +1,15 @@
+{
+  "name": "Generic layout: material costs",
+  "description": "Columns of generic_material_costs.csv matched to the standard material_costs fields.",
+  "source_profile": "generic",
+  "target": "material_costs",
+  "field_mapping": {
+    "material_id": "material_id",
+    "version": "version",
+    "effective_from": "effective_from",
+    "effective_to": "effective_to",
+    "standard_cost": "standard_cost",
+    "currency": "currency"
+  },
+  "defaults": {}
+}

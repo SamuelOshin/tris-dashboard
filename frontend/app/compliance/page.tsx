@@ -1,18 +1,10 @@
-import { DashboardLayout } from '@/components/dashboard-layout'
-import { ComplianceDashboard } from '@/components/compliance/dashboard'
+import { redirect } from 'next/navigation'
 
-export const metadata = {
-  title: 'Compliance & Reporting - TRIS',
-  description: 'Regulatory compliance and audit trail reporting',
-}
-
+/**
+ * The v1.x Compliance & Reporting page showed fixed sample figures (a compliance score, framework
+ * statuses and an invented audit trail), not real events. It is no longer reachable: the real audit
+ * log is on Manufacturing > Administration (administrators).
+ */
 export default function CompliancePage() {
-  return (
-    <DashboardLayout
-      title="Compliance & Reporting"
-      description="Regulatory audits, compliance status, and automated reporting"
-    >
-      <ComplianceDashboard />
-    </DashboardLayout>
-  )
+  redirect('/')
 }
