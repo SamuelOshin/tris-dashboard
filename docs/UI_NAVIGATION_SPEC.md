@@ -3,6 +3,9 @@
 Screens, navigation, who sees what, and the key action on each page. Screenshots of every manufacturing screen are
 in `docs/evidence/ticket-13/screenshots/` (index in `docs/evidence/ticket-13/SCREENSHOT_CHECKLIST.md`).
 
+The top bar carries an **Evaluation · Synthetic data** label on every page. The Material Cost page shows the dataset and the
+data date in its summary; the other manufacturing pages use all data.
+
 The manufacturing screens are part of the existing TRIS shell (left navigation, top bar, page header). They are not a
 second application. The shell, sign-in page and v1.4 pages are unchanged.
 
@@ -42,10 +45,13 @@ section; the backend also refuses their requests. Every manufacturing page has t
 ## 3. Pages
 
 ### Material Cost Intelligence — `/manufacturing/material-cost`
-Purpose: one row per material with price trend, deviation from standard cost, spend, stock cover, signals and risk
-score. Filters: search, category, supplier, product, signal, dataset, date. Key actions: **Calculate risk scores**
+Purpose: one row per material with price trend, deviation from standard cost, spend, stock cover, signals, risk
+score and the stored 30- and 90-day forecasts and 90-day projected exposure ("Not run" where none is stored).
+Filters: search, category, supplier, product, signal, **risk level**, dataset, date. **Export table (CSV)** saves exactly
+the rows shown, with plain numbers (no display formatting), the stored forecasts and exposure, the signals and the data date. Key actions: **Calculate risk scores**
 (reviewer/admin); click a row to open the **material detail** panel: price series, supplier spend, every signal with
-its explanation, the **risk score with each factor's points and plain-language reason**, and **Open a case** when the
+its explanation, a **Forecast and exposure** section (30- and 90-day value, range, model name and version, forecast
+date, dataset version, and the 90-day exposure, all read from stored runs), the **risk score with each factor's points and plain-language reason**, and **Open a case** when the
 latest stored score is High or Critical (or a link to the open case). Shows the data date, the calculation time and
 currency per row (euro and dollar rows are never added together).
 
@@ -92,6 +98,23 @@ labelled). **Saved mappings**: the saved column mappings, with delete. **Audit l
 happened, who, dates) and paged trail of imports, mapping and weight changes, forecast, scoring and validation runs,
 opened material cases, model switches, dataset labels, rule edits and sign-ins. Other roles do not see the page in the
 menu and get the no-access state if they open the address; the backend refuses their requests.
+
+### Sign-in page — `/login`
+Email, password, show/hide, Remember me, Forgot password, the evaluation-environment label. On a demonstration deployment
+(`DEMO_LOGIN_ENABLED=true`) a **Demo environment: sign in as** panel offers one button per role with a line on what the
+role can do; the user menu then has **Switch demo role**, and the Administration page warns that changes are shared. With the
+switch off, none of these appears. Five failed sign-ins for the same typed identifier (a username and an email are counted separately) pause sign-in for that identifier for 15 minutes ("Too many attempts"); a successful sign-in does not reset the count.
+
+### Dashboard — `/` (manufacturing summary)
+Below the existing risk overview, for admin, reviewer and read-only reviewer only (other roles see the dashboard as
+before): four cards (**High-risk materials**, **Projected material-cost exposure, next 90 days**, **Materials with a
+30-day forecast increase**, **Supplier concentration exposure**), a **Material-cost risk trend** bar chart and a **Top
+materials by projected exposure** table, each row linking to the material and to its open case. Definitions: high-risk
+means the newest stored score is High or Critical; a 30-day increase means the stored 30-day forecast is above the last
+price; supplier concentration exposure is the last 12 months' spend on materials whose "Dependence on one supplier" signal
+is triggered; the trend has one bar per set of saved scores (data date and weight version). Everything is read from stored
+results; amounts in different currencies are shown and ranked separately; a part with nothing stored says why instead
+of showing zero.
 
 ### Settings & Governance — `/dashboard/settings`
 v1.4: detection rule weights and switches (R-001 to R-007), account profile, user administration (admin). Manufacturing

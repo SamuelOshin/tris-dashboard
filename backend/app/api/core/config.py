@@ -52,6 +52,12 @@ class Settings(BaseSettings):
     )
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    DEMO_LOGIN_ENABLED: bool = False
+    """One-click sign-in as the demo roles. Demo deployments only: it needs no password."""
+    LOGIN_MAX_FAILURES: int = 5
+    """Failed sign-ins for one account within the window before sign-in is paused."""
+    LOGIN_LOCKOUT_MINUTES: int = 15
+    """Length of the window, and of the pause."""
 
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 

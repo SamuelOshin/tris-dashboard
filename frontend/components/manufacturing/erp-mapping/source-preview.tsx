@@ -17,7 +17,7 @@ interface Props {
 /** The column and sample-row preview shown before any mapping is committed. */
 export function SourcePreview({ preview, onSheetChange }: Props) {
   return (
-    <section className="space-y-3 rounded-xl border border-border bg-card p-5">
+    <section className="space-y-3 tris-surface p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Source file preview</h2>

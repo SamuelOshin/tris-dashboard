@@ -37,7 +37,7 @@ export function WeightsTab({ list, saving, onSave }: Props) {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-xl border border-border bg-card p-5">
+      <section className="tris-surface p-5">
         <h3 className="text-sm font-semibold text-foreground">Risk score weights — version {active.version} is active</h3>
         <p className="mt-1 text-xs text-muted-foreground">
           Saving creates a new version; earlier versions and every score already calculated stay as they were. Each
@@ -104,7 +104,7 @@ export function WeightsTab({ list, saving, onSave }: Props) {
           </Button>
         </div>
       </section>
-      <section className="rounded-xl border border-border bg-card p-5">
+      <section className="tris-surface p-5">
         <h3 className="text-sm font-semibold text-foreground">Versions</h3>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full min-w-[560px] text-left text-xs">

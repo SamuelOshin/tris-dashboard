@@ -20,6 +20,8 @@ interface Props {
   overview: Overview
   onChange: (key: keyof Filters, value: string) => void
   onClear: () => void
+  level: string
+  onLevelChange: (value: string) => void
 }
 
 function Choice(props: {
@@ -45,9 +47,14 @@ function Choice(props: {
   )
 }
 
+const RISK_LEVEL_OPTIONS = ['Critical', 'High', 'Moderate', 'Low', 'Not scored'].map((v) => ({
+  value: v,
+  label: v,
+}))
+
 const asOptions = (values: string[] = []) => values.map((v) => ({ value: v, label: v }))
 
-export function FilterBar({ filters, overview, onChange, onClear }: Props) {
+export function FilterBar({ filters, overview, onChange, onClear, level, onLevelChange }: Props) {
   const options = overview.filter_options
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -70,6 +77,7 @@ export function FilterBar({ filters, overview, onChange, onClear }: Props) {
       <Choice label="Signal" value={filters.signal}
         options={overview.signal_catalog.map((s) => ({ value: s.code, label: s.name }))}
         onChange={(v) => onChange('signal', v)} />
+      <Choice label="Risk level" value={level} options={RISK_LEVEL_OPTIONS} onChange={onLevelChange} />
       {overview.datasets.length > 0 && (
         <Choice label="Dataset" value={filters.dataset} options={asOptions(overview.datasets)}
           onChange={(v) => onChange('dataset', v)} />
@@ -81,7 +89,7 @@ export function FilterBar({ filters, overview, onChange, onClear }: Props) {
         aria-label="Data up to date"
         className="w-40"
       />
-      {(hasActiveFilters(filters) || filters.asOf) && (
+      {(hasActiveFilters(filters) || filters.asOf || level) && (
         <Button variant="ghost" size="sm" onClick={onClear}>
           <X />
           Clear filters

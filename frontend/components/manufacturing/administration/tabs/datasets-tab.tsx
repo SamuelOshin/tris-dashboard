@@ -27,7 +27,7 @@ export function DatasetsTab({ datasets, busy, onLabel }: Props) {
         recorded in the audit log. A dataset starts as not labelled.
       </p>
       {datasets.map((d) => (
-        <section key={d.dataset_id} className="rounded-xl border border-border bg-card p-5">
+        <section key={d.dataset_id} className="tris-surface p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h3 className="text-sm font-semibold text-foreground">{d.dataset_id}</h3>

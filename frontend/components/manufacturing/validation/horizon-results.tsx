@@ -42,7 +42,7 @@ function Matrix({ w }: { w: HorizonMetrics['warning'] }) {
 export function HorizonResults({ days, h }: { days: string; h: HorizonMetrics }) {
   const f = h.forecast
   return (
-    <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+    <section className="space-y-4 tris-surface p-5">
       <div>
         <h3 className="text-sm font-semibold text-foreground">{days}-day outlook</h3>
         <p className="text-xs text-muted-foreground">

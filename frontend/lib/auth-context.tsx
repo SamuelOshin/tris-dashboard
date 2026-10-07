@@ -16,6 +16,7 @@ export type UserRole =
 
 export interface User {
   id: string
+  username?: string
   name: string
   email: string
   role: UserRole
@@ -27,6 +28,7 @@ interface AuthContextType {
   user: User | null
   loading: boolean
   login: (emailOrUsername: string, password: string) => Promise<void>
+  loginAsDemo: (role: string) => Promise<void>
   logout: () => void
   hasPermission: (roles: UserRole[]) => boolean
   refreshUser: () => Promise<void>
@@ -37,6 +39,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 function mapBackendUser(beUser: BackendUser): User {
   return {
     id: beUser.user_id,
+    username: beUser.username,
     name: beUser.name,
     email: beUser.email,
     role: beUser.role.toLowerCase() as UserRole,
@@ -76,6 +79,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // No localStorage storage. No document.cookie token write.
   }
 
+  const loginAsDemo = async (role: string) => {
+    const { user: beUser } = await api.demoLogin(role)
+    resetSessionRedirectFlag()
+    setUser(mapBackendUser(beUser))
+  }
+
   const logout = () => {
     resetSessionRedirectFlag()
     api.logout().catch(() => {})
@@ -96,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, hasPermission, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, login, loginAsDemo, logout, hasPermission, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

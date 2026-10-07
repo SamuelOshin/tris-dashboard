@@ -99,7 +99,7 @@ export function ExposureWorkspace() {
       )}
 
       {missing.length > 0 && (
-        <details className="rounded-xl border border-border bg-card px-4 py-3 text-sm">
+        <details className="tris-surface px-4 py-3 text-sm">
           <summary className="cursor-pointer font-medium text-foreground">
             {missing.length} materials without a stored {ws.horizon}-day forecast
           </summary>

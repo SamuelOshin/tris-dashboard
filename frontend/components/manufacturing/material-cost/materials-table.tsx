@@ -8,10 +8,13 @@ import { RiskBadge } from '../risk-score/risk-badge'
 import type { ScoreSummary } from '../risk-score/types'
 import { SignalChips } from './signal-chips'
 import type { MaterialRow } from './types'
+import type { StoredResult } from '../dashboard/types'
+import { ExposureCell, ForecastCell } from './stored-cells'
 
 interface Props {
   rows: MaterialRow[]
   scores: Record<string, ScoreSummary>
+  results: Record<string, StoredResult>
   onOpen: (materialId: string) => void
 }
 
@@ -20,10 +23,10 @@ function Cell({ children, className = '' }: { children: React.ReactNode; classNa
 }
 
 /** One row per material. Every number comes from the stored purchase, cost and stock records. */
-export function MaterialsTable({ rows, scores, onOpen }: Props) {
+export function MaterialsTable({ rows, scores, results, onOpen }: Props) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-card">
-      <table className="w-full min-w-[1040px] text-left text-sm">
+    <div className="overflow-x-auto tris-surface">
+      <table className="w-full min-w-[1400px] text-left text-sm">
         <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
           <tr>
             <th className="px-3 py-2 font-medium">Material</th>
@@ -35,6 +38,9 @@ export function MaterialsTable({ rows, scores, onOpen }: Props) {
             <th className="px-3 py-2 font-medium">Main supplier</th>
             <th className="px-3 py-2 font-medium">Stock cover</th>
             <th className="px-3 py-2 font-medium">Risk score</th>
+            <th className="px-3 py-2 font-medium">30-day forecast</th>
+            <th className="px-3 py-2 font-medium">90-day forecast</th>
+            <th className="px-3 py-2 font-medium" title="Extra cost over the last price for 90 days of usage, and as a share of that spend">Exposure, 90 days</th>
             <th className="px-3 py-2 font-medium">Signals</th>
           </tr>
         </thead>
@@ -107,6 +113,15 @@ export function MaterialsTable({ rows, scores, onOpen }: Props) {
               </Cell>
               <Cell>
                 <RiskBadge score={scores[row.material_id]} />
+              </Cell>
+              <Cell>
+                <ForecastCell forecast={results[row.material_id]?.forecasts['30']} currency={row.currency} />
+              </Cell>
+              <Cell>
+                <ForecastCell forecast={results[row.material_id]?.forecasts['90']} currency={row.currency} />
+              </Cell>
+              <Cell>
+                <ExposureCell exposure={results[row.material_id]?.exposure} />
               </Cell>
               <Cell>
                 <SignalChips signals={row.signals} />

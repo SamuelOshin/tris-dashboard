@@ -1,5 +1,7 @@
 'use client'
 
+import { SHOW_EVALUATION_LABEL } from '@/lib/environment'
+import { DemoAccountsPanel } from '@/components/login/demo-accounts-panel'
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -160,7 +162,7 @@ export function LoginForm() {
 
         {/* Footer */}
         <div className="relative z-10 pt-4 border-t border-slate-800/60 text-[11px] font-mono text-slate-500">
-          <p>Evaluation environment · Synthetic test data only</p>
+          {SHOW_EVALUATION_LABEL && <p>Evaluation environment · Synthetic test data only</p>}
         </div>
       </div>
 
@@ -320,6 +322,7 @@ export function LoginForm() {
             </Button>
           </form>
 
+          <DemoAccountsPanel redirectTo={redirectTarget} />
         </div>
 
         {/* Bottom Trust & Legal Links */}

@@ -202,3 +202,9 @@
   color: inherit !important;
 }
 
+
+/* One card surface for every page: the same look as the Card component used on the dashboard
+   (borderless, soft shadow, #16181f in dark mode). Manufacturing screens use this class. */
+@utility tris-surface {
+  @apply rounded-2xl border-0 bg-card text-card-foreground shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] dark:bg-[#16181f] dark:shadow-[0_10px_35px_rgba(0,0,0,0.35)];
+}

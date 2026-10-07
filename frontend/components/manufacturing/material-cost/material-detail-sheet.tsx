@@ -12,6 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate, formatMoney, formatTimestamp, STATUS_LABEL } from './material-cost-guards'
 import { PriceTrend } from './price-trend'
 import { RiskScoreSection } from '../risk-score/risk-score-section'
+import { StoredForecastSection } from './stored-forecast-section'
+import type { StoredResult } from '../dashboard/types'
 import type { MaterialDetail, SignalDetail } from './types'
 
 interface Props {
@@ -19,6 +21,7 @@ interface Props {
   loading: boolean
   detail: MaterialDetail | null
   dataset: string
+  stored?: StoredResult
   onRiskChanged: () => void
   onClose: () => void
 }
@@ -58,10 +61,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Body({
   detail,
   dataset,
+  stored,
   onRiskChanged,
 }: {
   detail: MaterialDetail
   dataset: string
+  stored?: StoredResult
   onRiskChanged: () => void
 }) {
   const products = detail.signals.find((s) => s.code === 'bom_cost_escalation')?.details
@@ -74,6 +79,7 @@ function Body({
         dataset={dataset}
         onChanged={onRiskChanged}
       />
+      <StoredForecastSection stored={stored} asOf={detail.as_of} />
       <Section title="Signals">
         <SignalList signals={detail.signals} />
       </Section>
@@ -124,7 +130,15 @@ function Body({
   )
 }
 
-export function MaterialDetailSheet({ open, loading, detail, dataset, onRiskChanged, onClose }: Props) {
+export function MaterialDetailSheet({
+  open,
+  loading,
+  detail,
+  dataset,
+  stored,
+  onRiskChanged,
+  onClose,
+}: Props) {
   return (
     <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
@@ -140,7 +154,7 @@ export function MaterialDetailSheet({ open, loading, detail, dataset, onRiskChan
             <Skeleton className="h-40 w-full" />
           </div>
         )}
-        {detail && <Body detail={detail} dataset={dataset} onRiskChanged={onRiskChanged} />}
+        {detail && <Body detail={detail} dataset={dataset} stored={stored} onRiskChanged={onRiskChanged} />}
       </SheetContent>
     </Sheet>
   )

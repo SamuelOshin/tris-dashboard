@@ -47,7 +47,7 @@ export function ProblemsPanel({ run }: { run: RunDetail }) {
   if (!p) return null
   const gaps = Object.entries(p.not_forecast_or_evaluated)
   return (
-    <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+    <section className="space-y-4 tris-surface p-5">
       <h3 className="text-sm font-semibold text-foreground">Problems and gaps</h3>
       <p className="text-xs text-muted-foreground">
         {p.worse_than_naive_cases} judged case(s) were further from the real price than simply assuming it would stay

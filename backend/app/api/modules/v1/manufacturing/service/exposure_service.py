@@ -62,7 +62,7 @@ def _stored(run: ForecastRun) -> StoredForecast:
     )
 
 
-async def _latest_runs(
+async def latest_runs(
     session: AsyncSession, cutoff: date, horizon_days: int, dataset_id: str | None
 ) -> dict[str, ForecastRun]:
     """Newest stored run per material for this date, horizon and dataset scope."""
@@ -202,7 +202,7 @@ async def calculate_exposure(
     materials, _ = await loader.load_material_data(session, cutoff, dataset_id)
     if material_id and not any(m.material_id == material_id for m in materials):
         raise NotFoundError(f"Material '{material_id}' was not found in the analysed data.")
-    runs = await _latest_runs(session, cutoff, horizon_days, dataset_id)
+    runs = await latest_runs(session, cutoff, horizon_days, dataset_id)
     volumes = await _volumes(session, cutoff, dataset_id)
 
     inputs: list[ExposureInput] = []

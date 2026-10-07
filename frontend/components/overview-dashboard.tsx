@@ -9,6 +9,7 @@ import { useLedgerTelemetry } from '@/components/overview/hooks/use-ledger-telem
 import { HeroTelemetryCard } from '@/components/overview/tabs/hero-telemetry-card'
 import { RiskVolumeBreakdown } from '@/components/overview/tabs/risk-volume-breakdown'
 import { InvoiceLedgerTable } from '@/components/overview/tabs/invoice-ledger-table'
+import { ManufacturingSummary } from '@/components/manufacturing/dashboard/manufacturing-summary'
 
 /**
  * Overview dashboard conductor.
@@ -83,6 +84,8 @@ export function OverviewDashboard() {
           transactionCount: data.transactions.length,
         }}
       />
+
+      <ManufacturingSummary />
 
       <RiskVolumeBreakdown
         exposure={metrics.exposure}

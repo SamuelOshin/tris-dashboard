@@ -101,6 +101,15 @@ DEMO_PERSONAS = [
         "role": "process_owner",
         "department": "Operations",
     },
+    {
+        "user_id": "usr-ro-09",
+        "username": "readonly",
+        "name": "Read-Only Reviewer",
+        "email": "readonly@tris.internal",
+        "password": "password123",
+        "role": "read_only_reviewer",
+        "department": "Risk Management",
+    },
 ]
 
 

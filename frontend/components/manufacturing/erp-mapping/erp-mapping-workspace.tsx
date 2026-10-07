@@ -41,7 +41,7 @@ export function ErpMappingWorkspace() {
 
   if (!canImportData(user?.role)) {
     return (
-      <div className="rounded-xl border border-border bg-card px-6 py-12 text-center">
+      <div className="tris-surface px-6 py-12 text-center">
         <h2 className="text-base font-semibold text-foreground">Importing data is restricted</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
           Your account can review results but cannot upload or map source files. Contact an

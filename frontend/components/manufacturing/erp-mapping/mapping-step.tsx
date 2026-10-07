@@ -39,7 +39,7 @@ export function MappingStep({ ws, canSaveProfiles }: Props) {
         onDefaultChange={ws.setFieldDefault}
       />
 
-      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+      <section className="space-y-4 tris-surface p-5">
         <h2 className="text-sm font-semibold text-foreground">3. Check and import</h2>
         <div className="flex flex-wrap gap-4">
           <div className="grid gap-1.5">

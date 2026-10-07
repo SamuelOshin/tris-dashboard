@@ -15,6 +15,12 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class DemoLoginRequest(BaseModel):
+    """One-click demo sign-in: the role to sign in as."""
+
+    role: str = Field(..., max_length=50)
+
+
 class UserProfileUpdate(BaseModel):
     """User profile update request payload."""
 

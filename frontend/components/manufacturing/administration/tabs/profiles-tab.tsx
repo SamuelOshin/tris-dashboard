@@ -21,7 +21,7 @@ export function ProfilesTab({ profiles, busy, onDelete }: Props) {
     )
   }
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-card">
+    <div className="overflow-x-auto tris-surface">
       <table className="w-full min-w-[640px] text-left text-sm">
         <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
           <tr>

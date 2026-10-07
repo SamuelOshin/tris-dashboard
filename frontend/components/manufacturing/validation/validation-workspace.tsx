@@ -47,7 +47,7 @@ export function ValidationWorkspace() {
       {ws.detailLoading && <Skeleton className="h-48 w-full" />}
       {run && !ws.detailLoading && (
         <div className="space-y-5">
-          <div className="rounded-xl border border-border bg-card p-5 text-xs text-muted-foreground">
+          <div className="tris-surface p-5 text-xs text-muted-foreground">
             <p className="text-sm font-semibold text-foreground">{run.run_id}</p>
             <p>
               Saved {formatTimestamp(run.created_at)} · data up to {formatDate(run.data_end)} ·{' '}
@@ -70,7 +70,7 @@ export function ValidationWorkspace() {
                 <HorizonResults key={days} days={days} h={h} />
               ))}
               <ProblemsPanel run={run} />
-              <section className="rounded-xl border border-border bg-card p-5">
+              <section className="tris-surface p-5">
                 <h3 className="text-sm font-semibold text-foreground">Limitations</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground">
                   {run.limitations.map((l) => (

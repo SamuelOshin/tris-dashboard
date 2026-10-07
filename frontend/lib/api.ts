@@ -499,6 +499,18 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
   return json.data
 }
 
+export interface DemoAccount {
+  key: string
+  username: string
+  label: string
+  description: string
+}
+
+export interface DemoAccounts {
+  enabled: boolean
+  accounts: DemoAccount[]
+}
+
 export const api = {
   // Auth
   login: async (username: string, password: string): Promise<{ user: User }> => {
@@ -526,6 +538,21 @@ export const api = {
     }
     // Web client relies strictly on the server-set HttpOnly cookie.
     // The JSON access_token is ignored and not exposed to the application.
+    return { user }
+  },
+
+  /** Whether one-click demo sign-in is on, and the roles it offers (never passwords). */
+  demoAccounts: async (): Promise<DemoAccounts> => {
+    return request<DemoAccounts>('/auth/demo-accounts', { silent: true })
+  },
+
+  /** Sign in as a demo role without a password (the server refuses unless the demo switch is on). */
+  demoLogin: async (role: string): Promise<{ user: User }> => {
+    const user = await request<User>('/auth/demo-login', {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+      silent: true,
+    })
     return { user }
   },
 

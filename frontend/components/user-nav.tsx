@@ -19,13 +19,30 @@ import {
   ShieldAlert,
 } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { useDemoAccounts } from '@/components/login/hooks/use-demo-accounts'
 
 export function UserNav() {
-  const { user, logout } = useAuth()
+  const { user, logout, loginAsDemo } = useAuth()
+  const demoAccounts = useDemoAccounts()
   const router = useRouter()
   const [open, setOpen] = useState(false)
 
   if (!user) return null
+
+  // A demo visitor can move between roles without signing out and in again.
+  const isDemoUser = demoAccounts.some((a) => a.username === user.username)
+  const switchRole = async (key: string, label: string) => {
+    try {
+      await loginAsDemo(key)
+      setOpen(false)
+      toast.success(`Now signed in as ${label}`)
+      router.push('/')
+      router.refresh()
+    } catch {
+      toast.error('Demo sign-in is not available right now.')
+    }
+  }
 
   const handleSignOut = async () => {
     setOpen(false)
@@ -171,6 +188,25 @@ export function UserNav() {
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
           </Link>
         </div>
+
+        {isDemoUser && (
+          <div className="border-t border-border/30 p-2 text-xs">
+            <div className="px-2.5 py-1.5 text-[10px] font-mono font-semibold uppercase text-muted-foreground/70 tracking-wider">
+              Switch demo role
+            </div>
+            {demoAccounts
+              .filter((a) => a.username !== user.username)
+              .map((a) => (
+                <button
+                  key={a.key}
+                  onClick={() => switchRole(a.key, a.label)}
+                  className="w-full rounded-xl px-2.5 py-1.5 text-left text-muted-foreground transition-colors hover:bg-muted/30 hover:text-foreground cursor-pointer"
+                >
+                  {a.label}
+                </button>
+              ))}
+          </div>
+        )}
 
         {/* Footer / Logout */}
         <div className="p-2 border-t border-border/30 bg-muted/10">

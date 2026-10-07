@@ -39,7 +39,7 @@ export function FieldMappingTable(props: Props) {
   const sample = preview.sample_rows[0] ?? {}
 
   return (
-    <section className="space-y-3 rounded-xl border border-border bg-card p-5">
+    <section className="space-y-3 tris-surface p-5">
       <div>
         <h2 className="text-sm font-semibold text-foreground">2. Match columns to TRIS fields</h2>
         <p className="text-xs text-muted-foreground">

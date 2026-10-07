@@ -10,8 +10,8 @@ export function formatMoney(value: number | null | undefined, currency?: string 
     style: code ? 'currency' : 'decimal',
     currency: code ?? undefined,
     // Large amounts are shown in whole units; unit prices keep up to four decimals.
-    minimumFractionDigits: value >= 100 ? 0 : 2,
-    maximumFractionDigits: value >= 100 ? 0 : 4,
+    minimumFractionDigits: Math.abs(value) >= 100 ? 0 : 2,
+    maximumFractionDigits: Math.abs(value) >= 100 ? 0 : 4,
   }).format(value)
 }
 

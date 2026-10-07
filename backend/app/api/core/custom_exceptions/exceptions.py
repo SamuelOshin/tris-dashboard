@@ -115,6 +115,13 @@ class AuthenticationError(CustomDomainException):
         super().__init__(message=message, code="AUTHENTICATION_FAILED")
 
 
+class TooManyAttemptsError(CustomDomainException):
+    """Raised when sign-in is temporarily refused after repeated failed attempts."""
+
+    def __init__(self, message: str = "Too many attempts. Try again later."):
+        super().__init__(message=message, code="TOO_MANY_ATTEMPTS")
+
+
 class PermissionDeniedError(CustomDomainException):
     """Raised when the current user does not have permission to execute an action."""
 

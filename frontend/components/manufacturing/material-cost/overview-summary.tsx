@@ -3,7 +3,7 @@ import type { Overview } from './types'
 
 function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-border bg-card px-4 py-3">
+    <div className="tris-surface px-4 py-3">
       <p className="text-2xl font-semibold tabular-nums text-foreground">{value}</p>
       <p className="text-xs font-medium text-foreground">{label}</p>
       {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
@@ -12,7 +12,7 @@ function Tile({ label, value, hint }: { label: string; value: string; hint?: str
 }
 
 /** Headline counts and provenance (data date, calculation time), all taken from the response. */
-export function OverviewSummary({ overview }: { overview: Overview }) {
+export function OverviewSummary({ overview, dataset }: { overview: Overview; dataset: string }) {
   const summary = overview.summary
   if (!summary) return null
   const currency = summary.currencies.length === 1 ? summary.currencies[0] : null
@@ -49,7 +49,7 @@ export function OverviewSummary({ overview }: { overview: Overview }) {
         <Tile
           label="Data up to"
           value={formatDate(overview.as_of)}
-          hint={`Calculated ${formatTimestamp(overview.computed_at)}`}
+          hint={`Dataset: ${dataset || 'all data'} · calculated ${formatTimestamp(overview.computed_at)}`}
         />
       </div>
     </section>

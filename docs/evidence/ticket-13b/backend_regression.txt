@@ -1,0 +1,52 @@
+..................................................F..................... [ 16%]
+........................................................................ [ 33%]
+........................................................................ [ 50%]
+........................................................................ [ 66%]
+........................................................................ [ 83%]
+.........................s.............................................  [100%]
+================================== FAILURES ===================================
+_________ test_when_off_the_list_is_empty_and_signing_in_is_not_found _________
+tests\modules\v1\test_demo_login.py:62: in test_when_off_the_list_is_empty_and_signing_in_is_not_found
+    assert listed == {"enabled": False, "accounts": []}
+E   AssertionError: assert {'enabled': T...g section.'}]} == {'enabled': F...accounts': []}
+E     
+E     Differing items:
+E     {'accounts': [{'key': 'admin', 'username': 'admin', 'label': 'Administrator', 'description': 'Everything, including th... 'label': 'Process owner', 'description': 'Works cases through to corrective action; sees no Manufacturing section.'}]} != {'accounts': []}
+E     {'enabled': True} != {'enabled': False}
+E     Use -v to get more diff
+---------------------------- Captured stderr call -----------------------------
+INFO: HTTP Request: GET http://test/api/v1/auth/demo-accounts "HTTP/1.1 200 OK"
+------------------------------ Captured log call ------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: GET http://test/api/v1/auth/demo-accounts "HTTP/1.1 200 OK"
+============================== warnings summary ===============================
+tests/modules/v1/test_auth.py::test_successful_login
+  C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\passlib\handlers\argon2.py:716: DeprecationWarning: Accessing argon2.__version__ is deprecated and will be removed in a future release. Use importlib.metadata directly to query for argon2-cffi's packaging metadata.
+    _argon2_cffi.__version__, max_version)
+
+tests/modules/v1/test_auth.py::test_get_me_with_cookie_session_only
+tests/modules/v1/test_auth.py::test_update_me_profile
+  C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\httpx\_client.py:1768: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return await self.request(
+
+tests/modules/v1/test_auth.py::test_update_me_profile
+  C:\Users\dell\Documents\tris-app\backend\.venv\Lib\site-packages\httpx\_client.py:1933: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return await self.request(
+
+tests/modules/v1/test_demo_login.py::test_demo_sign_in_is_off_by_default
+  C:\Users\dell\Documents\tris-app\backend\tests\modules\v1\test_demo_login.py:48: PydanticDeprecatedSince211: Accessing the 'model_fields' attribute on the instance is deprecated. Instead, you should access this attribute from the model class. Deprecated in Pydantic V2.11 to be removed in V3.0.
+    assert settings.model_fields["DEMO_LOGIN_ENABLED"].default is False
+
+tests/modules/v1/test_ingestion.py::test_chunk_savepoint_isolation_single_bad_row
+  sys:1: SAWarning: New instance <Supplier at 0x1a2e6caf200> with identity key (<class 'app.api.modules.v1.suppliers.models.supplier.Supplier'>, ('SUP-DUP',), None) conflicts with persistent instance <Supplier at 0x1a2e6d84cd0>
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/modules/v1/test_demo_login.py::test_when_off_the_list_is_empty_and_signing_in_is_not_found
+1 failed, 429 passed, 1 skipped, 6 warnings in 2611.81s (0:43:31)
+
+-----
+NOTE (added after QA): the run above is the earlier full run (1 failed: a test that read the local .env;
+fixed in the test). QA re-ran the full suite alone on 2026-10-07 on the same code: 430 passed, 1 skipped
+(39 min). After QA, small changes were made (sign-in throttle wording, environment label switch, trend
+filter by date, type hint, test renames, one new test); the four affected test files and the auth tests
+were re-run: 28 passed across the four files, then the dashboard file again with its new test: 9 passed.

@@ -72,7 +72,7 @@ export function HorizonCards({ horizons, currency, active, onSelect }: Props) {
             aria-pressed={selected}
             onClick={() => onSelect(h.horizon_days)}
             className={`rounded-xl border p-4 text-left transition-colors disabled:cursor-default ${
-              selected ? 'border-primary bg-primary/5' : 'border-border bg-card'
+              selected ? 'border-primary bg-primary/5' : 'border-border bg-card dark:bg-[#16181f]'
             } ${clickable ? 'hover:bg-muted/40' : ''}`}
           >
             <p className="text-sm font-semibold text-foreground">{horizonLabel(h.horizon_days)}</p>

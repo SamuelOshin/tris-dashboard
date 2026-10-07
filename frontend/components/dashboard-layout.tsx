@@ -1,5 +1,6 @@
 'use client'
 
+import { SHOW_EVALUATION_LABEL } from '@/lib/environment'
 import { useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter, usePathname } from 'next/navigation'
@@ -318,6 +319,16 @@ export function DashboardLayout({
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            {/* Environment label: shown unless the deployment holds real data */}
+            {SHOW_EVALUATION_LABEL && (
+            <div
+              className="hidden md:flex items-center px-2.5 py-1 rounded-full bg-warning/10 border border-warning/30 text-[11px] font-mono text-warning-foreground dark:text-warning"
+              title="This environment holds synthetic test data only"
+            >
+              <span>Evaluation · Synthetic data</span>
+            </div>
+            )}
+
             {/* Live System Status */}
             <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-success/10 border border-success/20 text-[11px] font-mono text-success">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />

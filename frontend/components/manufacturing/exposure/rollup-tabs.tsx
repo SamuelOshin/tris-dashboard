@@ -18,7 +18,7 @@ function Table({ blocks, isScenario }: { blocks: RollupBlock[]; isScenario: bool
   return (
     <div className="space-y-4">
       {blocks.map((b) => (
-        <div key={b.currency} className="overflow-x-auto rounded-xl border border-border bg-card">
+        <div key={b.currency} className="overflow-x-auto tris-surface">
           <table className="w-full min-w-[520px] text-left text-sm">
             <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
               <tr>

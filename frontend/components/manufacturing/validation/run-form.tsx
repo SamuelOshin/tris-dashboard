@@ -36,7 +36,7 @@ export function RunForm({ value, onChange, running, onStart }: Props) {
         : [...value.horizons_days, days].sort((a, b) => a - b),
     })
   return (
-    <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+    <section className="space-y-4 tris-surface p-5">
       <div>
         <h2 className="text-sm font-semibold text-foreground">Run a validation</h2>
         <p className="text-xs text-muted-foreground">

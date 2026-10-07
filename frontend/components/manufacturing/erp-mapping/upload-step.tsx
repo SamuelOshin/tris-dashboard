@@ -23,7 +23,7 @@ export function UploadStep({ ws }: { ws: ErpMappingWorkspace }) {
   const needsSaved = ws.choice === 'saved' && !ws.savedProfileId
 
   return (
-    <section className="space-y-6 rounded-xl border border-border bg-card p-5">
+    <section className="space-y-6 tris-surface p-5">
       <div>
         <h2 className="text-sm font-semibold text-foreground">1. Choose the data and its layout</h2>
         <p className="mt-1 text-xs text-muted-foreground">

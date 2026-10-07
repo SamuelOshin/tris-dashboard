@@ -7,7 +7,9 @@ primary flows, so all writes are best-effort fire-and-forget within the same ses
 from datetime import UTC, datetime
 from typing import Optional
 
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 from app.api.modules.v1.auth.models.security_audit_log import SecurityAuditLog
 
@@ -69,6 +71,96 @@ class SecurityAuditService:
             occurred_at=datetime.now(UTC),
         )
         session.add(entry)
+        await session.commit()
+
+    @staticmethod
+    async def count_recent_login_failures(
+        *, session: AsyncSession, identifier: str, since: datetime
+    ) -> int:
+        """
+        Count failed sign-ins recorded for an identifier since a time.
+
+        Args:
+            session: Async database session.
+            identifier: Lower-cased username or email as it was typed.
+            since: Start of the window (UTC).
+
+        Returns:
+            The number of LOGIN_FAILURE entries for that identifier in the window.
+        """
+        result = await session.execute(
+            select(func.count())
+            .select_from(SecurityAuditLog)
+            .where(
+                SecurityAuditLog.event_type == "LOGIN_FAILURE",
+                SecurityAuditLog.actor_username == identifier,
+                SecurityAuditLog.occurred_at >= since,
+            )
+        )
+        return int(result.scalar_one())
+
+    @staticmethod
+    async def log_demo_login(
+        *,
+        session: AsyncSession,
+        actor_id: str,
+        actor_username: str,
+        actor_role: str,
+        ip_address: Optional[str] = None,
+    ) -> None:
+        """
+        Record a one-click demo sign-in (no password was used).
+
+        Args:
+            session: Async database session.
+            actor_id: User primary key.
+            actor_username: Username of the demo user.
+            actor_role: Role of the demo user.
+            ip_address: Originating IP (optional).
+        """
+        session.add(
+            SecurityAuditLog(
+                event_type="DEMO_LOGIN",
+                actor_id=actor_id,
+                actor_username=actor_username,
+                actor_role=actor_role,
+                detail=f"Demo sign-in as '{actor_username}' ({actor_role}); no password used.",
+                ip_address=ip_address,
+                occurred_at=datetime.now(UTC),
+            )
+        )
+        await session.commit()
+
+    @staticmethod
+    async def log_logout(
+        *,
+        session: AsyncSession,
+        actor_id: str,
+        actor_username: str,
+        actor_role: str,
+        ip_address: Optional[str] = None,
+    ) -> None:
+        """
+        Record that a signed-in user signed out.
+
+        Args:
+            session: Async database session.
+            actor_id: User primary key.
+            actor_username: Username of the user.
+            actor_role: Role of the user.
+            ip_address: Originating IP (optional).
+        """
+        session.add(
+            SecurityAuditLog(
+                event_type="LOGOUT",
+                actor_id=actor_id,
+                actor_username=actor_username,
+                actor_role=actor_role,
+                detail=f"User '{actor_username}' signed out.",
+                ip_address=ip_address,
+                occurred_at=datetime.now(UTC),
+            )
+        )
         await session.commit()
 
     @staticmethod

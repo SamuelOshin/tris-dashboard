@@ -47,6 +47,7 @@ study that go with them. v1.4 behaviour is unchanged (the v1.4 suite still passe
 
 Tests: **379 passed, 1 skipped** at Ticket 12 (full suite, about 18 minutes); `pytest -m pure` (no database) runs in
 seconds. Raw output for each ticket is in `docs/evidence/ticket-N/`.
+| 2026-10-07 | Ticket 13b (gaps found by checking the work plan `TRIS.docx` against the code): a manufacturing summary on the main dashboard; forecast, exposure and risk-level columns, a risk-level filter and CSV export on the Material Cost table; a forecast and exposure section on the material detail; a link from the dashboard to a material; an environment label in the top bar; sign-out is recorded in the audit log; sign-in is paused for 15 minutes after 5 failed attempts for the same typed identifier (`LOGIN_MAX_FAILURES`, `LOGIN_LOCKOUT_MINUTES`; the count comes from the audit log, so no new table). Also removed the stale "Coming soon" strip from the Material Cost page. One-click demo sign-in for testers: a "sign in as" panel on the login page and a "Switch demo role" item in the user menu, served by `GET /auth/demo-accounts` and `POST /auth/demo-login`; off unless `DEMO_LOGIN_ENABLED=true`, no passwords in the frontend, each use audited as `DEMO_LOGIN`; the seed adds a read-only reviewer demo user. |
 
 ## Known issues and gaps (read these first)
 
@@ -94,9 +95,18 @@ seconds. Raw output for each ticket is in `docs/evidence/ticket-N/`.
 12. Development database: holds demo data from earlier tickets (duplicate demo materials, extra runs, scratch
     databases `tris_empty_ui`, `tris_case_study`). Safe to delete; stored runs cannot be edited, so use a new database.
 
+## Sign-in throttle: what it does and does not do
+
+Five failed sign-ins for the same typed identifier within 15 minutes pause sign-in for that identifier until the window
+passes (`LOGIN_MAX_FAILURES`, `LOGIN_LOCKOUT_MINUTES`). A username and an email for one person are counted separately, a
+successful sign-in does not reset the count, and there is no limit per IP address. Anyone who knows a username can therefore keep
+that user locked out for 15 minutes at a time; the pause ends by itself. The demo sign-in does not use the throttle because it takes no
+password. The login page and the top bar say "evaluation environment, synthetic data" unless `NEXT_PUBLIC_EVALUATION_LABEL=off`
+is set for the frontend of a deployment that holds real data.
+
 ## Future work (not started)
 
-Unit and currency conversion; a dataset picker on every
+Unit and currency conversion; a dataset name and date range in the top bar of every manufacturing page (today only the Material Cost summary shows them); a dataset picker on every
 manufacturing page; a pilot on real purchasing data before any claim of usefulness; forecasting by supplier and
 from demand; an SAP- or Dynamics-style rendering of Environment B; merging and tagging `v2.0` after the final QA
 (Ticket 14).

@@ -10,7 +10,7 @@ function Figure({ label, value, currency, tone, note }: {
   note?: string
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card px-4 py-3">
+    <div className="tris-surface px-4 py-3">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className={`mt-1 text-xl font-semibold tabular-nums ${tone ?? 'text-foreground'}`}>
         {formatAmount(value, currency)}

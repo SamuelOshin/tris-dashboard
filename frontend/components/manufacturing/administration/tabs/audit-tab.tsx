@@ -19,7 +19,7 @@ export function AuditTab() {
         The audit trail cannot be edited or deleted. Each entry is saved together with the action it describes, and the
         person is the one who was signed in.
       </p>
-      <div className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 tris-surface p-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="grid gap-1">
           <label htmlFor="audit-type" className="text-[11px] text-muted-foreground">
             What happened
@@ -65,7 +65,7 @@ export function AuditTab() {
       {log.error && <p className="text-sm text-destructive">The audit trail could not be loaded: {log.error}</p>}
       {!data && log.loading && <Skeleton className="h-64 w-full" />}
       {data && (
-        <div className="overflow-x-auto rounded-xl border border-border bg-card">
+        <div className="overflow-x-auto tris-surface">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
               <tr>

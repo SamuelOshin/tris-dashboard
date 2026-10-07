@@ -25,7 +25,7 @@ export function ModelsTab({ config, busy, onToggle }: Props) {
   const s = config.forecast_settings
   return (
     <div className="space-y-5">
-      <section className="rounded-xl border border-border bg-card p-5">
+      <section className="tris-surface p-5">
         <h3 className="text-sm font-semibold text-foreground">Forecast models</h3>
         <p className="mt-1 text-xs text-muted-foreground">
           A model that is switched off is not used for new forecasts or validations. Forecasts already saved keep the
@@ -63,7 +63,7 @@ export function ModelsTab({ config, busy, onToggle }: Props) {
           ))}
         </ul>
       </section>
-      <section className="rounded-xl border border-border bg-card p-5">
+      <section className="tris-surface p-5">
         <h3 className="text-sm font-semibold text-foreground">Forecast settings</h3>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Setting label="Outlooks" value={s.horizons_days.map((d) => `${d}-day`).join(', ')} />

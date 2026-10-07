@@ -14,7 +14,7 @@ function Field({ label, value }: { label: string; value: string }) {
 /** Model name and version, dataset version, dates and horizon, and how the model was chosen. */
 export function ModelDetails({ run }: { run: ForecastRun }) {
   return (
-    <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+    <section className="space-y-4 tris-surface p-5">
       <h2 className="text-sm font-semibold text-foreground">How this forecast was made</h2>
       <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Model" value={`${run.model.name} (version ${run.model.version})`} />

@@ -28,7 +28,7 @@ function ScenarioCell({ row }: { row: MaterialExposure }) {
 /** One row per material, straight from its stored forecast and recent purchases. */
 export function ExposureTable({ rows, isScenario }: { rows: MaterialExposure[]; isScenario: boolean }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-card">
+    <div className="overflow-x-auto tris-surface">
       <table className="w-full min-w-[860px] text-left text-sm">
         <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
           <tr>

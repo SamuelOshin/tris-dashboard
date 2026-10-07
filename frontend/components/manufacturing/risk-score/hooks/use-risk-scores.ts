@@ -44,5 +44,5 @@ export function useRiskScores(asOf: string, dataset: string) {
     }
   }, [asOf, dataset])
 
-  return { scores, running, calculate, refresh: () => setVersion((v) => v + 1) }
+  return { scores, running, version, calculate, refresh: () => setVersion((v) => v + 1) }
 }

@@ -6,13 +6,16 @@ HTTP transport only — max 50 lines per handler, no business logic, no try-exce
 from fastapi import APIRouter, Request, Response, status
 
 from app.api.core.config import settings
-from app.api.core.dependencies import AuthenticatedUser, DbSession
+from app.api.core.dependencies import AuthenticatedUser, DbSession, OptionalUser
+from app.api.modules.v1.auth.models.user import User
 from app.api.modules.v1.auth.schemas.auth_schemas import (
+    DemoLoginRequest,
     LoginRequest,
     UserProfileUpdate,
     UserResponse,
 )
 from app.api.modules.v1.auth.service.auth_service import AuthService
+from app.api.modules.v1.auth.service.security_audit_service import SecurityAuditService
 from app.api.modules.v1.users.schemas.user_schemas import ChangePasswordRequest
 from app.api.modules.v1.users.service.user_service import UserService
 from app.api.utils.response_payloads import auth_response, success_response
@@ -20,10 +23,27 @@ from app.api.utils.response_payloads import auth_response, success_response
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+def _session_response(user: User, token: str, message: str) -> Response:
+    """The sign-in reply: the user in the body, the session in the HttpOnly cookie."""
+    res = auth_response(
+        status_code=status.HTTP_200_OK,
+        message=message,
+        access_token=token,
+        data=UserResponse.model_validate(user).model_dump(),
+    )
+    res.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=settings.is_production,
+    )
+    return res
+
+
 @router.post("/login", response_model=None)
 async def login(
     payload: LoginRequest,
-    response: Response,
     request: Request,
     db: DbSession = None,
 ):
@@ -39,21 +59,25 @@ async def login(
         session=db,
         ip_address=ip,
     )
-    user_data = UserResponse.model_validate(user).model_dump()
-    res = auth_response(
+    return _session_response(user, token, "Login successful")
+
+
+@router.get("/demo-accounts", response_model=None)
+async def demo_accounts():
+    """Whether one-click demo sign-in is on, and the roles it offers (no passwords)."""
+    return success_response(
         status_code=status.HTTP_200_OK,
-        message="Login successful",
-        access_token=token,
-        data=user_data,
+        message="Demo accounts",
+        data=AuthService.demo_accounts(),
     )
-    res.set_cookie(
-        key="access_token",
-        value=token,
-        httponly=True,
-        samesite="lax",
-        secure=settings.is_production,
-    )
-    return res
+
+
+@router.post("/demo-login", response_model=None)
+async def demo_login(payload: DemoLoginRequest, request: Request, db: DbSession = None):
+    """Sign in as a demo role without a password. Not found unless demo sign-in is switched on."""
+    ip = request.client.host if request.client else None
+    user, token = await AuthService.demo_login(payload.role, db, ip)
+    return _session_response(user, token, "Demo sign-in successful")
 
 
 @router.get("/me", response_model=None)
@@ -88,8 +112,16 @@ async def update_me(
 
 
 @router.post("/logout", response_model=None)
-async def logout(response: Response):
-    """Clear authentication session cookie."""
+async def logout(request: Request, db: DbSession = None, user: OptionalUser = None):
+    """Clear authentication session cookie; record the sign-out when the session is still valid."""
+    if user is not None:
+        await SecurityAuditService.log_logout(
+            session=db,
+            actor_id=user.user_id,
+            actor_username=user.username,
+            actor_role=str(getattr(user.role, "value", user.role)),
+            ip_address=request.client.host if request.client else None,
+        )
     res = success_response(
         status_code=status.HTTP_200_OK,
         message="Logout successful",

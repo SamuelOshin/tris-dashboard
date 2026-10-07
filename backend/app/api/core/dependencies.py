@@ -133,6 +133,7 @@ def require_roles(allowed_roles: Sequence[Role | str]):
 
 # ── Reusable Annotated Dependency Type Aliases ─────────────────────
 AuthenticatedUser = Annotated[User, Depends(get_current_user)]
+OptionalUser = Annotated[Optional[User], Depends(get_current_user_optional)]
 PrivilegedUser = Annotated[User, Depends(require_roles(PRIVILEGED_ROLES))]
 WriteUser = Annotated[User, Depends(require_roles(WRITE_ROLES))]
 NonReadOnlyUser = Annotated[User, Depends(require_roles(NON_READ_ONLY_ROLES))]

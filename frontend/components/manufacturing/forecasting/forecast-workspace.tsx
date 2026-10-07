@@ -95,7 +95,7 @@ export function ForecastWorkspace() {
             onSelect={ws.setActiveHorizon}
           />
           {run ? (
-            <section className="space-y-2 rounded-xl border border-border bg-card p-5">
+            <section className="space-y-2 tris-surface p-5">
               <h2 className="text-sm font-semibold text-foreground">
                 Price history and {run.horizon_days}-day forecast
               </h2>
