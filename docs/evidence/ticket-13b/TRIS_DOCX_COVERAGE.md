@@ -28,6 +28,6 @@ it is a release check, not a build item.
 | 14. Documentation | Built | All documents in `docs/`. |
 | 15. Screenshots | Built | 18 of 18 in `docs/evidence/ticket-13`. |
 | 16. Test checklist, 17. Acceptance criteria | Ticket 14 | Run in full and recorded there. |
-| 20. Handover package | Partly | Before screenshots of v1.4 to be supplied by the owner; screen recording optional; demo accounts to be shared securely outside the repository. |
+| 20. Handover package | Partly | Before screenshots of v1.4 supplied by the owner on 2026-10-07 (eight screens); screen recording optional; demo accounts to be shared securely outside the repository. |
 
 Deliberately not done: no live ERP connector (claimed nowhere), no real-data pilot, no unit or currency conversion.

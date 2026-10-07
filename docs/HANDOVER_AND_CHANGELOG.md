@@ -83,8 +83,9 @@ seconds. Raw output for each ticket is in `docs/evidence/ticket-N/`.
    separately). On-time delivery must be a fraction 0 to 1; day-first slash dates are not read.
 7. **Fixed 2026-10-07:** the "Coming soon" strip for forecast and exposure was removed from the Material Cost page (both exist on the Forecasting page).
 8. **The "Case Studies / Results" page is a placeholder**; the case study is a document and a script.
-9. **v1.4 "before" screenshots** (deferred in `BASELINE_README.md`) were never captured; the v2.0 screenshot
-   checklist is complete at 18 of 18 once the Administration page exists (items 17 and 18).
+9. **v1.4 "before" screenshots** were captured late, on 2026-10-07, from the `v1.4-baseline` code (eight screens in
+   `docs/evidence/ticket-13b/before/`; fraud detection, compliance and the correlation and reports pages were not captured). The
+   dates on screen are the capture date. The v2.0 screenshot checklist is complete at 18 of 18.
 10. **Independent check of the case study:** see `docs/evidence/ticket-13/INDEPENDENT_CHECK.md` for what was and
     was not done.
 11. **Migrations edited.** The baseline revision was added and three older migrations were changed (existence guards and

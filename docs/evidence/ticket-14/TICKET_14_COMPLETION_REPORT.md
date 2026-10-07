@@ -42,7 +42,7 @@ Other changes made in this ticket (documents and evidence only, plus the two sma
 - Regression "against the Ticket 1 baseline" was done test by test on test identifiers, because the baseline file lists 127 test ids.
 - The Section 16 checks that need a browser were run with a scripted Chrome against the running application using the demo sign-in for each role.
 - HTTPS was not verified: no deployed address was supplied. Cookies are marked secure outside development.
-- The v1.4 "before" screenshots and the optional screen recording are not made and are listed as owner items.
+- The v1.4 "before" screenshots were supplied by the owner after this report was first written (eight screens, captured 2026-10-07 from the `v1.4-baseline` code; see `docs/evidence/ticket-13b/before/README.md`). The optional screen recording is not made.
 
 ## Independent QA (verdict: ACCEPT WITH FOLLOW-UP, no blocker)
 

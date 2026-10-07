@@ -38,7 +38,7 @@ testers (owner request). Built on `v2.0-manufacturing-extension` after Ticket 13
 - Dataset name and date range are not in the top bar of every manufacturing page (listed in the handover).
 - Demo sign-in needs no password: use it only on a deployment with synthetic data. With it on, anyone can act as administrator; the
   Administration page says so and the demo guide has the reset routine.
-- The v1.4 "before" screenshots are still to be supplied by the owner.
+- The v1.4 "before" screenshots were supplied by the owner afterwards (see `docs/evidence/ticket-13b/before/README.md`).
 
 ## After QA (verdict: ACCEPT WITH FOLLOW-UP)
 

@@ -158,7 +158,7 @@ The `v2.0-manufacturing-extension` branch will add a complete Material-Cost Inte
 | `docs/baseline/v14_baseline_build.txt` | Raw `pnpm run build` output (exit code 0, 14 routes) |
 | `docs/baseline/v14_baseline_tests.txt` | Raw `pytest tests/ -v` output (captured after PostgreSQL available) |
 
-Screenshots of every v1.4 screen are captured manually and stored in `docs/baseline/screenshots/` (to be added; see §11 for the recorded deferral).
+Screenshots of every v1.4 screen are captured manually and stored in `docs/evidence/ticket-13b/before/` (eight screens, captured on 2026-10-07; see §11).
 
 ---
 
@@ -168,8 +168,8 @@ Recorded so the baseline's limits are explicit rather than implied.
 
 ### Deferred: "before" screenshots
 - The Ticket 1 acceptance criteria list a screenshot set of every working screen. It was deliberately deferred in the Ticket 1 implementation plan: capture is **manual**, and was accepted as non-blocking for Ticket 1 by the project owner.
-- **Status: not yet captured.** `docs/baseline/screenshots/` does not exist yet.
-- **Due before Ticket 3 (Navigation / UI Shell) changes the UI**, because that is the point at which a "before" reference stops being recoverable from the running app.
+- **Status: captured later, on 2026-10-07.** The screens were captured on 2026-10-07 from a checkout of the `v1.4-baseline` code against a fresh database seeded with the test workbook, so they show v1.4 as it behaves, not as it looked on the day the baseline was frozen (the date on the dashboard is the capture date; nothing was backdated). Eight screens are in `docs/evidence/ticket-13b/before/` (see its `README.md`); fraud detection, compliance and the three dashboard sub-pages were not captured.
+- **Was due before Ticket 3 (Navigation / UI Shell) changes the UI**, because that is the point at which a "before" reference stops being recoverable from the running app.
 - Expected coverage: login, risk cases, case detail, suppliers, ingestion, fraud detection, compliance, the three dashboard pages (correlation, reports, settings), zero trust, user administration.
 
 ### Known issue: concurrent test sessions cause spurious failures
