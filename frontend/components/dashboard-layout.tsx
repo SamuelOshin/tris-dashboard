@@ -1,5 +1,7 @@
 'use client'
 
+import { HelpMenu } from '@/components/onboarding/help-menu'
+import { OnboardingProvider } from '@/components/onboarding/onboarding-provider'
 import { SHOW_EVALUATION_LABEL } from '@/lib/environment'
 import { useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
@@ -183,6 +185,7 @@ export function DashboardLayout({
   })
 
   return (
+    <OnboardingProvider>
     <SidebarProvider>
       <Sidebar collapsible="icon" variant="sidebar" className="border-r border-sidebar-border bg-sidebar">
         {/* Brand Header */}
@@ -225,7 +228,7 @@ export function DashboardLayout({
                 const isActive = pathname === item.href
 
                 return (
-                  <SidebarMenuItem key={item.href}>
+                  <SidebarMenuItem key={item.href} data-tour={`nav-${item.href.slice(1)}`}>
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
@@ -336,6 +339,7 @@ export function DashboardLayout({
             </div>
 
             <HeaderSearch />
+            <HelpMenu />
             <NotificationsPopover />
             <div className="hidden sm:block w-px h-4 bg-border" />
             <ThemeToggle />
@@ -365,5 +369,6 @@ export function DashboardLayout({
         </main>
       </SidebarInset>
     </SidebarProvider>
+    </OnboardingProvider>
   )
 }

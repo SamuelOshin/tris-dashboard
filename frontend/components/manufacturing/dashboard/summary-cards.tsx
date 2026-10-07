@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { formatMoney } from '../material-cost/material-cost-guards'
+import { InfoTip } from '@/components/onboarding/info-tip'
+import type { GlossaryKey } from '@/components/onboarding/glossary'
 import type { ManufacturingSummary } from './types'
 
 function Card({
@@ -7,23 +9,36 @@ function Card({
   children,
   note,
   href,
+  tip,
+  spoken,
 }: {
   title: string
   children: React.ReactNode
   note?: string
   href: string
+  tip: GlossaryKey
+  /** What a screen reader says for the card link: the title and the figure. */
+  spoken: string
 }) {
+  // The whole card is a link; the "?" sits above the link so it is not a button inside a link.
   return (
-    <Link
-      href={href}
-      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <div className="h-full tris-surface px-4 py-3 transition-colors hover:bg-muted/30">
-        <p className="text-xs font-medium text-muted-foreground">{title}</p>
+    <div className="tris-surface relative px-4 py-3 transition-colors hover:bg-muted/30">
+      <Link
+        href={href}
+        aria-label={spoken}
+        className="absolute inset-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+      <div className="pointer-events-none relative">
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-xs font-medium text-muted-foreground">{title}</p>
+          <span className="pointer-events-auto relative z-10">
+            <InfoTip term={tip} />
+          </span>
+        </div>
         <div className="mt-1.5">{children}</div>
         {note && <p className="mt-1.5 text-xs text-muted-foreground">{note}</p>}
       </div>
-    </Link>
+    </div>
   )
 }
 
@@ -55,6 +70,12 @@ function PerCurrency({
   )
 }
 
+function money(amounts: Record<string, number>): string {
+  return Object.entries(amounts)
+    .map(([currency, value]) => formatMoney(value, currency))
+    .join(', ')
+}
+
 /** The four headline figures of the manufacturing summary. */
 export function SummaryCards({ summary }: { summary: ManufacturingSummary }) {
   const high = summary.high_risk!
@@ -67,6 +88,8 @@ export function SummaryCards({ summary }: { summary: ManufacturingSummary }) {
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <Card
         title="High-risk materials"
+        spoken={`High-risk materials: ${high.reason_empty ?? high.count}`}
+        tip="riskScore"
         href="/manufacturing/material-cost"
         note={high.scored ? `${high.scored} of ${summary.materials_total} materials scored` : undefined}
       >
@@ -78,6 +101,8 @@ export function SummaryCards({ summary }: { summary: ManufacturingSummary }) {
       </Card>
       <Card
         title={`Projected material-cost exposure, next ${exposure.horizon_days} days`}
+        tip="projectedExposure"
+        spoken={`Projected exposure, next ${exposure.horizon_days} days: ${money(exposure.by_currency) || exposure.reason_empty}`}
         href="/manufacturing/forecasting"
         note={
           hasExposure
@@ -93,6 +118,8 @@ export function SummaryCards({ summary }: { summary: ManufacturingSummary }) {
       </Card>
       <Card
         title="Materials with a 30-day forecast increase"
+        tip="forecast"
+        spoken={`Materials with a 30-day forecast increase: ${rising.reason_empty ?? rising.count}`}
         href="/manufacturing/forecasting"
         note={
           rising.forecasted ? `of ${rising.forecasted} materials with a 30-day forecast` : undefined
@@ -106,6 +133,8 @@ export function SummaryCards({ summary }: { summary: ManufacturingSummary }) {
       </Card>
       <Card
         title="Supplier concentration exposure"
+        tip="supplierConcentration"
+        spoken={`Supplier concentration exposure: ${money(concentration.spend_by_currency) || "none"}`}
         href="/manufacturing/material-cost"
         note={
           hasConcentration

@@ -1,0 +1,29 @@
+{
+ "welcome_text": "Welcome to TRIS |  | Trust & Risk Intelligence System |  | TRIS brings financial, supplier, approval and access information into one review workflow, so a reviewer can see why an exception needs attention, investigate it, document the fix and close it with evidence. |  | What is new |  | Material cost intelligence. Import purchase and bill-of-materials files, and TRIS spots price rises, prices above standard cost",
+ "admin_tour": [
+  "Material cost at a glance",
+  "The Manufacturing section",
+  "1. Bring your data in",
+  "2. Review the materials",
+  "3. Forecast and test what-ifs",
+  "4. Check the method",
+  "Administration",
+  "Risk Cases",
+  "Your account",
+  "Help is always here"
+ ],
+ "tour_closed_at_end": true,
+ "welcome_after_reload": 0,
+ "help_reopens_welcome": true,
+ "escape_closes_welcome": true,
+ "escape_closes_tour": true,
+ "tooltip_text": "Projected exposure. The extra cost (plus sign) or saving (minus sign) if the stored forecast price holds, over the next 90 days of usual use, compared with buying at today's price.",
+ "verifier_welcome_has_whats_new_list": false,
+ "verifier_tour": [
+  "Risk Cases",
+  "Your account",
+  "Help is always here"
+ ],
+ "mobile_tour_steps_available": 1,
+ "mobile_first_step": "Material cost at a glance"
+}

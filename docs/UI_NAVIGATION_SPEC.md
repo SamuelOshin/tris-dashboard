@@ -99,6 +99,19 @@ happened, who, dates) and paged trail of imports, mapping and weight changes, fo
 opened material cases, model switches, dataset labels, rule edits and sign-ins. Other roles do not see the page in the
 menu and get the no-access state if they open the address; the backend refuses their requests.
 
+### Welcome, tour and help (every page with the TRIS shell)
+- **Welcome.** After the first sign-in in a browser, the dashboard opens a **Welcome to TRIS** dialog: what TRIS does, a **What is new**
+  list (for roles that see the Manufacturing section; other roles get a short line about cases), and a note that all data is synthetic.
+  Buttons: **Take a quick tour** and **Skip for now**. It appears once per browser (not once per role, so a tester switching demo roles
+  is not shown it again); if the browser blocks storage it may appear again. It carries no version number.
+- **Help button** in the top bar: **What is new** reopens the welcome, **Take the tour** starts the tour.
+- **Tour.** Up to ten steps outlining one element at a time (dashboard summary, the Manufacturing menu and its four working pages in
+  order, Administration for administrators, Risk Cases, the account menu, Help). Steps whose element is not on screen, or not
+  allowed for the role, are left out. Next, Back and Skip; Right and Left arrows, and Escape to leave; Tab stays inside the card and focus goes back to where it was. If the highlighted element disappears (for example the window is made narrow) the tour moves on or ends. Nothing is saved or changed.
+- **"?" tooltips** beside terms a newcomer may not know (risk score, projected exposure, forecast, forecast range, standard cost, stock cover,
+  supplier concentration, scenario, validation, weight version, risk trend). They open on hover or keyboard focus; the wording lives in
+  `components/onboarding/glossary.ts` and says only what the system does.
+
 ### Sign-in page — `/login`
 Email, password, show/hide, Remember me, Forgot password, the evaluation-environment label. On a demonstration deployment
 (`DEMO_LOGIN_ENABLED=true`) a **Demo environment: sign in as** panel offers one button per role with a line on what the

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { InfoTip } from '@/components/onboarding/info-tip'
 import { formatMoney, formatPercent } from '../material-cost/material-cost-guards'
 import { RiskLevelPill } from './risk-level-pill'
 import type { TopExposureRow } from './types'
@@ -7,7 +8,10 @@ import type { TopExposureRow } from './types'
 export function TopExposureTable({ rows }: { rows: TopExposureRow[] }) {
   return (
     <div className="tris-surface p-4">
-      <h3 className="text-sm font-semibold text-foreground">Top materials by projected exposure</h3>
+      <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+        Top materials by projected exposure
+        <InfoTip term="projectedExposure" />
+      </h3>
       <p className="mt-0.5 text-xs text-muted-foreground">
         From the stored 90-day forecasts. Ranked separately for each currency.
       </p>

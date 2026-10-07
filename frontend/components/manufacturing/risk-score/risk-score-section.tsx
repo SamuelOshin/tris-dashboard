@@ -1,5 +1,6 @@
 'use client'
 
+import { InfoTip } from '@/components/onboarding/info-tip'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -88,7 +89,10 @@ export function RiskScoreSection({ materialId, asOf, dataset, onChanged }: Props
   return (
     <section className="space-y-3">
       <div className="flex items-center gap-3">
-        <h3 className="text-sm font-semibold text-foreground">Risk score</h3>
+        <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          Risk score
+          <InfoTip term="riskScore" />
+        </h3>
         <RiskBadge score={current ?? undefined} />
         {canRunScoring(user?.role) && (
           <Button size="sm" variant="outline" className="ml-auto" onClick={calculate} disabled={running}>

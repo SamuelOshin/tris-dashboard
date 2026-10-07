@@ -7,6 +7,7 @@ import {
 import { RiskBadge } from '../risk-score/risk-badge'
 import type { ScoreSummary } from '../risk-score/types'
 import { SignalChips } from './signal-chips'
+import { InfoTip } from '@/components/onboarding/info-tip'
 import type { MaterialRow } from './types'
 import type { StoredResult } from '../dashboard/types'
 import { ExposureCell, ForecastCell } from './stored-cells'
@@ -33,14 +34,44 @@ export function MaterialsTable({ rows, scores, results, onOpen }: Props) {
             <th className="px-3 py-2 font-medium">Current unit cost</th>
             <th className="px-3 py-2 font-medium">Last month</th>
             <th className="px-3 py-2 font-medium">Last 3 months</th>
-            <th className="px-3 py-2 font-medium">Vs standard</th>
+            <th className="px-3 py-2 font-medium">
+              <span className="inline-flex items-center gap-1">
+                Vs standard
+                <InfoTip term="standardCost" />
+              </span>
+            </th>
             <th className="px-3 py-2 font-medium">12-month spend</th>
             <th className="px-3 py-2 font-medium">Main supplier</th>
-            <th className="px-3 py-2 font-medium">Stock cover</th>
-            <th className="px-3 py-2 font-medium">Risk score</th>
-            <th className="px-3 py-2 font-medium">30-day forecast</th>
-            <th className="px-3 py-2 font-medium">90-day forecast</th>
-            <th className="px-3 py-2 font-medium" title="Extra cost over the last price for 90 days of usage, and as a share of that spend">Exposure, 90 days</th>
+            <th className="px-3 py-2 font-medium">
+              <span className="inline-flex items-center gap-1">
+                Stock cover
+                <InfoTip term="stockCover" />
+              </span>
+            </th>
+            <th className="px-3 py-2 font-medium">
+              <span className="inline-flex items-center gap-1">
+                Risk score
+                <InfoTip term="riskScore" />
+              </span>
+            </th>
+            <th className="px-3 py-2 font-medium">
+              <span className="inline-flex items-center gap-1">
+                30-day forecast
+                <InfoTip term="forecast" />
+              </span>
+            </th>
+            <th className="px-3 py-2 font-medium">
+              <span className="inline-flex items-center gap-1">
+                90-day forecast
+                <InfoTip term="forecast" />
+              </span>
+            </th>
+            <th className="px-3 py-2 font-medium">
+              <span className="inline-flex items-center gap-1">
+                Exposure, 90 days
+                <InfoTip term="projectedExposure" />
+              </span>
+            </th>
             <th className="px-3 py-2 font-medium">Signals</th>
           </tr>
         </thead>

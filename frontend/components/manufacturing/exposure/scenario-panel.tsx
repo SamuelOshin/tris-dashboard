@@ -1,5 +1,6 @@
 'use client'
 
+import { InfoTip } from '@/components/onboarding/info-tip'
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -112,7 +113,10 @@ export function ScenarioPanel({ value, onChange, suppliers, running, canApply, o
   return (
     <section className="space-y-4 rounded-xl border border-dashed border-primary/40 bg-primary/[0.03] p-5">
       <div>
-        <h2 className="text-sm font-semibold text-foreground">What-if scenario</h2>
+        <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          What-if scenario
+          <InfoTip term="scenario" />
+        </h2>
         <p className="text-xs text-muted-foreground">
           Try a change and see the cost effect. This is a scenario, not a prediction, and nothing is saved.
         </p>

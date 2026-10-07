@@ -1,0 +1,21 @@
+{
+ "step_before_resize": "2. Review the materials",
+ "after_narrow_card_count": 1,
+ "after_narrow_title": "Help is always here",
+ "restart_after_resize_starts_at": "Material cost at a glance",
+ "tab_stays_in_card": true,
+ "shift_tab_stays_in_card": true,
+ "focus_after_close": "Help",
+ "spotlight_shadow": "lab(48.9245 16.9316 -76.7102) 0px 0px 0px 2px, rgba(0, 0, 0, 0.62) 0px 0px 0px 9999px",
+ "welcome_back_on_dashboard_with_blocked_storage": 0,
+ "verifier_line": [
+  "TRIS brings financial, supplier, approval and access information into one review workflow, so a reviewer can see why an exception needs attention, investigate it, document the fix and close it with evidence.",
+  ""
+ ],
+ "card_link_names": [
+  "High-risk materials: 3",
+  "Projected exposure, next 90 days: $3,085",
+  "Materials with a 30-day forecast increase: 2",
+  "Supplier concentration exposure: $1,026,002"
+ ]
+}

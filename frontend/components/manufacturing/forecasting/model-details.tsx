@@ -1,4 +1,5 @@
 import { formatDate, formatTimestamp } from '../material-cost/material-cost-guards'
+import { InfoTip } from '@/components/onboarding/info-tip'
 import { number, percent } from './forecast-guards'
 import type { ForecastRun } from './types'
 
@@ -15,7 +16,10 @@ function Field({ label, value }: { label: string; value: string }) {
 export function ModelDetails({ run }: { run: ForecastRun }) {
   return (
     <section className="space-y-4 tris-surface p-5">
-      <h2 className="text-sm font-semibold text-foreground">How this forecast was made</h2>
+      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+        How this forecast was made
+        <InfoTip term="forecastRange" />
+      </h2>
       <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Model" value={`${run.model.name} (version ${run.model.version})`} />
         <Field label="Dataset version" value={run.dataset_version} />

@@ -1,5 +1,6 @@
 'use client'
 
+import { InfoTip } from '@/components/onboarding/info-tip'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,7 +39,10 @@ export function WeightsTab({ list, saving, onSave }: Props) {
   return (
     <div className="space-y-5">
       <section className="tris-surface p-5">
-        <h3 className="text-sm font-semibold text-foreground">Risk score weights — version {active.version} is active</h3>
+        <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          Risk score weights — version {active.version} is active
+          <InfoTip term="weightVersion" />
+        </h3>
         <p className="mt-1 text-xs text-muted-foreground">
           Saving creates a new version; earlier versions and every score already calculated stay as they were. Each
           score says which version it used. The scales and the minimum data coverage are kept from the active version.

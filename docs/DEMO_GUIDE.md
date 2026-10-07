@@ -29,6 +29,10 @@ the read-only reviewer to an older seeded database; it skips users that are alre
 Without the switch, use the demo accounts defined in `backend/app/scripts/seed.py` and share their passwords outside the
 repository. Never reuse them elsewhere.
 
+**First visit.** Each new browser sees a **Welcome to TRIS** dialog on the dashboard once, with a short tour. Take it, or use
+**Help** in the top bar at any time. Scripts that drive the application (tests, screenshots) should dismiss the dialog or set
+`tris.welcome.seen` to `yes` in the browser's local storage first, or it will sit over the page.
+
 ## 2. The route (about 20 minutes)
 
 | Minutes | Screen | Show | Say |

@@ -1,5 +1,6 @@
 'use client'
 
+import { InfoTip } from '@/components/onboarding/info-tip'
 import { Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,7 +39,10 @@ export function RunForm({ value, onChange, running, onStart }: Props) {
   return (
     <section className="space-y-4 tris-surface p-5">
       <div>
-        <h2 className="text-sm font-semibold text-foreground">Run a validation</h2>
+        <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          Run a validation
+          <InfoTip term="validation" />
+        </h2>
         <p className="text-xs text-muted-foreground">
           Goes back to past dates, forecasts using only what was known then, saves each forecast, and only afterwards
           compares it with what happened. Every material and date is included.

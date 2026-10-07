@@ -1,5 +1,6 @@
 'use client'
 
+import { InfoTip } from '@/components/onboarding/info-tip'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { formatDate } from '../material-cost/material-cost-guards'
 import type { TrendPoint } from './types'
@@ -21,7 +22,10 @@ export function RiskTrendChart({ points }: { points: TrendPoint[] }) {
   }))
   return (
     <div className="tris-surface p-4">
-      <h3 className="text-sm font-semibold text-foreground">Material-cost risk trend</h3>
+      <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+        Material-cost risk trend
+        <InfoTip term="riskTrend" />
+      </h3>
       <p className="mt-0.5 text-xs text-muted-foreground">
         Materials scored High or Critical in each set of saved scores. Each set keeps its own
         weight version.

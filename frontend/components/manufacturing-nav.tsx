@@ -23,7 +23,7 @@ export function ManufacturingNavGroup() {
   if (!canViewManufacturing(user?.role)) return null
 
   return (
-    <SidebarGroup>
+    <SidebarGroup data-tour="manufacturing-nav">
       <SidebarGroupLabel className="px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1">
         Manufacturing
       </SidebarGroupLabel>
@@ -32,7 +32,7 @@ export function ManufacturingNavGroup() {
           const Icon = item.icon
           const isActive = pathname === item.href
           return (
-            <SidebarMenuItem key={item.href}>
+            <SidebarMenuItem key={item.href} data-tour={`nav-${item.id}`}>
               <SidebarMenuButton
                 asChild
                 isActive={isActive}

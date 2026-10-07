@@ -80,6 +80,7 @@ export function UserNav() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
+          data-tour="user-menu"
           className="relative flex items-center justify-center w-8 h-8 rounded-full ring-2 ring-primary/20 hover:ring-primary/50 transition-all cursor-pointer bg-gradient-to-tr from-primary/20 via-primary/10 to-primary/30 text-primary font-bold text-xs select-none shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           title={`${user.name} (${user.role})`}
           aria-label="User Account Menu"

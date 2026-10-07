@@ -30,7 +30,11 @@ export function ManufacturingSummary() {
   if (!allowed) return null
 
   return (
-    <section className="space-y-3" aria-label="Material cost intelligence summary">
+    <section
+      className="space-y-3"
+      aria-label="Material cost intelligence summary"
+      data-tour="mfg-summary"
+    >
       <Heading asOf={summary?.as_of} />
       {loading ? (
         <Skeleton className="h-28 w-full" />
