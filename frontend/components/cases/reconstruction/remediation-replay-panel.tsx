@@ -29,6 +29,7 @@ interface RemediationReplayPanelProps {
   onSelectControlId: (id: string) => void
   onRunReplay: (controlId?: string) => void
   isReplayLoading: boolean
+  canRun?: boolean
 }
 
 export function RemediationReplayPanel({
@@ -38,6 +39,7 @@ export function RemediationReplayPanel({
   onSelectControlId,
   onRunReplay,
   isReplayLoading,
+  canRun = true,
 }: RemediationReplayPanelProps) {
   const getDeterminationBadge = (determination?: string) => {
     switch (determination) {
@@ -92,7 +94,7 @@ export function RemediationReplayPanel({
         <Button
           size="sm"
           onClick={() => onRunReplay(selectedControlId)}
-          disabled={isReplayLoading}
+          disabled={isReplayLoading || !canRun}
           className="gap-2 text-xs font-semibold self-start sm:self-center"
         >
           {isReplayLoading ? (

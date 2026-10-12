@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { RiskCase } from '@/lib/api'
 import { isClosureLocked } from '../case-workflow-guards'
+import { useCasePermissions, ViewOnlyNotice } from '../case-permissions'
 
 const CLOSURE_TYPES = [
   'Confirmed Fraud / Blocked',
@@ -104,7 +105,8 @@ export function ClosureTab({
   ].filter(Boolean).length
 
   const allSatisfied = satisfiedCount === 8
-  const isEditable = isPendingOrClosed && !isClosed
+  const { canWork, canClose } = useCasePermissions()
+  const isEditable = isPendingOrClosed && !isClosed && canClose
 
   return (
     <div className="space-y-6 pt-2">
@@ -115,6 +117,18 @@ export function ClosureTab({
             TRIS enforces system-validated closure. All 8 mandatory criteria must be satisfied.
           </p>
         </div>
+
+        {!canWork ? (
+          <ViewOnlyNotice />
+        ) : (
+          !canClose &&
+          !isClosed && (
+            <ViewOnlyNotice title="Closing needs a verifier.">
+              You can take a case up to verification. Only a verifier or an administrator can complete the
+              closure, and nobody closes a case they investigated.
+            </ViewOnlyNotice>
+          )
+        )}
 
         {/* Stage-based Lock State */}
         {isLocked && (
@@ -154,7 +168,7 @@ export function ClosureTab({
               <Button
                 size="sm"
                 onClick={onAdvanceToVerification}
-                disabled={isActionLoading || !hasCorrectiveAction}
+                disabled={isActionLoading || !hasCorrectiveAction || !canWork}
                 className="text-xs bg-purple-600 hover:bg-purple-700 text-white shrink-0 font-medium"
               >
                 Advance to Verification →
@@ -163,7 +177,7 @@ export function ClosureTab({
           </div>
         )}
 
-        {caseData.status === 'Pending Verification' && (
+        {caseData.status === 'Pending Verification' && canClose && (
           <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-800 dark:text-sky-300 text-xs flex items-center gap-2">
             <FileCheck2 className="w-4 h-4 shrink-0 text-sky-600 dark:text-sky-400" />
             <span>
@@ -476,16 +490,16 @@ export function ClosureTab({
                 <Button
                   size="sm"
                   onClick={onExecuteClosure}
-                  disabled={isActionLoading || !allSatisfied}
+                  disabled={isActionLoading || !allSatisfied || !canClose}
                   className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4"
                 >
-                  {isActionLoading ? 'Validating Closure...' : 'Mark as Closed'}
+                  {isActionLoading ? 'Validating Closure...' : canClose ? 'Mark as Closed' : 'Needs a verifier'}
                 </Button>
               ) : caseData.status === 'Corrective Action' ? (
                 <Button
                   size="sm"
                   onClick={onAdvanceToVerification}
-                  disabled={isActionLoading || !hasCorrectiveAction}
+                  disabled={isActionLoading || !hasCorrectiveAction || !canWork}
                   className="text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4"
                 >
                   {isActionLoading ? 'Transitioning...' : 'Advance to Pending Verification →'}

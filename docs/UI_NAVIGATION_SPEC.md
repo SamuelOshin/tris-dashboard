@@ -99,6 +99,19 @@ happened, who, dates) and paged trail of imports, mapping and weight changes, fo
 opened material cases, model switches, dataset labels, rule edits and sign-ins. Other roles do not see the page in the
 menu and get the no-access state if they open the address; the backend refuses their requests.
 
+### Role-aware screens
+The server refuses what a role may not do; the screens show the same limits up front so a button is not offered and then refused.
+The lists are in `frontend/lib/permissions.ts`, mirrored from `backend/app/api/core/permissions.py`, and a test
+(`test_frontend_permissions_mirror.py`) fails if the two drift apart.
+- **Dashboard:** a **What you can do as <role>** card lists what the role can and cannot do. The **Upload Data** quick action is shown only to
+  roles that may import (administrator, reviewer).
+- **Case page:** roles that cannot change cases (the read-only reviewer) see a **View only** note and disabled fields and buttons on the
+  Overview (Assign to Me), Investigation, Corrective Action, Closure and Historical Replay tabs, and in the header. A role that can work a case but not close it (reviewer, process owner)
+  sees **Closing needs a verifier** on the Closure tab, with the closing fields disabled and the button reading **Needs a verifier**. Verifier and
+  administrator keep the full closing controls (the server still refuses closing a case you investigated).
+- **Demo sign-in panel:** each role card also says what the role cannot do.
+- What every role can read is unchanged (cases, suppliers, transactions, detection rules, access events); that is the v1.4 design.
+
 ### Welcome, tour and help (every page with the TRIS shell)
 - **Welcome.** After the first sign-in in a browser, the dashboard opens a **Welcome to TRIS** dialog: what TRIS does, a **What is new**
   list (for roles that see the Manufacturing section; other roles get a short line about cases), and a note that all data is synthetic.

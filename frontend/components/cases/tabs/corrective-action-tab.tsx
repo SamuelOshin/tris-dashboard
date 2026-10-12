@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input'
 import { RiskCase } from '@/lib/api'
 import { CorrectiveActionFormData } from '../types'
 import { isCorrectiveLocked } from '../case-workflow-guards'
+import { useCasePermissions, ViewOnlyNotice } from '../case-permissions'
 
 interface CorrectiveActionTabProps {
   caseData: RiskCase
@@ -44,7 +45,8 @@ export function CorrectiveActionTab({
   isActionLoading,
 }: CorrectiveActionTabProps) {
   const isClosed = caseData.status === 'Closed'
-  const isLocked = isCorrectiveLocked(caseData)
+  const { canWork } = useCasePermissions()
+  const isLocked = isCorrectiveLocked(caseData) || !canWork
 
   const {
     actionTaken,
@@ -92,6 +94,8 @@ export function CorrectiveActionTab({
           )}
         </div>
 
+        {!canWork && <ViewOnlyNotice />}
+
         {/* Lifecycle Stage Alert / Option A Locked State */}
         {(caseData.status === 'New' || caseData.status === 'Assigned') && (
           <div className="p-4 rounded-xl bg-slate-500/10 border border-border text-xs text-muted-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
@@ -136,7 +140,7 @@ export function CorrectiveActionTab({
             <Button
               size="sm"
               onClick={onSubmitForVerification}
-              disabled={isActionLoading || !actionTaken.trim()}
+              disabled={isActionLoading || !actionTaken.trim() || !canWork}
               className="text-xs bg-purple-600 hover:bg-purple-700 text-white shrink-0 font-medium"
             >
               Submit for Verification →

@@ -8,6 +8,7 @@ import { formatAmount } from '@/components/manufacturing/exposure/exposure-guard
 import { formatDate } from '@/components/manufacturing/material-cost/material-cost-guards'
 import { RiskCase } from '@/lib/api'
 import { getPriorityBadgeStyle } from '../case-workflow-guards'
+import { useCasePermissions } from '../case-permissions'
 import { categoryLabel, snapshotOf } from './material-case-guards'
 
 interface Props {
@@ -31,6 +32,7 @@ export function MaterialCaseOverview({ caseData, onAcceptCase, onViewTimeline }:
   const exposure = snapshot?.exposure
   const reasons = (snapshot?.factors ?? []).filter((f) => f.status === 'evaluated' && f.points > 0)
   const isClosed = caseData.status === 'Closed'
+  const { canWork } = useCasePermissions()
 
   return (
     <div className="grid grid-cols-1 gap-6 pt-2 lg:grid-cols-2">
@@ -51,11 +53,14 @@ export function MaterialCaseOverview({ caseData, onAcceptCase, onViewTimeline }:
           </Row>
           <Row label="Status">{caseData.status}</Row>
           <Row label="Owner">
-            {caseData.assigned_to || (
-              <button onClick={onAcceptCase} className="font-semibold text-primary hover:underline">
-                Assign to Me
-              </button>
-            )}
+            {caseData.assigned_to ||
+              (canWork ? (
+                <button onClick={onAcceptCase} className="font-semibold text-primary hover:underline">
+                  Assign to Me
+                </button>
+              ) : (
+                'Unassigned'
+              ))}
           </Row>
           <Row label="Main supplier">{caseData.supplier_id ?? 'Not recorded'}</Row>
           <Row label="Opened">{formatDate(caseData.created_at)}</Row>

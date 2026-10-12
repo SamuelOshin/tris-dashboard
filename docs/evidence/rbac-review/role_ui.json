@@ -1,0 +1,283 @@
+{
+ "admin": {
+  "dashboard_heading": "Welcome Back, System Administrator !",
+  "dashboard_subtitle": "System Administration \u00b7 Multi-Tenant Risk Intelligence \u00b7 Engine Metrics",
+  "dashboard_quick_actions": [
+   "Investigate",
+   "Investigate",
+   "Risk Cases",
+   "Risk Cases",
+   "Upload Data",
+   "Upload Data",
+   "Access Logs",
+   "Access Logs"
+  ],
+  "dashboard_sections": [
+   "Risk & Variance Overview",
+   "Material cost intelligence",
+   "Risk Movement & Volume Breakdown",
+   "Audited Invoices",
+   "Active Alerts"
+  ],
+  "sidebar": [
+   "Access Events",
+   "Administration",
+   "Case Studies / Results",
+   "Dashboard",
+   "Data Ingestion",
+   "ERP/BOM Data Mapping",
+   "Forecasting & Scenarios",
+   "Material Cost Intelligence",
+   "Risk Cases",
+   "Settings & Governance",
+   "Suppliers",
+   "TRIS\nRISK INTELLIGENCE",
+   "Validation"
+  ],
+  "ingestion_has_upload_control": true,
+  "ingestion_text": "Toggle Sidebar | TRIS Studio | Data Ingestion | Evaluation \u00b7 Synthetic data | All Systems Operational | 5 | SA |  | Monday, Oct 12, 2026 |  | Relational Ingestion Pipeline |  | Ingest multi-sheet enterprise Excel workbooks into the TRIS relational database schema with referential int",
+  "settings_tabs_or_headings": [
+   "Settings & Governance"
+  ],
+  "settings_has_user_admin": true,
+  "settings_switches": 7,
+  "settings_enabled_switches": 7,
+  "case_page_buttons": [
+   "Toggle Sidebar",
+   "5",
+   "SA",
+   "Investigate",
+   "Risk Cases",
+   "Upload Data",
+   "Access Logs",
+   "Overview",
+   "Investigation",
+   "Corrective Action",
+   "Closure",
+   "Historical Replay",
+   "History",
+   "Recurrence"
+  ]
+ },
+ "reviewer": {
+  "dashboard_heading": "Welcome Back, Risk Reviewer !",
+  "dashboard_subtitle": "Risk Review & Anomaly Investigation \u00b7 Operational Workflows \u00b7 Case Escalation",
+  "dashboard_quick_actions": [
+   "Investigate",
+   "Investigate",
+   "Risk Cases",
+   "Risk Cases",
+   "Upload Data",
+   "Upload Data",
+   "Access Logs",
+   "Access Logs"
+  ],
+  "dashboard_sections": [
+   "Risk & Variance Overview",
+   "Material cost intelligence",
+   "Risk Movement & Volume Breakdown",
+   "Audited Invoices"
+  ],
+  "sidebar": [
+   "Access Events",
+   "Case Studies / Results",
+   "Dashboard",
+   "Data Ingestion",
+   "ERP/BOM Data Mapping",
+   "Forecasting & Scenarios",
+   "Material Cost Intelligence",
+   "Risk Cases",
+   "Settings & Governance",
+   "Suppliers",
+   "TRIS\nRISK INTELLIGENCE",
+   "Validation"
+  ],
+  "ingestion_has_upload_control": true,
+  "ingestion_text": "Toggle Sidebar | TRIS Studio | Data Ingestion | Evaluation \u00b7 Synthetic data | All Systems Operational | 7 | RR |  | Monday, Oct 12, 2026 |  | Relational Ingestion Pipeline |  | Ingest multi-sheet enterprise Excel workbooks into the TRIS relational database schema with referential int",
+  "settings_tabs_or_headings": [
+   "Settings & Governance"
+  ],
+  "settings_has_user_admin": false,
+  "settings_switches": 7,
+  "settings_enabled_switches": 0,
+  "case_page_buttons": [
+   "Toggle Sidebar",
+   "7",
+   "RR",
+   "Investigate",
+   "Risk Cases",
+   "Upload Data",
+   "Access Logs",
+   "Overview",
+   "Investigation",
+   "Corrective Action",
+   "Closure",
+   "Historical Replay",
+   "History",
+   "Recurrence"
+  ]
+ },
+ "read_only_reviewer": {
+  "dashboard_heading": "Welcome Back, Read-Only Reviewer !",
+  "dashboard_subtitle": "Read-Only Audit & Inspection \u00b7 Dashboard Views \u00b7 Validation Reports",
+  "dashboard_quick_actions": [
+   "Investigate",
+   "Investigate",
+   "Risk Cases",
+   "Risk Cases",
+   "Upload Data",
+   "Upload Data",
+   "Access Logs",
+   "Access Logs"
+  ],
+  "dashboard_sections": [
+   "Risk & Variance Overview",
+   "Material cost intelligence",
+   "Risk Movement & Volume Breakdown",
+   "Audited Invoices",
+   "Active Alerts"
+  ],
+  "sidebar": [
+   "Access Events",
+   "Case Studies / Results",
+   "Dashboard",
+   "Data Ingestion",
+   "ERP/BOM Data Mapping",
+   "Forecasting & Scenarios",
+   "Material Cost Intelligence",
+   "Risk Cases",
+   "Settings & Governance",
+   "Suppliers",
+   "TRIS\nRISK INTELLIGENCE",
+   "Validation"
+  ],
+  "ingestion_has_upload_control": true,
+  "ingestion_text": "Toggle Sidebar | TRIS Studio | Data Ingestion | Evaluation \u00b7 Synthetic data | All Systems Operational | RR |  | Monday, Oct 12, 2026 |  | Relational Ingestion Pipeline |  | Ingest multi-sheet enterprise Excel workbooks into the TRIS relational database schema with referential integ",
+  "settings_tabs_or_headings": [
+   "Settings & Governance"
+  ],
+  "settings_has_user_admin": false,
+  "settings_switches": 7,
+  "settings_enabled_switches": 0,
+  "case_page_buttons": [
+   "Toggle Sidebar",
+   "RR",
+   "Investigate",
+   "Risk Cases",
+   "Upload Data",
+   "Access Logs",
+   "Overview",
+   "Investigation",
+   "Corrective Action",
+   "Closure",
+   "Historical Replay",
+   "History",
+   "Recurrence"
+  ]
+ },
+ "verifier": {
+  "dashboard_heading": "Welcome Back, Compliance Verifier !",
+  "dashboard_subtitle": "Independent Verification \u00b7 8-Field Closure Gates \u00b7 SOX Compliance Governance",
+  "dashboard_quick_actions": [
+   "Investigate",
+   "Investigate",
+   "Risk Cases",
+   "Risk Cases",
+   "Upload Data",
+   "Upload Data",
+   "Access Logs",
+   "Access Logs"
+  ],
+  "dashboard_sections": [
+   "Risk & Variance Overview",
+   "Risk Movement & Volume Breakdown",
+   "Audited Invoices",
+   "Active Alerts"
+  ],
+  "sidebar": [
+   "Access Events",
+   "Dashboard",
+   "Data Ingestion",
+   "Risk Cases",
+   "Settings & Governance",
+   "Suppliers",
+   "TRIS\nRISK INTELLIGENCE"
+  ],
+  "ingestion_has_upload_control": true,
+  "ingestion_text": "Toggle Sidebar | TRIS Studio | Data Ingestion | Evaluation \u00b7 Synthetic data | All Systems Operational | 5 | CV |  | Monday, Oct 12, 2026 |  | Relational Ingestion Pipeline |  | Ingest multi-sheet enterprise Excel workbooks into the TRIS relational database schema with referential int",
+  "settings_tabs_or_headings": [
+   "Settings & Governance"
+  ],
+  "settings_has_user_admin": false,
+  "settings_switches": 7,
+  "settings_enabled_switches": 0,
+  "case_page_buttons": [
+   "Toggle Sidebar",
+   "5",
+   "CV",
+   "Investigate",
+   "Risk Cases",
+   "Upload Data",
+   "Access Logs",
+   "Overview",
+   "Investigation",
+   "Corrective Action",
+   "Closure",
+   "Historical Replay",
+   "History",
+   "Recurrence"
+  ]
+ },
+ "process_owner": {
+  "dashboard_heading": "Welcome Back, Process Owner !",
+  "dashboard_subtitle": "Departmental Risk Oversight \u00b7 Corrective Action Execution \u00b7 Control Proposals",
+  "dashboard_quick_actions": [
+   "Investigate",
+   "Investigate",
+   "Risk Cases",
+   "Risk Cases",
+   "Upload Data",
+   "Upload Data",
+   "Access Logs",
+   "Access Logs"
+  ],
+  "dashboard_sections": [
+   "Risk & Variance Overview",
+   "Risk Movement & Volume Breakdown",
+   "Audited Invoices",
+   "Active Alerts"
+  ],
+  "sidebar": [
+   "Access Events",
+   "Dashboard",
+   "Data Ingestion",
+   "Risk Cases",
+   "Settings & Governance",
+   "Suppliers",
+   "TRIS\nRISK INTELLIGENCE"
+  ],
+  "ingestion_has_upload_control": true,
+  "ingestion_text": "Toggle Sidebar | TRIS Studio | Data Ingestion | Evaluation \u00b7 Synthetic data | All Systems Operational | PO |  | Monday, Oct 12, 2026 |  | Relational Ingestion Pipeline |  | Ingest multi-sheet enterprise Excel workbooks into the TRIS relational database schema with referential integ",
+  "settings_tabs_or_headings": [
+   "Settings & Governance"
+  ],
+  "settings_has_user_admin": false,
+  "settings_switches": 7,
+  "settings_enabled_switches": 0,
+  "case_page_buttons": [
+   "Toggle Sidebar",
+   "PO",
+   "Investigate",
+   "Risk Cases",
+   "Upload Data",
+   "Access Logs",
+   "Overview",
+   "Investigation",
+   "Corrective Action",
+   "Closure",
+   "Historical Replay",
+   "History",
+   "Recurrence"
+  ]
+ }
+}

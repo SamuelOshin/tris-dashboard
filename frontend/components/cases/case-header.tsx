@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft, UserCheck, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { RiskCase } from '@/lib/api'
+import { useCasePermissions } from './case-permissions'
 import { categoryLabel, isMaterialCase, snapshotOf } from './material/material-case-guards'
 import {
   getPriorityBadgeStyle,
@@ -31,6 +32,8 @@ export function CaseHeader({
   const isClosed = caseData.status === 'Closed'
   const priorityStyle = getPriorityBadgeStyle(caseData.priority)
   const statusStyle = getStatusBadgeStyle(caseData.status)
+
+  const { canWork } = useCasePermissions()
 
   const displayStatus = isClosed
     ? 'Closed'
@@ -76,7 +79,8 @@ export function CaseHeader({
           <Button
             size="sm"
             onClick={onAcceptCase}
-            disabled={isActionLoading}
+            disabled={isActionLoading || !canWork}
+            title={canWork ? undefined : 'Your role cannot change cases'}
             className="text-xs bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
           >
             <UserCheck className="w-3.5 h-3.5 mr-1" />
@@ -87,7 +91,8 @@ export function CaseHeader({
           <Button
             size="sm"
             onClick={onStartInvestigation}
-            disabled={isActionLoading}
+            disabled={isActionLoading || !canWork}
+            title={canWork ? undefined : 'Your role cannot change cases'}
             className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium"
           >
             Begin Investigation
@@ -98,7 +103,8 @@ export function CaseHeader({
             variant="outline"
             size="sm"
             onClick={onOpenReopenModal}
-            disabled={isActionLoading}
+            disabled={isActionLoading || !canWork}
+            title={canWork ? undefined : 'Your role cannot change cases'}
             className="text-xs"
           >
             <RotateCcw className="w-3.5 h-3.5 mr-1" />

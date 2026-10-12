@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { RiskCase } from '@/lib/api'
 import { getPriorityBadgeStyle } from '../case-workflow-guards'
+import { useCasePermissions } from '../case-permissions'
 
 interface OverviewTabProps {
   caseData: RiskCase
@@ -23,6 +24,7 @@ export function OverviewTab({
   onViewTimeline,
 }: OverviewTabProps) {
   const isClosed = caseData.status === 'Closed'
+  const { canWork } = useCasePermissions()
   const priorityBadgeColor = getPriorityBadgeStyle(caseData.priority)
 
   return (
@@ -70,14 +72,17 @@ export function OverviewTab({
               <div className="flex justify-between items-center pt-2">
                 <span className="text-muted-foreground font-medium">Owner</span>
                 <span className="font-mono font-medium text-foreground">
-                  {caseData.assigned_to || (
-                    <button
-                      onClick={onAcceptCase}
-                      className="text-primary hover:underline font-semibold"
-                    >
-                      Assign to Me
-                    </button>
-                  )}
+                  {caseData.assigned_to ||
+                    (canWork ? (
+                      <button
+                        onClick={onAcceptCase}
+                        className="text-primary hover:underline font-semibold"
+                      >
+                        Assign to Me
+                      </button>
+                    ) : (
+                      'Unassigned'
+                    ))}
                 </span>
               </div>
 

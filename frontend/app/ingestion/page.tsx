@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
+import { canImportData } from '@/lib/permissions'
 import { toast } from 'sonner'
 import {
   UploadCloud,
@@ -109,7 +110,7 @@ const WORKBOOK_SHEETS: SheetSpec[] = [
 
 export default function IngestionPage() {
   const { user } = useAuth()
-  const canUpload = ['admin', 'compliance', 'reviewer'].includes(user?.role?.toLowerCase() || '')
+  const canUpload = canImportData(user?.role)
 
   const [file, setFile] = useState<File | null>(null)
   const [duplicateStrategy, setDuplicateStrategy] = useState<'skip' | 'update' | 'fail'>('skip')

@@ -1,0 +1,192 @@
+{
+ "admin": {
+  "guide_title": "What you can do as System Administrator",
+  "guide_can": [
+   "You can:\nDo everything the other roles can",
+   "You can:\nManage users, detection rules, forecast models and risk weights",
+   "You can:\nRead the audit log",
+   "You cannot:\nClose a case you worked on yourself"
+  ],
+  "guide_cannot": [
+   "You cannot:\nClose a case you worked on yourself"
+  ],
+  "quick_actions": [
+   "Investigate",
+   "Risk Cases",
+   "Upload Data",
+   "Access Logs"
+  ],
+  "header_buttons": {},
+  "Investigation": {
+   "notes": [],
+   "actions": [
+    "enabled"
+   ]
+  },
+  "Corrective Action": {
+   "notes": [],
+   "actions": [
+    "enabled"
+   ]
+  },
+  "Closure": {
+   "notes": [],
+   "actions": []
+  }
+ },
+ "reviewer": {
+  "guide_title": "What you can do as Risk Reviewer",
+  "guide_can": [
+   "You can:\nImport data and run forecasts, scoring and validation",
+   "You can:\nOpen and investigate cases, and send them for verification",
+   "You cannot:\nClose a case (a verifier does that)",
+   "You cannot:\nManage users or rules, or open Administration"
+  ],
+  "guide_cannot": [
+   "You cannot:\nClose a case (a verifier does that)",
+   "You cannot:\nManage users or rules, or open Administration"
+  ],
+  "quick_actions": [
+   "Investigate",
+   "Risk Cases",
+   "Upload Data",
+   "Access Logs"
+  ],
+  "header_buttons": {},
+  "Investigation": {
+   "notes": [],
+   "actions": [
+    "enabled"
+   ]
+  },
+  "Corrective Action": {
+   "notes": [],
+   "actions": [
+    "enabled"
+   ]
+  },
+  "Closure": {
+   "notes": [
+    "Closing needs a verifier. You can take a case up to verification. Only"
+   ],
+   "actions": []
+  }
+ },
+ "read_only_reviewer": {
+  "guide_title": "What you can do as Read-Only Reviewer",
+  "guide_can": [
+   "You can:\nSee every dashboard, result, case and document",
+   "You can:\nTry a what-if scenario (nothing is saved)",
+   "You cannot:\nChange anything",
+   "You cannot:\nImport data, run forecasts or open cases"
+  ],
+  "guide_cannot": [
+   "You cannot:\nChange anything",
+   "You cannot:\nImport data, run forecasts or open cases"
+  ],
+  "quick_actions": [
+   "Investigate",
+   "Risk Cases",
+   "Access Logs"
+  ],
+  "header_buttons": {},
+  "Investigation": {
+   "notes": [
+    "View only. Your role can read this case but not change it."
+   ],
+   "actions": [
+    "disabled"
+   ]
+  },
+  "Corrective Action": {
+   "notes": [
+    "View only. Your role can read this case but not change it."
+   ],
+   "actions": [
+    "disabled"
+   ]
+  },
+  "Closure": {
+   "notes": [
+    "View only. Your role can read this case but not change it."
+   ],
+   "actions": []
+  }
+ },
+ "verifier": {
+  "guide_title": "What you can do as Compliance Verifier",
+  "guide_can": [
+   "You can:\nReview cases",
+   "You can:\nVerify and close cases you did not investigate",
+   "You cannot:\nImport data",
+   "You cannot:\nSee Manufacturing",
+   "You cannot:\nChange rules or users"
+  ],
+  "guide_cannot": [
+   "You cannot:\nImport data",
+   "You cannot:\nSee Manufacturing",
+   "You cannot:\nChange rules or users"
+  ],
+  "quick_actions": [
+   "Investigate",
+   "Risk Cases",
+   "Access Logs"
+  ],
+  "header_buttons": {},
+  "Investigation": {
+   "notes": [],
+   "actions": [
+    "enabled"
+   ]
+  },
+  "Corrective Action": {
+   "notes": [],
+   "actions": [
+    "enabled"
+   ]
+  },
+  "Closure": {
+   "notes": [],
+   "actions": []
+  }
+ },
+ "process_owner": {
+  "guide_title": "What you can do as Process Owner",
+  "guide_can": [
+   "You can:\nWork cases through to corrective action",
+   "You can:\nReview how a decision would have gone at the time",
+   "You cannot:\nImport data",
+   "You cannot:\nSee Manufacturing",
+   "You cannot:\nClose a case"
+  ],
+  "guide_cannot": [
+   "You cannot:\nImport data",
+   "You cannot:\nSee Manufacturing",
+   "You cannot:\nClose a case"
+  ],
+  "quick_actions": [
+   "Investigate",
+   "Risk Cases",
+   "Access Logs"
+  ],
+  "header_buttons": {},
+  "Investigation": {
+   "notes": [],
+   "actions": [
+    "enabled"
+   ]
+  },
+  "Corrective Action": {
+   "notes": [],
+   "actions": [
+    "enabled"
+   ]
+  },
+  "Closure": {
+   "notes": [
+    "Closing needs a verifier. You can take a case up to verification. Only"
+   ],
+   "actions": []
+  }
+ }
+}

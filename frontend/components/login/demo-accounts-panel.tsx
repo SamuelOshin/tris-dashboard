@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useAuth } from '@/lib/auth-context'
+import { roleSummary } from '@/lib/permissions'
 import { useDemoAccounts } from './hooks/use-demo-accounts'
 
 /**
@@ -53,6 +54,9 @@ export function DemoAccountsPanel({ redirectTo }: { redirectTo: string }) {
               </span>
               <span className="mt-0.5 block text-xs text-muted-foreground">
                 {account.description}
+              </span>
+              <span className="mt-1 block text-xs text-muted-foreground/80">
+                <span className="font-medium">Cannot:</span> {roleSummary(account.key).cannot.join('; ')}.
               </span>
             </button>
           </li>

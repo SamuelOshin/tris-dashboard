@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { RiskCase } from '@/lib/api'
 import { InvestigationFormData } from '../types'
 import { isInvestigationLocked } from '../case-workflow-guards'
+import { useCasePermissions, ViewOnlyNotice } from '../case-permissions'
 
 interface InvestigationTabProps {
   caseData: RiskCase
@@ -38,7 +39,8 @@ export function InvestigationTab({
   isActionLoading,
 }: InvestigationTabProps) {
   const isClosed = caseData.status === 'Closed'
-  const isLocked = isInvestigationLocked(caseData)
+  const { canWork } = useCasePermissions()
+  const isLocked = isInvestigationLocked(caseData) || !canWork
 
   const {
     evidenceReviewed,
@@ -84,6 +86,8 @@ export function InvestigationTab({
           )}
         </div>
 
+        {!canWork && <ViewOnlyNotice />}
+
         {/* Lifecycle Stage Alert / Lock State */}
         {caseData.status === 'New' && (
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
@@ -99,7 +103,7 @@ export function InvestigationTab({
             <Button
               size="sm"
               onClick={onAcceptCase}
-              disabled={isActionLoading}
+              disabled={isActionLoading || !canWork}
               className="text-xs bg-amber-600 hover:bg-amber-700 text-white shrink-0 font-semibold"
             >
               <UserCheck className="w-3.5 h-3.5 mr-1" />

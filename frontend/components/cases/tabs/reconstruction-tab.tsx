@@ -5,6 +5,7 @@ import { RotateCcw, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { RiskCase } from '@/lib/api'
+import { useCasePermissions, ViewOnlyNotice } from '../case-permissions'
 import { useReconstructionWorkspace } from '../hooks/use-reconstruction-workspace'
 import { EmptyReconstructionState } from '../reconstruction/empty-reconstruction-state'
 import { HistoricalStatePanel } from '../reconstruction/historical-state-panel'
@@ -27,6 +28,7 @@ export function ReconstructionTab({ caseData }: ReconstructionTabProps) {
     transactionId,
     actions,
   } = useReconstructionWorkspace(caseData)
+  const { canRunHistory } = useCasePermissions()
 
   if (loading && !reconstruction) {
     return (
@@ -84,6 +86,10 @@ export function ReconstructionTab({ caseData }: ReconstructionTabProps) {
         </div>
       </div>
 
+      {!canRunHistory && (
+        <ViewOnlyNotice>Your role can read this but not run a replay simulation.</ViewOnlyNotice>
+      )}
+
       {/* Main Content Area */}
       {!reconstruction ? (
         <EmptyReconstructionState
@@ -104,6 +110,7 @@ export function ReconstructionTab({ caseData }: ReconstructionTabProps) {
             onSelectControlId={setSelectedControlId}
             onRunReplay={actions.runReplay}
             isReplayLoading={replayLoading}
+            canRun={canRunHistory}
           />
         </div>
       )}

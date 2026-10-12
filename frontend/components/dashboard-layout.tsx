@@ -1,5 +1,6 @@
 'use client'
 
+import { canImportData } from '@/lib/permissions'
 import { HelpMenu } from '@/components/onboarding/help-menu'
 import { OnboardingProvider } from '@/components/onboarding/onboarding-provider'
 import { SHOW_EVALUATION_LABEL } from '@/lib/environment'
@@ -89,6 +90,7 @@ const coreNavigation = [
 
 
 function DefaultQuickActions() {
+  const { user } = useAuth()
   return (
     <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 shrink-0">
       <Link href="/cases/TEST-CASE-001">
@@ -110,16 +112,18 @@ function DefaultQuickActions() {
           Risk Cases
         </Button>
       </Link>
-      <Link href="/ingestion">
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8.5 px-3.5 rounded-xl border-0 bg-card shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:bg-muted/60 text-xs font-medium flex items-center gap-1.5 transition-all"
-        >
-          <Database className="w-3.5 h-3.5 text-muted-foreground" />
-          Upload Data
-        </Button>
-      </Link>
+      {canImportData(user?.role) && (
+        <Link href="/ingestion">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8.5 px-3.5 rounded-xl border-0 bg-card shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:bg-muted/60 text-xs font-medium flex items-center gap-1.5 transition-all"
+          >
+            <Database className="w-3.5 h-3.5 text-muted-foreground" />
+            Upload Data
+          </Button>
+        </Link>
+      )}
       <Link href="/zero-trust">
         <Button
           variant="outline"

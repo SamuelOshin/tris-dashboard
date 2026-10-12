@@ -9,6 +9,7 @@ import { useLedgerTelemetry } from '@/components/overview/hooks/use-ledger-telem
 import { HeroTelemetryCard } from '@/components/overview/tabs/hero-telemetry-card'
 import { RiskVolumeBreakdown } from '@/components/overview/tabs/risk-volume-breakdown'
 import { InvoiceLedgerTable } from '@/components/overview/tabs/invoice-ledger-table'
+import { RoleGuide } from '@/components/overview/role-guide'
 import { ManufacturingSummary } from '@/components/manufacturing/dashboard/manufacturing-summary'
 
 /**
@@ -62,6 +63,8 @@ export function OverviewDashboard() {
           onRetry={data.refetchIngest}
         />
       )}
+
+      <RoleGuide />
 
       <HeroTelemetryCard
         summary={{
