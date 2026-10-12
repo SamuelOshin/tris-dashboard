@@ -1,0 +1,42 @@
+{
+ "loading": {
+  "panel": {
+   "top": 485,
+   "height": 489
+  },
+  "signInTop": 417,
+  "skeletons": 5,
+  "busy": "true",
+  "realCards": 0,
+  "docHeight": 1095
+ },
+ "ready": {
+  "panel": {
+   "top": 485,
+   "height": 488
+  },
+  "signInTop": 417,
+  "skeletons": 0,
+  "busy": "false",
+  "realCards": 5,
+  "docHeight": 1094
+ },
+ "off_loading": {
+  "panel": {
+   "top": 485,
+   "height": 489
+  },
+  "signInTop": 417,
+  "skeletons": 5,
+  "busy": "true",
+  "realCards": 0,
+  "docHeight": 1095
+ },
+ "off_after": {
+  "section_count": 0
+ },
+ "error_after": {
+  "section_count": 0,
+  "form_visible": true
+ }
+}

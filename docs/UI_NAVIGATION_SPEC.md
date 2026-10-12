@@ -128,8 +128,10 @@ The lists are in `frontend/lib/permissions.ts`, mirrored from `backend/app/api/c
 ### Sign-in page — `/login`
 Email, password, show/hide, Remember me, Forgot password, the evaluation-environment label. On a demonstration deployment
 (`DEMO_LOGIN_ENABLED=true`) a **Demo environment: sign in as** panel offers one button per role with a line on what the
-role can do; the user menu then has **Switch demo role**, and the Administration page warns that changes are shared. With the
-switch off, none of these appears. Five failed sign-ins for the same typed identifier (a username and an email are counted separately) pause sign-in for that identifier for 15 minutes ("Too many attempts"); a successful sign-in does not reset the count.
+role can do; the user menu then has **Switch demo role**, and the Administration page warns that changes are shared. While the server's
+answer is on its way the panel shows five pulsing placeholder cards the size of the real ones, so the form is usable at once and
+nothing moves when the roles arrive. With the switch off, or if the server cannot be reached, the placeholders go away and none
+of these appears. Five failed sign-ins for the same typed identifier (a username and an email are counted separately) pause sign-in for that identifier for 15 minutes ("Too many attempts"); a successful sign-in does not reset the count.
 
 ### Dashboard — `/` (manufacturing summary)
 Below the existing risk overview, for admin, reviewer and read-only reviewer only (other roles see the dashboard as
